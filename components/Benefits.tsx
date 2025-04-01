@@ -1,11 +1,11 @@
-import { FiBrain, FiActivity, FiHeart, FiUsers } from 'react-icons/fi'
+import { FiBookOpen, FiActivity, FiHeart, FiUsers } from 'react-icons/fi'
 
 const benefits = [
   {
     id: 1,
     title: 'Improves Focus',
     description: 'Enhances concentration and mental clarity in students',
-    icon: FiBrain
+    icon: FiBookOpen
   },
   {
     id: 2,
