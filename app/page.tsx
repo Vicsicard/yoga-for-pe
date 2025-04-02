@@ -12,29 +12,26 @@ import { FiUsers, FiAward, FiHeart, FiBook, FiCheckCircle, FiArrowRight } from '
 const featuredPrograms = [
   {
     id: 1,
-    title: 'Elementary School Yoga Curriculum',
-    description: 'A complete 36-week curriculum with age-appropriate poses, games, and mindfulness activities for K-5 students.',
-    price: '$89.99',
+    title: 'Meditation',
+    description: 'Discover the power of mindfulness and meditation techniques designed to help students reduce stress, improve focus, and develop emotional awareness.',
     image: '/images/elementary-yoga (2).jpg',
-    url: '/shop/elementary-curriculum',
+    url: '/videos/meditation',
     featured: true
   },
   {
     id: 2,
-    title: 'Middle School Yoga Integration',
-    description: 'Specialized program designed for adolescent development with focus on stress reduction and self-regulation.',
-    price: '$79.99',
+    title: 'Yoga for PE',
+    description: 'A comprehensive approach to integrating yoga into physical education classes, featuring adaptable poses and sequences suitable for all skill levels.',
     image: '/images/middle-school-yoga (2).JPG',
-    url: '/shop/middle-school-curriculum',
+    url: '/videos/yoga-for-pe',
     featured: true
   },
   {
     id: 3,
-    title: 'High School Mindful Movement',
-    description: 'Advanced curriculum connecting yoga practices to sports performance, mental health, and academic success.',
-    price: '$89.99',
+    title: 'Athletic Yoga',
+    description: 'Enhance athletic performance through specialized yoga sequences that improve flexibility, strength, balance, and mental focus for sports excellence.',
     image: '/images/high-school-yoga (2).JPG',
-    url: '/shop/high-school-curriculum',
+    url: '/videos/athletic-performance',
     featured: true
   }
 ]
@@ -144,11 +141,6 @@ export default function Home() {
                   alt={program.title}
                   className="w-full h-full object-cover"
                 />
-                {program.price && (
-                  <div className="absolute top-4 left-4 bg-primary-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                    {program.price}
-                  </div>
-                )}
               </CardImage>
               <CardContent>
                 <CardTitle>{program.title}</CardTitle>
