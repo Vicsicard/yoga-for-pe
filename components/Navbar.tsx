@@ -42,10 +42,10 @@ export function Navbar() {
 
           {/* Sign In/Sign Up buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button href="/login" variant="outline" size="sm">
+            <Button href="/videos" variant="outline" size="sm">
               Sign In
             </Button>
-            <Button href="/signup" size="sm">
+            <Button href="/videos" size="sm">
               Sign Up
             </Button>
           </div>

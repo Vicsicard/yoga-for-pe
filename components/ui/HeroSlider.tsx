@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react"
 import { cn } from "../../lib/utils"
 import { Container } from "./Container"
 import { Button } from "./Button"
+import Image from "next/image"
 
 // Define the image paths for the slider
 const sliderImages = [
@@ -51,28 +52,8 @@ export function HeroSlider({
   buttons,
   ...props
 }: HeroSliderProps) {
-  const [currentIndex, setCurrentIndex] = useState(0)
-  
-  // Preload all images to prevent flickering
-  useEffect(() => {
-    // Preload all images
-    sliderImages.forEach((src) => {
-      const img = new Image()
-      img.src = src
-    })
-  }, [])
-
-  // Handle automatic image transitions
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setCurrentIndex((prevIndex) => 
-        prevIndex === sliderImages.length - 1 ? 0 : prevIndex + 1
-      )
-    }, transitionInterval)
-
-    return () => clearInterval(intervalId)
-  }, [transitionInterval])
-
+  // Use a single static background image instead of a slider for reliability
+  // This ensures no flickering or gray screens in production
   return (
     <section
       className={cn(
@@ -84,18 +65,13 @@ export function HeroSlider({
       )}
       {...props}
     >
-      {/* Background Images */}
-      {sliderImages.map((image, index) => (
-        <div 
-          key={index}
-          className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
-          style={{
-            backgroundImage: `url(${image})`,
-            opacity: index === currentIndex ? 1 : 0,
-            zIndex: index === currentIndex ? 1 : 0
-          }}
-        />
-      ))}
+      {/* Static Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center"
+        style={{
+          backgroundImage: `url('/images/hero-bg.jpg')`,
+        }}
+      />
       
       {/* Overlay */}
       <div 
