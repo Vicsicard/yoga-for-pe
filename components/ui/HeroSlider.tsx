@@ -1,23 +1,9 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React from "react"
 import { cn } from "../../lib/utils"
 import { Container } from "./Container"
 import { Button } from "./Button"
-import Image from "next/image"
-
-// Define the image paths for the slider
-const sliderImages = [
-  '/slider-images/Beach Yoga.png',
-  '/slider-images/Believe.png',
-  '/slider-images/Human Yoga.png',
-  '/slider-images/India Hands.png',
-  '/slider-images/Jumping.png',
-  '/slider-images/3 leg Downdog.png',
-  '/slider-images/Mandala Star.png',
-  '/slider-images/V Teaching at SHAPE.png',
-  '/slider-images/Bubbles.png'
-]
 
 interface HeroSliderProps extends React.HTMLAttributes<HTMLElement> {
   className?: string
@@ -52,8 +38,6 @@ export function HeroSlider({
   buttons,
   ...props
 }: HeroSliderProps) {
-  // Use a single static background image instead of a slider for reliability
-  // This ensures no flickering or gray screens in production
   return (
     <section
       className={cn(
@@ -65,18 +49,25 @@ export function HeroSlider({
       )}
       {...props}
     >
-      {/* Static Background Image */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: `url('/images/hero-bg.jpg')`,
-        }}
-      />
+      {/* Hero Slider with CSS Animation */}
+      <div className="hero-slider absolute inset-0 w-full h-full">
+        <div className="slides">
+          <div className="slide" style={{ backgroundImage: "url('/slider-images/Beach Yoga.png')" }}></div>
+          <div className="slide" style={{ backgroundImage: "url('/slider-images/Believe.png')" }}></div>
+          <div className="slide" style={{ backgroundImage: "url('/slider-images/Human Yoga.png')" }}></div>
+          <div className="slide" style={{ backgroundImage: "url('/slider-images/India Hands.png')" }}></div>
+          <div className="slide" style={{ backgroundImage: "url('/slider-images/Jumping.png')" }}></div>
+          <div className="slide" style={{ backgroundImage: "url('/slider-images/3 leg Downdog.png')" }}></div>
+          <div className="slide" style={{ backgroundImage: "url('/slider-images/Mandala Star.png')" }}></div>
+          <div className="slide" style={{ backgroundImage: "url('/slider-images/V Teaching at SHAPE.png')" }}></div>
+          <div className="slide" style={{ backgroundImage: "url('/slider-images/Bubbles.png')" }}></div>
+        </div>
+      </div>
       
       {/* Overlay */}
       <div 
         className={cn(
-          "absolute inset-0",
+          "absolute inset-0 z-10",
           overlayOpacity === "medium" && "bg-black/50",
           overlayOpacity === "light" && "bg-black/30",
           overlayOpacity === "dark" && "bg-black/70"
@@ -84,7 +75,7 @@ export function HeroSlider({
       />
 
       {/* Content */}
-      <Container className="relative z-10">
+      <Container className="relative z-20">
         <div 
           className={cn(
             "max-w-3xl",
@@ -144,6 +135,52 @@ export function HeroSlider({
           )}
         </div>
       </Container>
+
+      {/* CSS for the slider animation */}
+      <style jsx>{`
+        .hero-slider {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+        }
+        
+        .slides {
+          position: absolute;
+          width: 900%;
+          height: 100%;
+          display: flex;
+          animation: slideshow 45s linear infinite;
+        }
+        
+        .slide {
+          width: 11.11%;
+          height: 100%;
+          background-size: cover;
+          background-position: center;
+        }
+        
+        @keyframes slideshow {
+          0% { transform: translateX(0); }
+          11.11% { transform: translateX(0); }
+          12.5% { transform: translateX(-11.11%); }
+          22.22% { transform: translateX(-11.11%); }
+          23.61% { transform: translateX(-22.22%); }
+          33.33% { transform: translateX(-22.22%); }
+          34.72% { transform: translateX(-33.33%); }
+          44.44% { transform: translateX(-33.33%); }
+          45.83% { transform: translateX(-44.44%); }
+          55.55% { transform: translateX(-44.44%); }
+          56.94% { transform: translateX(-55.55%); }
+          66.66% { transform: translateX(-55.55%); }
+          68.05% { transform: translateX(-66.66%); }
+          77.77% { transform: translateX(-66.66%); }
+          79.16% { transform: translateX(-77.77%); }
+          88.88% { transform: translateX(-77.77%); }
+          90.27% { transform: translateX(-88.88%); }
+          100% { transform: translateX(-88.88%); }
+        }
+      `}</style>
     </section>
   )
 }
