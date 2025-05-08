@@ -111,11 +111,11 @@ export default function Home() {
         buttons={{
           primary: {
             text: "View Our Programs",
-            href: "/shop"
+            href: "/videos"
           },
           secondary: {
             text: "Watch Demo",
-            href: "/videos/demo"
+            href: "/videos"
           }
         }}
         size="lg"
@@ -156,7 +156,7 @@ export default function Home() {
         </div>
         
         <div className="text-center mt-10">
-          <Button href="/shop" variant="outline">
+          <Button href="/videos" variant="outline">
             View All Programs
           </Button>
         </div>
@@ -228,10 +228,10 @@ export default function Home() {
               Join thousands of schools already enhancing their physical education programs with yoga.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button href="/shop" size="lg">
+              <Button href="/videos" size="lg">
                 Browse Programs
               </Button>
-              <Button href="/contact" variant="light" size="lg">
+              <Button href="/videos" variant="light" size="lg">
                 Contact Us
               </Button>
             </div>

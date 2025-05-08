@@ -53,6 +53,15 @@ export function HeroSlider({
 }: HeroSliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   
+  // Preload all images to prevent flickering
+  useEffect(() => {
+    // Preload all images
+    sliderImages.forEach((src) => {
+      const img = new Image()
+      img.src = src
+    })
+  }, [])
+
   // Handle automatic image transitions
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -75,14 +84,18 @@ export function HeroSlider({
       )}
       {...props}
     >
-      {/* Background Image */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: `url(${sliderImages[currentIndex]})`,
-          transition: "background-image 0.5s ease-in-out"
-        }}
-      />
+      {/* Background Images */}
+      {sliderImages.map((image, index) => (
+        <div 
+          key={index}
+          className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
+          style={{
+            backgroundImage: `url(${image})`,
+            opacity: index === currentIndex ? 1 : 0,
+            zIndex: index === currentIndex ? 1 : 0
+          }}
+        />
+      ))}
       
       {/* Overlay */}
       <div 
