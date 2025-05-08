@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { Hero } from '../components/ui/Hero'
+import { HeroSlider } from '../components/ui/HeroSlider'
 import { Section, SectionHeader } from '../components/ui/Section'
 import { Button } from '../components/ui/Button'
 import { Card, CardImage, CardContent, CardTitle, CardDescription, CardFooter } from '../components/ui/Card'
@@ -12,14 +12,6 @@ import { FiUsers, FiAward, FiHeart, FiBook, FiCheckCircle, FiArrowRight } from '
 const featuredPrograms = [
   {
     id: 1,
-    title: 'Meditation',
-    description: 'Discover the power of mindfulness and meditation techniques designed to help students reduce stress, improve focus, and develop emotional awareness.',
-    image: '/images/elementary-yoga (2).jpg',
-    url: '/videos/meditation',
-    featured: true
-  },
-  {
-    id: 2,
     title: 'Yoga for PE',
     description: 'A comprehensive approach to integrating yoga into physical education classes, featuring adaptable poses and sequences suitable for all skill levels.',
     image: '/images/middle-school-yoga (2).JPG',
@@ -27,11 +19,19 @@ const featuredPrograms = [
     featured: true
   },
   {
+    id: 2,
+    title: 'Relaxation',
+    description: 'Teach students effective relaxation techniques to manage stress, improve focus, and develop self-regulation skills that benefit both academic and physical performance.',
+    image: '/images/relaxation-yoga.jpg',
+    url: '/videos/relaxation',
+    featured: true
+  },
+  {
     id: 3,
-    title: 'Athletic Yoga',
-    description: 'Enhance athletic performance through specialized yoga sequences that improve flexibility, strength, balance, and mental focus for sports excellence.',
-    image: '/images/high-school-yoga (2).JPG',
-    url: '/videos/athletic-performance',
+    title: 'Meditation',
+    description: 'Discover the power of mindfulness and meditation techniques designed to help students reduce stress, improve focus, and develop emotional awareness.',
+    image: '/images/elementary-yoga (2).jpg',
+    url: '/videos/meditation',
     featured: true
   }
 ]
@@ -104,8 +104,8 @@ const testimonials = [
 export default function Home() {
   return (
     <main>
-      {/* Hero Section */}
-      <Hero
+      {/* Hero Slider Section */}
+      <HeroSlider
         title="Transform Your PE Program with Yoga"
         description="Research-backed yoga resources designed specifically for physical education classes. Enhance focus, improve wellness, and bring mindfulness to your PE curriculum."
         buttons={{
@@ -120,8 +120,8 @@ export default function Home() {
         }}
         size="lg"
         align="center"
-        backgroundImage="https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=1920&auto=format&fit=crop"
         overlayOpacity="medium"
+        transitionInterval={4000} // Transition every 4 seconds
       />
       
       {/* Featured Programs */}
