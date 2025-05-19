@@ -1,8 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { Navbar } from '../../components/Navbar'
-import { Footer } from '../../components/Footer'
 import { FiSearch, FiFilter, FiLock, FiPlay } from 'react-icons/fi'
 
 // Mock data for videos - in a real app, this would come from Supabase
@@ -105,14 +103,12 @@ export default function VideosPage() {
   
   return (
     <>
-      <Navbar />
-      
       <main>
         {/* Hero Banner */}
         <section className="bg-gradient-to-r from-primary-800 to-primary-900 text-white py-12">
           <div className="container">
             <h1 className="text-3xl md:text-4xl font-bold mb-4">Yoga Videos for PE Classes</h1>
-            <p className="text-xl max-w-2xl">Discover our collection of instructional videos designed to help you integrate yoga into your physical education curriculum.</p>
+            <p className="text-xl max-w-2xl text-white font-medium">Discover our collection of instructional videos designed to help you integrate yoga into your physical education curriculum.</p>
           </div>
         </section>
         
@@ -266,8 +262,6 @@ export default function VideosPage() {
           </div>
         </div>
       )}
-      
-      <Footer />
     </>
   )
 }

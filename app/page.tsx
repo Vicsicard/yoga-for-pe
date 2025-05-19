@@ -2,6 +2,7 @@ import Image from 'next/image'
 import { Hero } from '../components/ui/Hero'
 import { Section, SectionHeader } from '../components/ui/Section'
 import { Button } from '../components/ui/Button'
+import { HeroSlider, HeroSliderContent } from '../components/ui/HeroSlider'
 import { Card, CardImage, CardContent, CardTitle, CardDescription, CardFooter } from '../components/ui/Card'
 import { Container } from '../components/ui/Container'
 import { TestimonialCard, TestimonialGrid } from '../components/ui/Testimonial'
@@ -126,25 +127,20 @@ const missionContent = {
 export default function Home() {
   return (
     <main>
-      {/* Hero Section */}
-      <Hero
-        title="Bend the Body, Brighten the Mind, Bloom the Soul"
-        description="Research-backed yoga resources designed specifically for physical education classes, educators, and lifelong learners. Enhance focus, improve wellness, and bring mindfulness to your curriculum and life."
-        buttons={{
-          primary: {
-            text: "View Our Programs",
-            href: "/shop"
-          },
-          secondary: {
-            text: "Watch Demo",
-            href: "/videos/demo"
-          }
-        }}
-        size="lg"
-        align="center"
-        backgroundImage="https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=1920&auto=format&fit=crop"
-        overlayOpacity="medium"
-      />
+      {/* Hero Section with Image Slider */}
+      <HeroSlider height="h-[600px] md:h-[700px]" overlayOpacity="medium" autoplayInterval={6000}>
+        <HeroSliderContent>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 drop-shadow-md">
+            Bend the Body, Brighten the Mind, Bloom the Soul
+          </h1>
+          <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto drop-shadow-md text-white font-medium">
+            Research-backed yoga resources designed specifically for physical education classes, educators, and lifelong learners. Enhance focus, improve wellness, and bring mindfulness to your curriculum and life.
+          </p>
+          <Button href="/videos" size="lg" className="text-lg px-8 py-3">
+            View Our Videos
+          </Button>
+        </HeroSliderContent>
+      </HeroSlider>
       
       {/* Mission Section */}
       <Section spacing="lg">
@@ -292,8 +288,8 @@ export default function Home() {
               Join thousands of schools already enhancing their physical education programs with yoga.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button href="/shop" size="lg">
-                Browse Programs
+              <Button href="/videos" size="lg">
+                View our Videos
               </Button>
               <Button href="/contact" variant="light" size="lg">
                 Contact Us

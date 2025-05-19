@@ -46,55 +46,11 @@ export function Footer() {
                   Videos
                 </Link>
               </li>
-              <li>
-                <Link href="/blogs" className="text-gray-400 hover:text-white transition-colors">
-                  Blogs
-                </Link>
-              </li>
-              <li>
-                <Link href="/merchandise" className="text-gray-400 hover:text-white transition-colors">
-                  Merchandise
-                </Link>
-              </li>
-              <li>
-                <Link href="/travel" className="text-gray-400 hover:text-white transition-colors">
-                  Travel
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="text-gray-400 hover:text-white transition-colors">
-                  About
-                </Link>
-              </li>
             </ul>
           </div>
           
-          {/* Resources */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Resources</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/pricing" className="text-gray-400 hover:text-white transition-colors">
-                  Pricing
-                </Link>
-              </li>
-              <li>
-                <Link href="/faq" className="text-gray-400 hover:text-white transition-colors">
-                  FAQs
-                </Link>
-              </li>
-              <li>
-                <Link href="/testimonials" className="text-gray-400 hover:text-white transition-colors">
-                  Testimonials
-                </Link>
-              </li>
-              <li>
-                <Link href="/support" className="text-gray-400 hover:text-white transition-colors">
-                  Support
-                </Link>
-              </li>
-            </ul>
-          </div>
+          {/* Footer Spacer */}
+          <div></div>
           
           {/* Contact */}
           <div>
