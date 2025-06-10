@@ -3,21 +3,20 @@ import { FiMail, FiPhone, FiMapPin, FiUser, FiMessageSquare } from 'react-icons/
 import { Container } from '../../components/ui/Container';
 import { Section, SectionHeader } from '../../components/ui/Section';
 import { Button } from '../../components/ui/Button';
+import { HeroSlider, HeroSliderContent } from '../../components/ui/HeroSlider';
 
 export default function ContactPage() {
   return (
     <main>
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white py-20">
-        <Container>
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">Get in Touch</h1>
-            <p className="text-xl mb-8">
-              Have questions about bringing yoga to your PE program? We're here to help you bend, brighten, and bloom.
-            </p>
-          </div>
-        </Container>
-      </div>
+      {/* Hero Section with Image Slider */}
+      <HeroSlider height="h-[400px] md:h-[500px]" overlayOpacity="medium" autoplayInterval={6000}>
+        <HeroSliderContent>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 drop-shadow-md">Get in Touch</h1>
+          <p className="text-xl mb-8 max-w-3xl mx-auto drop-shadow-md text-white font-medium">
+            Have questions about bringing yoga to your PE program? We're here to help you bend, brighten, and bloom.
+          </p>
+        </HeroSliderContent>
+      </HeroSlider>
 
       {/* Contact Form Section */}
       <Section spacing="xl">
