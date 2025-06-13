@@ -25,7 +25,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={montserrat.variable}>
-      <ClerkProvider>
+      <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
         <body className="min-h-screen bg-gray-50 font-sans flex flex-col">
           <ErrorBoundary>
             <Navbar />
