@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import VimeoPlayer from '@/components/VimeoPlayer';
+import VimeoPlayer from '../../components/VimeoPlayer';
 import { FiLock } from 'react-icons/fi';
 
 export default function VimeoDemo() {
