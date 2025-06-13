@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { FiMenu, FiX, FiChevronDown } from 'react-icons/fi'
 import { Button } from './ui/Button'
+import { SignInButton, SignUpButton, UserButton, SignedIn, SignedOut } from '@clerk/nextjs'
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -40,14 +41,18 @@ export function Navbar() {
             </Link>
           </nav>
 
-          {/* Sign In/Sign Up buttons */}
+          {/* Authentication */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button href="/login" variant="outline" size="sm">
-              Sign In
-            </Button>
-            <Button href="/signup" size="sm">
-              Sign Up
-            </Button>
+            <Link href="/sign-in" className="text-gray-700 hover:text-primary-600 transition-colors">
+              <Button variant="outline" size="sm">
+                Sign In
+              </Button>
+            </Link>
+            <Link href="/sign-up" className="text-gray-700 hover:text-primary-600 transition-colors">
+              <Button size="sm">
+                Sign Up
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile menu button */}
@@ -77,12 +82,16 @@ export function Navbar() {
               </Link>
               
               <div className="pt-4 border-t border-gray-100 flex flex-col space-y-2">
-                <Button href="/login" variant="outline" fullWidth>
-                  Sign In
-                </Button>
-                <Button href="/signup" fullWidth>
-                  Sign Up
-                </Button>
+                <Link href="/sign-in" className="text-gray-700 hover:text-primary-600 transition-colors">
+                  <Button variant="outline" fullWidth>
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/sign-up" className="text-gray-700 hover:text-primary-600 transition-colors">
+                  <Button fullWidth>
+                    Sign Up
+                  </Button>
+                </Link>
               </div>
             </nav>
           </div>

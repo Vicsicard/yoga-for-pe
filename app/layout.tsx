@@ -4,6 +4,8 @@ import { Montserrat } from 'next/font/google'
 import './globals.css'
 import { Navbar } from '../components/Navbar'
 import { Footer } from '../components/Footer'
+import { ErrorBoundary } from '../components/ErrorBoundary'
+import { ClerkProvider } from '@clerk/nextjs'
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -23,13 +25,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={montserrat.variable}>
-      <body className="min-h-screen bg-gray-50 font-sans flex flex-col">
-        <Navbar />
-        <main className="flex-grow">
-          {children}
-        </main>
-        <Footer />
-      </body>
+      <ClerkProvider>
+        <body className="min-h-screen bg-gray-50 font-sans flex flex-col">
+          <ErrorBoundary>
+            <Navbar />
+            <main className="flex-grow">
+              {children}
+            </main>
+            <Footer />
+          </ErrorBoundary>
+        </body>
+      </ClerkProvider>
     </html>
-  )
+  );
 }
