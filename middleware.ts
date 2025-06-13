@@ -1,24 +1,14 @@
-import { authMiddleware } from "@clerk/nextjs/server";
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export default authMiddleware({
-  // Routes that can be accessed while signed out
-  publicRoutes: [
-    "/", 
-    "/contact", 
-    "/videos", 
-    "/about", 
-    "/api/(.*)",
-    "/favicon.ico",
-    "/images/(.*)",
-    "/vimeo-standalone",
-    "/vimeo-demo"
-  ],
-  // Routes that can always be accessed, and have no authentication information
-  ignoredRoutes: ["/api/webhook/(.*)"],
-  debug: process.env.NODE_ENV === 'development'
-});
+// This function can be marked `async` if using `await` inside
+export function middleware(request: NextRequest) {
+  // For now, we're just passing through all requests without authentication
+  // This is temporary to isolate the Vercel deployment issue
+  return NextResponse.next();
+}
 
-// Stop Middleware running on static files
+// See "Matching Paths" below to learn more
 export const config = {
   matcher: [
     /*
