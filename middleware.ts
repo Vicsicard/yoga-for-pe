@@ -14,14 +14,20 @@ export default authMiddleware({
     "/vimeo-demo"
   ],
   // Routes that can always be accessed, and have no authentication information
-  ignoredRoutes: ["/api/webhook/(.*)"]
+  ignoredRoutes: ["/api/webhook/(.*)"],
+  debug: process.env.NODE_ENV === 'development'
 });
 
+// Stop Middleware running on static files
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
-    "/(api|trpc)(.*)",
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public folder
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };
