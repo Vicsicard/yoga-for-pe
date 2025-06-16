@@ -9,7 +9,7 @@ export default function ContactPage() {
   return (
     <main>
       {/* Hero Section with Image Slider */}
-      <HeroSlider height="h-[400px] md:h-[500px]" overlayOpacity="medium" autoplayInterval={6000}>
+      <HeroSlider height="h-[400px] md:h-[500px]" overlayOpacity="medium" autoplayInterval={6000} imageSet="contact">
         <HeroSliderContent>
           <h1 className="text-4xl md:text-5xl font-bold mb-6 drop-shadow-md">Get in Touch</h1>
           <p className="text-xl mb-8 max-w-3xl mx-auto drop-shadow-md text-white font-medium">

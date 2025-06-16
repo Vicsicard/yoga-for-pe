@@ -39,6 +39,29 @@ const sliderImages = [
   }
 ]
 
+const contactSliderImages = [
+  {
+    src: '/slider-images/contact slider/Believe.JPG',
+    alt: 'Believe',
+  },
+  {
+    src: '/slider-images/contact slider/IMG_3042.JPG',
+    alt: 'Yoga Practice',
+  },
+  {
+    src: '/slider-images/contact slider/IMG_7532.jpeg',
+    alt: 'Yoga Session',
+  },
+  {
+    src: '/slider-images/contact slider/PE Institute Ashville 2017.JPG',
+    alt: 'PE Institute Ashville 2017',
+  },
+  {
+    src: '/slider-images/contact slider/SHAPE America Boston 2017.png',
+    alt: 'SHAPE America Boston 2017',
+  }
+]
+
 interface HeroSliderProps {
   overlayOpacity?: 'light' | 'medium' | 'dark'
   autoplayInterval?: number
@@ -46,6 +69,7 @@ interface HeroSliderProps {
   showOverlay?: boolean
   height?: string
   children?: React.ReactNode
+  imageSet?: 'default' | 'contact'
 }
 
 export function HeroSlider({
@@ -54,7 +78,8 @@ export function HeroSlider({
   showControls = true,
   showOverlay = true,
   height = 'h-96 md:h-[500px] lg:h-[600px]',
-  children
+  children,
+  imageSet = 'default'
 }: HeroSliderProps) {
   const [currentSlide, setCurrentSlide] = useState(0)
   
@@ -63,27 +88,30 @@ export function HeroSlider({
     medium: 'bg-black/50',
     dark: 'bg-black/70'
   }
+  
+  // Select the appropriate image set
+  const images = imageSet === 'contact' ? contactSliderImages : sliderImages
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % sliderImages.length)
+      setCurrentSlide((prev) => (prev + 1) % images.length)
     }, autoplayInterval)
 
     return () => clearInterval(interval)
-  }, [autoplayInterval])
+  }, [autoplayInterval, images.length])
 
   const goToNextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % sliderImages.length)
+    setCurrentSlide((prev) => (prev + 1) % images.length)
   }
 
   const goToPrevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + sliderImages.length) % sliderImages.length)
+    setCurrentSlide((prev) => (prev - 1 + images.length) % images.length)
   }
 
   return (
     <div className={`relative w-full ${height} overflow-hidden`}>
       {/* Slider Images */}
-      {sliderImages.map((image, index) => (
+      {images.map((image, index) => (
         <div
           key={index}
           className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${
@@ -134,7 +162,7 @@ export function HeroSlider({
 
       {/* Indicators */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex space-x-2">
-        {sliderImages.map((_, index) => (
+        {images.map((_, index) => (
           <button
             key={index}
             className={`w-2 h-2 rounded-full focus:outline-none transition-colors ${
