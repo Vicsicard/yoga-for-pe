@@ -420,7 +420,14 @@ export default function VideosPage() {
                 Subscribe to access our complete library of premium videos, curriculum materials, and exclusive resources for yoga in physical education.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button className="btn btn-primary">
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => {
+                    // Default to Silver tier when opening from CTA
+                    setSelectedTier(SubscriptionTier.SILVER);
+                    setShowPremiumModal(true);
+                  }}
+                >
                   View Subscription Plans
                 </button>
                 <button className="btn btn-secondary">

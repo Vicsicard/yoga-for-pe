@@ -28,27 +28,29 @@ export interface Video {
   category: VideoCategory;
 }
 
-// Vimeo OTT API configuration
-const VIMEO_OTT_API_KEY = process.env.NEXT_PUBLIC_VIMEO_OTT_API_KEY || '';
-const VIMEO_API_BASE_URL = 'https://api.vimeo.com/ott';
-
-// Helper function to make authenticated requests to Vimeo OTT API
+// Helper function to make requests to our Vimeo OTT API proxy
 const makeVimeoRequest = async (endpoint: string, params: Record<string, string> = {}): Promise<any> => {
-  const url = new URL(`${VIMEO_API_BASE_URL}/${endpoint}`);
-  Object.entries(params).forEach(([key, value]) => url.searchParams.append(key, value));
-
-  const response = await fetch(url.toString(), {
-    headers: {
-      'Authorization': `Bearer ${VIMEO_OTT_API_KEY}`,
-      'Content-Type': 'application/json',
-    }
+  // Use our API route as a proxy to avoid CORS issues
+  const apiUrl = new URL('/api/vimeo', window.location.origin);
+  
+  // Add the endpoint and other params to the query string
+  apiUrl.searchParams.append('endpoint', endpoint);
+  Object.entries(params).forEach(([key, value]) => {
+    apiUrl.searchParams.append(key, value);
   });
 
-  if (!response.ok) {
-    throw new Error(`Vimeo API request failed: ${response.statusText}`);
-  }
+  try {
+    const response = await fetch(apiUrl.toString());
 
-  return response.json();
+    if (!response.ok) {
+      throw new Error(`Vimeo API request failed: ${response.statusText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching videos:', error);
+    throw error;
+  }
 };
 
 // Function to get videos by category with pagination
