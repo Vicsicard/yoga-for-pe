@@ -1,3 +1,5 @@
+'use client'
+
 import Image from 'next/image'
 import { Hero } from '../components/ui/Hero'
 import { Section, SectionHeader } from '../components/ui/Section'
