@@ -8,7 +8,8 @@ import { Container } from '../components/ui/Container'
 import { TestimonialCard, TestimonialGrid } from '../components/ui/Testimonial'
 import { Feature, FeatureGrid, FeatureWithImage } from '../components/ui/Features'
 import { FiUsers, FiAward, FiHeart, FiBook, FiCheckCircle, FiArrowRight, FiPlay } from 'react-icons/fi'
-import { getFeaturedFreeVideos } from '../lib/vimeo-browser'
+import { useState, useEffect } from 'react'
+import { getFeaturedFreeVideos, Video } from '../lib/vimeo-browser'
 import Link from 'next/link'
 
 // Content bubbles for Bend, Brighten, Bloom section
@@ -127,8 +128,24 @@ const missionContent = {
 }
 
 export default function Home() {
-  // Get featured free videos from our Vimeo utility
-  const featuredVideos = getFeaturedFreeVideos();
+  // State for featured videos and loading
+  const [featuredVideos, setFeaturedVideos] = useState<Video[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load featured videos on mount
+  useEffect(() => {
+    const loadFeaturedVideos = async () => {
+      try {
+        const videos = await getFeaturedFreeVideos();
+        setFeaturedVideos(videos);
+      } catch (error) {
+        console.error('Error loading featured videos:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadFeaturedVideos();
+  }, []);
   return (
     <main>
       {/* Hero Section with Image Slider */}
@@ -167,48 +184,55 @@ export default function Home() {
         />
         
         <div className="grid md:grid-cols-3 gap-8 mt-12">
-          {featuredVideos.map(video => (
-            <Link href={`/videos?video=${video.id}`} key={video.id} className="block">
-              <Card key={video.id} hover={true}>
-                <div className="relative aspect-video overflow-hidden bg-gray-300">
-                  {/* Video thumbnail */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary-500/20 to-primary-800/20 group-hover:from-primary-500/30 group-hover:to-primary-800/30 transition-all" />
-                  <div className="flex items-center justify-center w-full h-full text-white">
-                    <span className="text-lg font-medium">Video Thumbnail</span>
-                  </div>
-                  
-                  {/* Play button */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-16 h-16 rounded-full bg-primary-600/90 text-white flex items-center justify-center transition-transform hover:scale-110">
-                      <FiPlay size={24} />
+          {isLoading ? (
+            <div className="col-span-3 text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading featured videos...</p>
+            </div>
+          ) : (
+            featuredVideos.map(video => (
+              <Link href={`/videos?video=${video.id}`} key={video.id} className="block">
+                <Card key={video.id} hover={true}>
+                  <div className="relative aspect-video overflow-hidden bg-gray-300">
+                    {/* Video thumbnail */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary-500/20 to-primary-800/20 group-hover:from-primary-500/30 group-hover:to-primary-800/30 transition-all" />
+                    <div className="flex items-center justify-center w-full h-full text-white">
+                      <span className="text-lg font-medium">Video Thumbnail</span>
+                    </div>
+                    
+                    {/* Play button */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-16 h-16 rounded-full bg-primary-600/90 text-white flex items-center justify-center transition-transform hover:scale-110">
+                        <FiPlay size={24} />
+                      </div>
+                    </div>
+                    
+                    {/* Category and Free badge */}
+                    <div className="absolute top-3 right-3 bg-primary-600 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center">
+                      {(video.category === 'meditation' ? 'Meditation' : 
+                       video.category === 'yoga-for-pe' ? 'Yoga for PE' : 'Relaxation')} • Free
+                    </div>
+                    
+                    {/* Duration */}
+                    <div className="absolute bottom-3 right-3 bg-black/70 text-white px-2 py-1 rounded text-xs">
+                      {video.duration}
                     </div>
                   </div>
                   
-                  {/* Category and Free badge */}
-                  <div className="absolute top-3 right-3 bg-primary-600 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center">
-                    {video.category === 'meditation' ? 'Meditation' : 
-                     video.category === 'yoga-for-pe' ? 'Yoga for PE' : 'Relaxation'} • Free
-                  </div>
-                  
-                  {/* Duration */}
-                  <div className="absolute bottom-3 right-3 bg-black/70 text-white px-2 py-1 rounded text-xs">
-                    {video.duration}
-                  </div>
-                </div>
-                
-                <CardContent>
-                  <CardTitle>{video.title}</CardTitle>
-                  <CardDescription>{video.description}</CardDescription>
-                </CardContent>
-                <CardFooter>
-                  <div className="flex justify-between items-center w-full">
-                    <span className="text-xs bg-gray-100 px-2 py-1 rounded">{video.level}</span>
-                    <span className="text-xs text-primary-600">Free</span>
-                  </div>
-                </CardFooter>
-              </Card>
-            </Link>
-          ))}
+                  <CardContent>
+                    <CardTitle>{video.title}</CardTitle>
+                    <CardDescription>{video.description}</CardDescription>
+                  </CardContent>
+                  <CardFooter>
+                    <div className="flex justify-between items-center w-full">
+                      <span className="text-xs bg-gray-100 px-2 py-1 rounded">{video.level}</span>
+                      <span className="text-xs text-primary-600">Free</span>
+                    </div>
+                  </CardFooter>
+                </Card>
+              </Link>
+            ))
+          )}
         </div>
         
         <div className="text-center mt-8">

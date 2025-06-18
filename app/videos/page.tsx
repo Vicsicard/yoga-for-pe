@@ -45,6 +45,11 @@ export default function VideosPage() {
   const [yogaForPeVideos, setYogaForPeVideos] = useState<Video[]>([])
   const [relaxationVideos, setRelaxationVideos] = useState<Video[]>([])
   
+  // State for loading status in each category
+  const [isLoadingMeditation, setIsLoadingMeditation] = useState(false)
+  const [isLoadingYoga, setIsLoadingYoga] = useState(false)
+  const [isLoadingRelaxation, setIsLoadingRelaxation] = useState(false)
+  
   // State for pagination in each category
   const [meditationPage, setMeditationPage] = useState(1)
   const [yogaForPePage, setYogaForPePage] = useState(1)
@@ -90,20 +95,17 @@ export default function VideosPage() {
   const loadMoreVideos = async (category: VideoCategory) => {
     switch (category) {
       case VideoCategory.MEDITATION:
-        setLoadingMeditation(true);
+        setIsLoadingMeditation(true)
         try {
-          const nextPage = meditationPage + 1;
-          const newVideos = await getVideosByCategory(VideoCategory.MEDITATION, nextPage, 3);
-          if (newVideos.length > 0) {
-            setMeditationVideos([...meditationVideos, ...newVideos]);
-            setMeditationPage(nextPage);
-          }
+          const newMeditationVideos = await getVideosByCategory(VideoCategory.MEDITATION, meditationPage + 1)
+          setMeditationVideos(prev => [...prev, ...newMeditationVideos])
+          setMeditationPage(meditationPage + 1)
         } catch (error) {
           console.error('Error loading more meditation videos:', error);
         } finally {
-          setLoadingMeditation(false);
+          setIsLoadingMeditation(false)
         }
-        break;
+        break
         
       case VideoCategory.YOGA_FOR_PE:
         setLoadingYogaForPe(true);
