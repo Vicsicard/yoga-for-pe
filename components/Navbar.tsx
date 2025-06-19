@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { FiMenu, FiX, FiChevronDown } from 'react-icons/fi'
 import { Button } from './ui/Button'
+import { Logo } from './Logo'
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -28,13 +28,7 @@ export function Navbar() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <img 
-              src="/images/logo.png" 
-              alt="Yoga for PE Logo" 
-              width="150" 
-              height="40" 
-              style={{ height: 'auto' }} 
-            />
+            <Logo />
           </Link>
 
           {/* Desktop Navigation */}
