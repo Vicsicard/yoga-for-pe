@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { FiSearch, FiFilter, FiLock, FiPlay, FiChevronRight, FiRefreshCw } from 'react-icons/fi'
-import { VideoCategory, SubscriptionTier, Video, getVideosByCategory, hasAccessToVideo, subscriptionTierDetails } from '../../lib/vimeo-browser'
+import { VideoCategory, SubscriptionTier, Video, hasAccessToVideo, subscriptionTierDetails } from '../../lib/vimeo-browser'
+import { getVideosFromCatalog, getAllVideosFromCatalog } from '../../lib/video-catalog'
 
 // Video filter categories
 const videoCategories = [
@@ -10,13 +11,21 @@ const videoCategories = [
   { id: VideoCategory.MEDITATION, name: 'Meditation' },
   { id: VideoCategory.YOGA_FOR_PE, name: 'Yoga for PE' },
   { id: VideoCategory.RELAXATION, name: 'Relaxation' },
+  { id: VideoCategory.MINDFUL_MOVEMENTS, name: 'Mindful Movements' },
   { id: 'beginner', name: 'Beginner' },
   { id: 'intermediate', name: 'Intermediate' },
   { id: 'advanced', name: 'Advanced' }
 ]
 
+// Define section type
+type VideoSection = {
+  id: VideoCategory;
+  title: string;
+  description: string;
+};
+
 // Section definitions
-const videoSections = [
+const videoSections: VideoSection[] = [
   {
     id: VideoCategory.MEDITATION,
     title: 'Meditation',
@@ -31,6 +40,11 @@ const videoSections = [
     id: VideoCategory.RELAXATION,
     title: 'Relaxation',
     description: 'Help students unwind, restore, and find balance with these calming sequences and techniques.',
+  },
+  {
+    id: VideoCategory.MINDFUL_MOVEMENTS,
+    title: 'Mindful Movements',
+    description: 'Positive, inspirational songs set to yoga and functional strength movements for cardio workouts and SEL discussions.',
   }
 ]
 
@@ -77,10 +91,10 @@ export default function VideosPage() {
       setIsLoadingRelaxation(true);
       
       try {
-        // Fetch 9 videos for each category to have enough for rotation
-        const meditationData = await getVideosByCategory(VideoCategory.MEDITATION, 1, 9);
-        const yogaForPeData = await getVideosByCategory(VideoCategory.YOGA_FOR_PE, 1, 9);
-        const relaxationData = await getVideosByCategory(VideoCategory.RELAXATION, 1, 9);
+        // Fetch videos from our catalog data
+        const meditationData = await getVideosFromCatalog(VideoCategory.MEDITATION, 1, 9);
+        const yogaForPeData = await getVideosFromCatalog(VideoCategory.YOGA_FOR_PE, 1, 9);
+        const relaxationData = await getVideosFromCatalog(VideoCategory.RELAXATION, 1, 9);
         
         setMeditationVideos(meditationData);
         setYogaForPeVideos(yogaForPeData);
@@ -110,7 +124,7 @@ export default function VideosPage() {
         try {
           // If we've shown all videos, fetch more
           if (meditationStartIndex + 3 >= meditationVideos.length) {
-            const newMeditationVideos = await getVideosByCategory(VideoCategory.MEDITATION, meditationPage + 1, 6);
+            const newMeditationVideos = await getVideosFromCatalog(VideoCategory.MEDITATION, meditationPage + 1, 6);
             if (newMeditationVideos.length > 0) {
               setMeditationVideos(prev => [...prev, ...newMeditationVideos]);
               setMeditationPage(meditationPage + 1);
@@ -143,7 +157,7 @@ export default function VideosPage() {
         try {
           // If we've shown all videos, fetch more
           if (yogaForPeStartIndex + 3 >= yogaForPeVideos.length) {
-            const newVideos = await getVideosByCategory(VideoCategory.YOGA_FOR_PE, yogaForPePage + 1, 6);
+            const newVideos = await getVideosFromCatalog(VideoCategory.YOGA_FOR_PE, yogaForPePage + 1, 6);
             if (newVideos.length > 0) {
               setYogaForPeVideos(prev => [...prev, ...newVideos]);
               setYogaForPePage(yogaForPePage + 1);
@@ -176,7 +190,7 @@ export default function VideosPage() {
         try {
           // If we've shown all videos, fetch more
           if (relaxationStartIndex + 3 >= relaxationVideos.length) {
-            const newVideos = await getVideosByCategory(VideoCategory.RELAXATION, relaxationPage + 1, 6);
+            const newVideos = await getVideosFromCatalog(VideoCategory.RELAXATION, relaxationPage + 1, 6);
             if (newVideos.length > 0) {
               setRelaxationVideos(prev => [...prev, ...newVideos]);
               setRelaxationPage(relaxationPage + 1);
@@ -272,7 +286,10 @@ export default function VideosPage() {
           <div className="container">
             {/* Filter videos by search and category */}
             {(() => {
-              const filteredVideos = [...meditationVideos, ...yogaForPeVideos, ...relaxationVideos].filter(video => {
+              // Get all videos from catalog for filtering
+              const allVideos = getAllVideosFromCatalog();
+              
+              const filteredVideos = allVideos.filter(video => {
                 // Filter by search query
                 const matchesSearch = searchQuery === '' || 
                   video.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -281,6 +298,7 @@ export default function VideosPage() {
                 // Filter by category
                 const matchesCategory = selectedCategory === 'all' || 
                   video.category === selectedCategory ||
+                  (selectedCategory === VideoCategory.MINDFUL_MOVEMENTS && video.category === VideoCategory.YOGA_FOR_PE && video.title.includes('Mindful')) ||
                   (selectedCategory === 'beginner' && video.level === 'beginner') ||
                   (selectedCategory === 'intermediate' && video.level === 'intermediate') ||
                   (selectedCategory === 'advanced' && video.level === 'advanced');
@@ -457,7 +475,7 @@ export default function VideosPage() {
                                   ? 'Gold' 
                                   : video.tier === SubscriptionTier.SILVER 
                                     ? 'Silver' 
-                                    : 'Free'}
+                                    : 'Bronze'}
                               </div>
                               
                               {/* Duration badge */}
@@ -473,7 +491,7 @@ export default function VideosPage() {
                                 <span className="text-xs px-2 py-1 bg-gray-100 rounded-full">{video.level}</span>
                                 <span className="text-xs text-gray-500">
                                   {video.tier === SubscriptionTier.BRONZE 
-                                    ? 'Free' 
+                                    ? 'Bronze (Free)' 
                                     : video.tier === SubscriptionTier.SILVER 
                                       ? 'Silver ($7.99)' 
                                       : 'Gold ($9.99)'}

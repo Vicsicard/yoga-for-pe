@@ -31,7 +31,8 @@ export const subscriptionTierDetails = {
 export enum VideoCategory {
   MEDITATION = 'meditation',
   YOGA_FOR_PE = 'yoga-for-pe',
-  RELAXATION = 'relaxation'
+  RELAXATION = 'relaxation',
+  MINDFUL_MOVEMENTS = 'mindful-movements'
 }
 
 // Define video interface
@@ -94,7 +95,8 @@ const makeVimeoRequest = async (endpoint: string, params: Record<string, string>
 const categoryMappings: Record<VideoCategory, string> = {
   [VideoCategory.MEDITATION]: 'meditation',
   [VideoCategory.YOGA_FOR_PE]: 'yoga-for-pe',
-  [VideoCategory.RELAXATION]: 'relaxation'
+  [VideoCategory.RELAXATION]: 'relaxation',
+  [VideoCategory.MINDFUL_MOVEMENTS]: 'mindful-movements'
 };
 
 // Function to get videos by category with pagination

@@ -1,0 +1,298 @@
+{
+  "meditation": [
+    {
+      "id": "med-1",
+      "title": "Calming Heart at the Royal Arch",
+      "originalName": "Royal Arch Calming heart",
+      "length": "14 min",
+      "tier": "Gold",
+      "description": "Calming Heart is a meditation from the Kundalini Yoga lineage. It involves placing one hand at the heart center to create a still point, while the other hand is held in a receptive position of peace. This practice fosters a deep sense of calm and tranquility."
+    },
+    {
+      "id": "med-2",
+      "title": "Nostril Navigator: Alt Nostril Breath",
+      "originalName": "Alt Nostril Breathing Flow",
+      "length": "13 min",
+      "tier": "Gold",
+      "description": "Take a breath on both sides!This fun and simple practice alternates your breath between the left and right sides, helping you feel balanced, calm, and ready to take on the day."
+    },
+    {
+      "id": "med-3",
+      "title": "Nostril Navigator: Alt Nostril Breath",
+      "originalName": "Alt Nostril Breathing w/intro & instruction",
+      "length": "15 min",
+      "tier": "Gold",
+      "description": "This easy and effective practice alternates your breath between the left and right sides, supporting a sense of balance, calm, and readiness for the day ahead."
+    },
+    {
+      "id": "med-4",
+      "title": "Box Breath Flowing into Calming Heart",
+      "originalName": "Box Breath & Calm Heart",
+      "length": "11:30 min",
+      "tier": "Silver",
+      "description": "Box Breath is a simple breathing technique used to create a steady rhythm in the breath. It's a great tool for moments of stress and can be done anywhere. We followed up this Box Breath with the Calming Heart Meditation to give it some extra power!"
+    },
+    {
+      "id": "med-5",
+      "title": "High-5 Meditation",
+      "originalName": "High-5",
+      "length": "6:30 min",
+      "tier": "Bronze",
+      "description": "This is a great breath pattern for bringing awareness to your breathing. Tracing your hand helps create a connection between the body, breath, and mind."
+    },
+    {
+      "id": "med-6",
+      "title": "I AM Flow Mediation",
+      "originalName": "I AM Flow",
+      "length": "15 min",
+      "tier": "Silver",
+      "description": "I AM is a meditation from the Kundalini Yoga linage. Helping us dissolve the lables we give ourselves. The first I AM causes the brain to search for an answer BUT followed by the second I AM, the answer becomes I AM what I AM."
+    },
+    {
+      "id": "med-7",
+      "title": "I AM Instructions & Flow Meditation",
+      "originalName": "I AM Instructions",
+      "length": "19 min",
+      "tier": "Gold",
+      "description": "I AM is a meditation from the Kundalini Yoga lineage. This introduction and its instructions help us dissolve the labels when we place on ourselves. The first \"I AM\" often triggers the mind to respond when followed by the second I AM the answer becomes I AM what I AM"
+    },
+    {
+      "id": "med-8",
+      "title": "Breath in Peace & Out Stress The basics of Long Deep Breath",
+      "originalName": "Long Deep Breath",
+      "length": "8 min",
+      "tier": "Bronze",
+      "description": "Learn the basics of long, deep breathing in this gentle introduction designed to help you slow down, relax, and find calm amidst a busy day. Perfect for students and educators looking to reset focus and reduce stress with simple, mindful breaths."
+    },
+    {
+      "id": "med-9",
+      "title": "Kirtan Kriya",
+      "originalName": "Kirtan Kriya",
+      "length": "33 min",
+      "tier": "Gold",
+      "description": "Kirtan Kriya has substantial scientific research behind it. This meditation promotes total mental balance by combining posture, sound, eye focus, hand movements (mudras), and breath patterns."
+    }
+  ],
+  "relaxation": [
+    {
+      "id": "relax-1",
+      "title": "Nostril Navigator: Alt Nostril Breath",
+      "originalName": "Alt Nostril Breath Flow",
+      "length": "13 min",
+      "tier": "Gold",
+      "description": "Take a breath on both sides! This fun, easy practice switches your breath from left to right to help you feel balanced, calm, and ready to take on the day."
+    },
+    {
+      "id": "relax-2",
+      "title": "Nostril Navigator: Alt Nostril Breath",
+      "originalName": "Alt Nostral Breath w/intro & instruction",
+      "length": "15 min",
+      "tier": "Gold",
+      "description": "Take a breath on both sides! This fun, easy practice switches your breath from left to right to help you feel balanced, calm, and ready to take on the day."
+    },
+    {
+      "id": "relax-3",
+      "title": "Body Scan with Flowers",
+      "originalName": "Body Scan Flowers",
+      "length": "10 min",
+      "tier": "Silver",
+      "description": "This audio body scan helps students tune into their body by guiding them through the body parts and connecting to the breath. Using anatomical terms for muscle and joint identification and basic physiological functions allows the students to truly connect the body and mind. This is a great introductory mindful activity to do in a standard classroom, physical education setting or at home."
+    },
+    {
+      "id": "relax-4",
+      "title": "High-5 Meditation",
+      "originalName": "High-5",
+      "length": "6:30 min",
+      "tier": "Bronze",
+      "description": "Great breath pattern to bring consciousness with where your breathing and how you tracing your hand brings a connection between the body-breath and mind."
+    },
+    {
+      "id": "relax-5",
+      "title": "Breath in Peace & Out Stress The basics of Long Deep Breath",
+      "originalName": "Long Deep Breath",
+      "length": "8 min",
+      "tier": "Bronze",
+      "description": "Learn the basics of long, deep breathing in this gentle introduction designed to help you slow down, relax, and find calm amidst a busy day. Perfect for students and educators looking to reset focus and reduce stress with simple, mindful breaths."
+    },
+    {
+      "id": "relax-6",
+      "title": "The Warm Fuzzy Tale",
+      "originalName": "Warm Fuzzy",
+      "length": "",
+      "tier": "Silver",
+      "description": "Storytime with \"The Warm Fuzzy Tale\" is a classic story by Claude Steiner. IT's a timeless piece cleverly written that any current topic can be discussed through the story. Wonderful for SEL lessons or to simply relax and enjoy."
+    }
+  ],
+  "yoga-for-pe": [
+    {
+      "id": "yoga-1",
+      "title": "Open the Gate, Release the Drama",
+      "originalName": "Gate Series",
+      "length": "22 min",
+      "tier": "Silver",
+      "description": "This class is your exit strategy from side-body stress and emotional plot twists. Your ribs are holding secrets so open the gate and let it all go."
+    },
+    {
+      "id": "yoga-2",
+      "title": "IT bands, it's not techy it's stretchy",
+      "originalName": "IT Band",
+      "length": "22 min",
+      "tier": "Silver",
+      "description": "This IT isn't techy, it' stretcy. Come for the yoga, stay because your legs finally forgave you."
+    },
+    {
+      "id": "yoga-3",
+      "title": "Sun Salutation Foundations: Your Yoga Foundation",
+      "originalName": "Modified Sun A Flow",
+      "length": "9 min",
+      "tier": "Silver",
+      "description": "Master the building blocks of yoga with this modified Sun Salutation. The essential flow that sets the stage for strength, flexiblity, and balance in every practice."
+    },
+    {
+      "id": "yoga-4",
+      "title": "Rise & Shine: Sun Salutation with positive Affirmations (Because You're a Superhero)",
+      "originalName": "Modified Sun W/positive affirmations & Balance challenge",
+      "length": "11 min",
+      "tier": "Gold",
+      "description": "Stretch, breathe, and tell yourself you're amazing--because let's face it you are! This Sun Salutation flow comes with a side of positive vibes. Wearing your own cape is optional."
+    },
+    {
+      "id": "yoga-5",
+      "title": "Firefighter Flow: Shoulder & Hip Rescue",
+      "originalName": "Shoulders & Hips",
+      "length": "18 min",
+      "tier": "Silver",
+      "description": "Designed for heroes who carry heavy loads. This series targets tight shoulders and hips to help you move freer, recover faster, and stay ready for the next call. Because even Firefighters deserve a break. Dedicated to Tony:)"
+    },
+    {
+      "id": "yoga-6",
+      "title": "Sunrise Salutation: Flowing with Lake Michigan's First Light",
+      "originalName": "Sunrise Sun A & B Flow",
+      "length": "11 min",
+      "tier": "Bronze",
+      "description": "Flow alongside the rising sun as it paints Lake Michigan in gold. This gentle Sun Salutation is your daily dose of peace, energy, and a splash of lakeside magic."
+    },
+    {
+      "id": "yoga-7",
+      "title": "The Wonder of Warriors",
+      "originalName": "Wonder of Warriors",
+      "length": "16 min",
+      "tier": "Silver",
+      "description": "Uncover the beauty behind the boldness. This series dives into the Warrior poses as moving meditations, where every stance tells a story of strength, resilience, and inner calm."
+    },
+    {
+      "id": "yoga-8",
+      "title": "Chop Shop Countdown with Instructions",
+      "originalName": "Chopper w/instruction",
+      "length": "9 min",
+      "tier": "Gold",
+      "description": "This instructional rep-based yoga flow starts at 5 and works its way down to 1---crushing stress, tension, and distractions with every breath and movement. A playful countdown that blends strength, stretching, and focus to leave you grounded and energized."
+    },
+    {
+      "id": "yoga-9",
+      "title": "Chop Shop Cranking it out (flow)",
+      "originalName": "Chopper Flow",
+      "length": "6 min",
+      "tier": "Gold",
+      "description": "This rep-based yoga flow starts at 5 and works its way down to 1---crushing stress, tension, and distractions with every breath and movement. A playful countdown that blends strength, stretching, and focus to leave you grounded and energized."
+    },
+    {
+      "id": "yoga-10",
+      "title": "Dog Days & Core Plays",
+      "originalName": "DD Plank Abs",
+      "length": "8 min",
+      "tier": "Silver",
+      "description": "This energizing yoga-fitness blend focuses on planks, downward dogs, and ab-burning transitions to build total-body strength and stability. Flow, hold, and fire up your core as you move with purpose from pose to power."
+    },
+    {
+      "id": "yoga-11",
+      "title": "Ab Circle 1",
+      "originalName": "Ab circle 1",
+      "length": "10 min",
+      "tier": "Bronze",
+      "description": "Ab circle is a fun, full-circle core workout that targets every major ab muscle—upper, lower, obliques, and deep stabilizers—in one dynamic loop. It's your core's joyride to strength, control, and serious burn!"
+    },
+    {
+      "id": "yoga-12",
+      "title": "Ab Circle 2",
+      "originalName": "Ab Circle 2",
+      "length": "7 min",
+      "tier": "Gold",
+      "description": "Leveling up your ab circle! Do seperately or ab circle 1 followed by ab circle 2......Ab Circle is a fun, full-circle core workout that targets every major ab muscle—upper, lower, obliques, and deep stabilizers—in one dynamic loop. It's your core's joyride to strength, control, and serious burn!"
+    },
+    {
+      "id": "yoga-13",
+      "title": "Chop Shop Countdown with Instructions",
+      "originalName": "Chopper w/instruction",
+      "length": "9 min",
+      "tier": "Gold",
+      "description": "This instructional rep-based yoga flow starts at 5 and works its way down to 1---crushing stress, tension, and distractions with every breath and movement. A playful countdown that blends strength, stretching, and focus to leave you grounded and energized."
+    },
+    {
+      "id": "yoga-14",
+      "title": "Branch Out",
+      "originalName": "All About Tree",
+      "length": "6 min",
+      "tier": "Gold",
+      "description": "A playful climb through Tree Pose variations—build strength, focus, and maybe a little wobble!"
+    },
+    {
+      "id": "yoga-15",
+      "title": "Inhale Peace, Exhale Stress",
+      "originalName": "Intro & Instructions to Long Deep Breath",
+      "length": "2 min",
+      "tier": "Bronze",
+      "description": "A gentle introduction to set up and why of deep breathing"
+    },
+    {
+      "id": "yoga-16",
+      "title": "Sun Salutation Foundations with instsructions",
+      "originalName": "Sun Salutation w/instruction",
+      "length": "22 min",
+      "tier": "Bronze",
+      "description": "Master the building blocks of yoga with this modified Sun Salutation. The essential flow breaks down the poses and sets the stage for strength, flexiblity, and balance in every practice."
+    },
+    {
+      "id": "yoga-17",
+      "title": "Sunrise Salutation: Instructions to flow with Lake Michigan's First Light",
+      "originalName": "Sunrise Sun A & B w/instructions",
+      "length": "11 min",
+      "tier": "Gold",
+      "description": "Enjoy this instructional flow alongside the rising sun as it paints Lake Michigan in gold. This gentle Sun Salutation is your daily dose of peace, energy, and a splash of lakeside magic."
+    }
+  ],
+  "mindful-movements": [
+    {
+      "id": "mm-1",
+      "title": "The Flower by Michael Franti & Spearhead, Victoria Canal",
+      "originalName": "The Flower",
+      "length": "",
+      "tier": "free",
+      "description": "Mindful Movements are positive, inspirational songs set to yoga and functional strength movements. My students and I create Mindful Movements for a great cardio workout and to help stimualte discussion on SEL topics. We can use the music, lyrics, and meaning of the song as a bridge for SEL learning on topics like social justice, bullying, inequalities, etc. etc. Using the music as the vehicle; thus, not addressing a person or group of people. Creating a safe learning environment to discuss hard topics."
+    },
+    {
+      "id": "mm-2",
+      "title": "Fight Song by Rachel Platten",
+      "originalName": "Fight Song",
+      "length": "4 min",
+      "tier": "free",
+      "description": "Mindful Movements are positive, inspirational songs set to yoga and functional strength movements. My students and I create Mindful Movements for a great cardio workout and to help stimualte discussion on SEL topics. We can use the music, lyrics, and meaning of the song as a bridge for SEL learning on topics like social justice, bullying, inequalities, etc. etc. Using the music as the vehicle; thus, not addressing a person or group of people. Creating a safe learning environment to discuss hard topics."
+    },
+    {
+      "id": "mm-3",
+      "title": "The Champion by Carrie Underwood, Ludacris",
+      "originalName": "I Am Champion",
+      "length": "4 min",
+      "tier": "free",
+      "description": "Mindful Movements are positive, inspirational songs set to yoga and functional strength movements. My students and I create Mindful Movements for a great cardio workout and to help stimualte discussion on SEL topics. We can use the music, lyrics, and meaning of the song as a bridge for SEL learning on topics like social justice, bullying, inequalities, etc. etc. Using the music as the vehicle; thus, not addressing a person or group of people. Creating a safe learning environment to discuss hard topics."
+    },
+    {
+      "id": "mm-4",
+      "title": "Thunder by Imagine Dragons",
+      "originalName": "Thunder",
+      "length": "3:30 min",
+      "tier": "free",
+      "description": "Mindful Movements are positive, inspirational songs set to yoga and functional strength movements. My students and I create Mindful Movements for a great cardio workout and to help stimualte discussion on SEL topics. We can use the music, lyrics, and meaning of the song as a bridge for SEL learning on topics like social justice, bullying, inequalities, etc. etc. Using the music as the vehicle; thus, not addressing a person or group of people. Creating a safe learning environment to discuss hard topics."
+    }
+  ]
+}
