@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yoga for PE - Video Metadata Formatter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .output {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .video-card {
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+        .video-card h3 {
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .copy-btn {
+            background-color: #2196F3;
+            margin-left: 10px;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background-color: white;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .field-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .field-value {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            color: green;
+            margin-left: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Yoga for PE - Video Metadata Formatter</h1>
+        <p>This tool helps format your spreadsheet data for manual Vimeo uploads.</p>
+        
+        <div class="section">
+            <h2>Step 1: Paste Your Spreadsheet Data</h2>
+            <p>Copy data from your Google Spreadsheet and paste it below:</p>
+            <textarea id="spreadsheetData" placeholder="Paste your spreadsheet data here..."></textarea>
+            <button id="processBtn">Process Data</button>
+        </div>
+        
+        <div class="output" id="output" style="display:none;">
+            <div class="tabs">
+                <div class="tab active" data-tab="formatted">Formatted Output</div>
+                <div class="tab" data-tab="raw">Raw Data</div>
+            </div>
+            
+            <div class="tab-content active" id="formatted-content">
+                <h2>Formatted Video Metadata</h2>
+                <div id="videoList"></div>
+            </div>
+            
+            <div class="tab-content" id="raw-content">
+                <h2>Raw Parsed Data</h2>
+                <pre id="rawData"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const processBtn = document.getElementById('processBtn');
+            const spreadsheetData = document.getElementById('spreadsheetData');
+            const output = document.getElementById('output');
+            const videoList = document.getElementById('videoList');
+            const rawData = document.getElementById('rawData');
+            const tabs = document.querySelectorAll('.tab');
+            
+            // Handle tab switching
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    tabs.forEach(t => t.classList.remove('active'));
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Hide all tab content
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // Show the selected tab content
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId + '-content').classList.add('active');
+                });
+            });
+            
+            // Process button click handler
+            processBtn.addEventListener('click', function() {
+                const data = spreadsheetData.value.trim();
+                if (!data) {
+                    alert('Please paste some data first!');
+                    return;
+                }
+                
+                const videos = parseSpreadsheetData(data);
+                displayVideos(videos);
+                rawData.textContent = JSON.stringify(videos, null, 2);
+                output.style.display = 'block';
+            });
+            
+            // Parse spreadsheet data
+            function parseSpreadsheetData(data) {
+                const lines = data.split('\n');
+                const videos = [];
+                
+                // Check if we have a header row
+                const hasHeader = lines[0].toLowerCase().includes('title') || 
+                                lines[0].toLowerCase().includes('description');
+                
+                // Start from index 1 if we have a header
+                const startIndex = hasHeader ? 1 : 0;
+                
+                for (let i = startIndex; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+                    
+                    // Split line by tabs or multiple spaces
+                    const parts = line.split(/\t/).map(part => part.trim());
+                    
+                    // Try to identify columns based on content
+                    let title = '';
+                    let description = '';
+                    let category = '';
+                    let level = 'Beginner';
+                    let tier = 'silver';
+                    
+                    // Assume first column is title, second is description
+                    if (parts.length >= 1) title = parts[0];
+                    if (parts.length >= 2) description = parts[1];
+                    
+                    // Try to determine category from title or description
+                    if (title.toLowerCase().includes('meditation') || description.toLowerCase().includes('meditation')) {
+                        category = 'meditation';
+                    } else if (title.toLowerCase().includes('yoga') || description.toLowerCase().includes('yoga for pe')) {
+                        category = 'yoga-for-pe';
+                        tier = 'gold';
+                    } else if (title.toLowerCase().includes('relaxation') || description.toLowerCase().includes('relaxation')) {
+                        category = 'relaxation';
+                    } else if (title.toLowerCase().includes('mindful movement') || description.toLowerCase().includes('mindful movement')) {
+                        category = 'mindful-movement';
+                    } else if (title.toLowerCase().includes('free') || description.toLowerCase().includes('free')) {
+                        category = 'free-videos';
+                        tier = 'bronze';
+                    }
+                    
+                    // Try to determine level from title or description
+                    if (title.toLowerCase().includes('intermediate') || description.toLowerCase().includes('intermediate')) {
+                        level = 'Intermediate';
+                    } else if (title.toLowerCase().includes('advanced') || description.toLowerCase().includes('advanced')) {
+                        level = 'Advanced';
+                    }
+                    
+                    videos.push({
+                        title,
+                        description,
+                        category,
+                        level,
+                        tier
+                    });
+                }
+                
+                return videos;
+            }
+            
+            // Display videos in the UI
+            function displayVideos(videos) {
+                videoList.innerHTML = '';
+                
+                // Group videos by category
+                const categories = {};
+                videos.forEach(video => {
+                    const cat = video.category || 'uncategorized';
+                    if (!categories[cat]) {
+                        categories[cat] = [];
+                    }
+                    categories[cat].push(video);
+                });
+                
+                // Create HTML for each category
+                Object.keys(categories).sort().forEach(category => {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'category-section';
+                    
+                    const categoryTitle = document.createElement('h2');
+                    categoryTitle.textContent = category.toUpperCase();
+                    categoryDiv.appendChild(categoryTitle);
+                    
+                    // Add videos in this category
+                    categories[category].forEach((video, index) => {
+                        const videoCard = document.createElement('div');
+                        videoCard.className = 'video-card';
+                        
+                        const videoTitle = document.createElement('h3');
+                        videoTitle.textContent = `Video ${index + 1}: ${video.title}`;
+                        videoCard.appendChild(videoTitle);
+                        
+                        // Add title field
+                        addField(videoCard, 'Title', video.title);
+                        
+                        // Add description field
+                        addField(videoCard, 'Description', video.description);
+                        
+                        // Add level field
+                        addField(videoCard, 'Level', video.level);
+                        
+                        // Add tier field
+                        addField(videoCard, 'Tier', video.tier);
+                        
+                        categoryDiv.appendChild(videoCard);
+                    });
+                    
+                    videoList.appendChild(categoryDiv);
+                });
+            }
+            
+            // Helper function to add a field with copy button
+            function addField(container, label, value) {
+                const fieldDiv = document.createElement('div');
+                fieldDiv.className = 'field';
+                
+                const fieldLabel = document.createElement('div');
+                fieldLabel.className = 'field-label';
+                fieldLabel.textContent = label;
+                
+                const fieldValue = document.createElement('div');
+                fieldValue.className = 'field-value';
+                fieldValue.textContent = value;
+                
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'copy-btn';
+                copyBtn.textContent = 'Copy';
+                copyBtn.onclick = function() {
+                    navigator.clipboard.writeText(value).then(() => {
+                        this.textContent = 'Copied!';
+                        setTimeout(() => {
+                            this.textContent = 'Copy';
+                        }, 2000);
+                    });
+                };
+                
+                fieldLabel.appendChild(copyBtn);
+                fieldDiv.appendChild(fieldLabel);
+                fieldDiv.appendChild(fieldValue);
+                
+                container.appendChild(fieldDiv);
+            }
+        });
+    </script>
+</body>
+</html>

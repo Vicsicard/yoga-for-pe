@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { FiSearch, FiFilter, FiLock, FiPlay } from 'react-icons/fi'
-import { VideoCategory, SubscriptionTier, Video, getVideosByCategory, hasAccessToVideo } from '../../lib/vimeo-browser'
+import { VideoCategory, SubscriptionTier, Video, getVideosByCategory, hasAccessToVideo, subscriptionTierDetails } from '../../lib/vimeo-browser'
 
 // Video filter categories
 const videoCategories = [
@@ -444,12 +444,12 @@ export default function VideosPage() {
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <h3 className="text-2xl font-bold mb-4">
-              {selectedTier === SubscriptionTier.SILVER ? 'Silver' : 'Gold'} Subscription Required
+              {selectedTier !== null && subscriptionTierDetails[selectedTier].name} Subscription Required
             </h3>
             <p className="mb-6">
-              {selectedTier === SubscriptionTier.SILVER
-                ? 'This video requires a Silver subscription ($7.99/month). Upgrade to access this and other Silver content.'
-                : 'This video requires a Gold subscription ($9.99/month). Upgrade to access all premium content including Gold videos.'}
+              {selectedTier !== null && 
+                `This video requires a ${subscriptionTierDetails[selectedTier].name} subscription ($${subscriptionTierDetails[selectedTier].price.toFixed(2)}/month). ${subscriptionTierDetails[selectedTier].description}.`
+              }
             </p>
             
             <div className="mb-6">
@@ -457,17 +457,17 @@ export default function VideosPage() {
               <div className="space-y-3">
                 <div className="p-3 border rounded-lg flex justify-between items-center">
                   <div>
-                    <span className="font-medium">Silver Subscription</span>
-                    <p className="text-sm text-gray-600">Access to Bronze and Silver content</p>
+                    <span className="font-medium">{subscriptionTierDetails[SubscriptionTier.SILVER].name} Subscription</span>
+                    <p className="text-sm text-gray-600">{subscriptionTierDetails[SubscriptionTier.SILVER].description}</p>
                   </div>
-                  <span className="font-bold">$7.99/mo</span>
+                  <span className="font-bold">${subscriptionTierDetails[SubscriptionTier.SILVER].price.toFixed(2)}/mo</span>
                 </div>
                 <div className="p-3 border rounded-lg flex justify-between items-center bg-yellow-50">
                   <div>
-                    <span className="font-medium">Gold Subscription</span>
-                    <p className="text-sm text-gray-600">Access to all content</p>
+                    <span className="font-medium">{subscriptionTierDetails[SubscriptionTier.GOLD].name} Subscription</span>
+                    <p className="text-sm text-gray-600">{subscriptionTierDetails[SubscriptionTier.GOLD].description}</p>
                   </div>
-                  <span className="font-bold">$9.99/mo</span>
+                  <span className="font-bold">${subscriptionTierDetails[SubscriptionTier.GOLD].price.toFixed(2)}/mo</span>
                 </div>
               </div>
             </div>
@@ -476,8 +476,13 @@ export default function VideosPage() {
               <button 
                 className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                 onClick={() => {
-                  // In a real app, redirect to subscription page with Vimeo OTT
-                  console.log('Redirecting to Vimeo OTT subscription page');
+                  // Redirect to Vimeo OTT subscription page
+                  // In a real implementation, this would use the actual Vimeo OTT subscription URL
+                  const tier = selectedTier === SubscriptionTier.SILVER ? 'silver' : 'gold';
+                  const subscriptionUrl = `https://vimeo.com/ott/yogaforpe/subscribe/${tier}`;
+                  
+                  // Open in a new tab
+                  window.open(subscriptionUrl, '_blank');
                   setShowPremiumModal(false);
                 }}
               >

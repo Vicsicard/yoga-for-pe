@@ -28,7 +28,7 @@ export function Navbar() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <Logo />
+            <span className="text-3xl font-bold text-primary-600">Yoga for PE</span>
           </Link>
 
           {/* Desktop Navigation */}

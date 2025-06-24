@@ -11,7 +11,7 @@ import { TestimonialCard, TestimonialGrid } from '../components/ui/Testimonial'
 import { Feature, FeatureGrid, FeatureWithImage } from '../components/ui/Features'
 import { FiUsers, FiAward, FiHeart, FiBook, FiCheckCircle, FiArrowRight, FiPlay } from 'react-icons/fi'
 import { useState, useEffect } from 'react'
-import { getFeaturedFreeVideos, Video } from '../lib/vimeo-browser'
+import { getFeaturedFreeVideos, Video, SubscriptionTier, VideoCategory } from '../lib/vimeo-browser'
 import Link from 'next/link'
 
 // Content bubbles for Bend, Brighten, Bloom section
@@ -133,15 +133,60 @@ export default function Home() {
   // State for featured videos and loading
   const [featuredVideos, setFeaturedVideos] = useState<Video[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  // Fallback videos in case the API calls fail
+  const fallbackVideos: Video[] = [
+    {
+      id: 457053392,
+      title: 'I Am Meditation',
+      description: 'A guided meditation to help you connect with your inner self and find peace.',
+      duration: '1:08',
+      level: 'Beginner',
+      thumbnail: 'https://i.vimeocdn.com/video/1016790651-4c20aab2a41f4d5a4e5e9c9ec5e9b3b9a1b7c4f4d5e5c4f4d5e5c4f4d5e5c4f4_640',
+      vimeoId: '457053392',
+      tier: SubscriptionTier.BRONZE,
+      category: VideoCategory.MEDITATION
+    },
+    {
+      id: 1095788590,
+      title: 'Ab Circle',
+      description: 'A fun, full-circle core workout that targets every major ab muscle in one dynamic loop.',
+      duration: '1:30',
+      level: 'Beginner',
+      thumbnail: 'https://i.vimeocdn.com/video/1016790651-4c20aab2a41f4d5a4e5e9c9ec5e9b3b9a1b7c4f4d5e5c4f4d5e5c4f4d5e5c4f4_640',
+      vimeoId: '1095788590',
+      tier: SubscriptionTier.BRONZE,
+      category: VideoCategory.YOGA_FOR_PE
+    },
+    {
+      id: 452426275,
+      title: 'Zenevate Body Scan',
+      description: 'A relaxing body scan meditation to help you unwind and connect with your body.',
+      duration: '1:00',
+      level: 'Beginner',
+      thumbnail: 'https://i.vimeocdn.com/video/1016790651-4c20aab2a41f4d5a4e5e9c9ec5e9b3b9a1b7c4f4d5e5c4f4d5e5c4f4d5e5c4f4_640',
+      vimeoId: '452426275',
+      tier: SubscriptionTier.BRONZE,
+      category: VideoCategory.RELAXATION
+    }
+  ];
 
   // Load featured videos on mount
   useEffect(() => {
     const loadFeaturedVideos = async () => {
       try {
         const videos = await getFeaturedFreeVideos();
-        setFeaturedVideos(videos);
+        if (videos && videos.length > 0) {
+          setFeaturedVideos(videos);
+        } else {
+          console.log('No videos returned from API, using fallbacks');
+          setFeaturedVideos(fallbackVideos);
+        }
       } catch (error) {
         console.error('Error loading featured videos:', error);
+        setLoadError('Failed to load videos from Vimeo. Using fallback videos instead.');
+        setFeaturedVideos(fallbackVideos);
       } finally {
         setIsLoading(false);
       }

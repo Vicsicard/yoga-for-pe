@@ -1,0 +1,24 @@
+[
+  {
+    "title": "High-5 Meditation",
+    "description": "A quick 5-minute meditation perfect for classroom settings. Students learn to focus their minds and prepare for learning.",
+    "category": "meditation",
+    "tier": "bronze",
+    "level": "Beginner",
+    "featured": true
+  },
+  {
+    "title": "Morning Energizer Flow",
+    "description": "Start the day with this energizing 10-minute yoga flow designed to wake up the body and mind.",
+    "category": "yoga-for-pe",
+    "tier": "silver",
+    "level": "Intermediate"
+  },
+  {
+    "title": "Deep Relaxation",
+    "description": "A 15-minute guided relaxation session to help students unwind and release tension.",
+    "category": "relaxation",
+    "tier": "gold",
+    "level": "All Levels"
+  }
+]

@@ -11,32 +11,78 @@ export async function GET(request: NextRequest) {
   // Build the query string for the Vimeo API request
   const queryString = new URLSearchParams(queryParams).toString();
   
-  // Get the API key from environment variables
-  const apiKey = process.env.NEXT_PUBLIC_VIMEO_OTT_API_KEY;
+  // Get the access token from environment variables
+  const accessToken = process.env.VIMEO_ACCESS_TOKEN;
+  const clientId = process.env.VIMEO_CLIENT_ID;
+  const clientSecret = process.env.VIMEO_CLIENT_SECRET;
   
-  if (!apiKey) {
+  // Enhanced environment variable checking
+  const missingVars = [];
+  if (!accessToken) missingVars.push('VIMEO_ACCESS_TOKEN');
+  if (!clientId) missingVars.push('VIMEO_CLIENT_ID');
+  if (!clientSecret) missingVars.push('VIMEO_CLIENT_SECRET');
+  
+  if (missingVars.length > 0) {
+    const errorMessage = `Missing Vimeo environment variables: ${missingVars.join(', ')}`;
+    console.error(errorMessage);
+    
+    // Log more details about the environment
+    console.error(`Environment: ${process.env.NODE_ENV}`);
+    console.error(`Environment variables available: ${Object.keys(process.env).filter(key => key.startsWith('VIMEO')).join(', ')}`);
+    
     return NextResponse.json(
-      { error: 'Vimeo OTT API key not configured' },
+      { 
+        error: 'Vimeo configuration error', 
+        message: errorMessage,
+        environment: process.env.NODE_ENV || 'unknown',
+        missingVars,
+        availableEnvVars: Object.keys(process.env).filter(key => key.startsWith('VIMEO')).length
+      },
       { status: 500 }
     );
   }
 
   try {
-    // Make the request to Vimeo OTT API
+    // Log the request being made (without the token)
+    console.log(`Making Vimeo API request to: https://api.vimeo.com/${endpoint}?${queryString}`);
+    console.log(`Environment: ${process.env.NODE_ENV}, Token length: ${accessToken.length}`);
+    
+    // Make the request to standard Vimeo API
+    const apiUrl = `https://api.vimeo.com/${endpoint}?${queryString}`;
+    console.log(`Full API URL: ${apiUrl}`);
+    
     const response = await fetch(
-      `https://api.vimeo.com/ott/${endpoint}?${queryString}`,
+      apiUrl,
       {
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
+          'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
+          'Accept': 'application/vnd.vimeo.*+json;version=3.4'
         },
       }
     );
 
     if (!response.ok) {
       const errorText = await response.text();
+      console.error(`Vimeo API error (${response.status}):`, errorText);
+      
+      // Try to parse the error as JSON for more details
+      let parsedError = {};
+      try {
+        parsedError = JSON.parse(errorText);
+      } catch (e) {
+        // If it's not valid JSON, use the raw text
+        parsedError = { raw: errorText };
+      }
+      
       return NextResponse.json(
-        { error: `Vimeo API error: ${errorText}` },
+        { 
+          error: `Vimeo API error (${response.status})`, 
+          message: errorText,
+          details: parsedError,
+          endpoint: endpoint,
+          url: apiUrl
+        },
         { status: response.status }
       );
     }
@@ -46,7 +92,13 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error proxying request to Vimeo:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch data from Vimeo' },
+      { 
+        error: 'Failed to fetch data from Vimeo', 
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        endpoint: endpoint,
+        environment: process.env.NODE_ENV || 'unknown'
+      },
       { status: 500 }
     );
   }
