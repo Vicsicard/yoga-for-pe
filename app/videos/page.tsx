@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { FiSearch, FiFilter, FiLock, FiPlay } from 'react-icons/fi'
+import { FiSearch, FiFilter, FiLock, FiPlay, FiChevronRight, FiRefreshCw } from 'react-icons/fi'
 import { VideoCategory, SubscriptionTier, Video, getVideosByCategory, hasAccessToVideo, subscriptionTierDetails } from '../../lib/vimeo-browser'
 
 // Video filter categories
@@ -45,6 +45,16 @@ export default function VideosPage() {
   const [yogaForPeVideos, setYogaForPeVideos] = useState<Video[]>([])
   const [relaxationVideos, setRelaxationVideos] = useState<Video[]>([])
   
+  // State for displayed videos in each category (3 at a time)
+  const [displayedMeditationVideos, setDisplayedMeditationVideos] = useState<Video[]>([])
+  const [displayedYogaForPeVideos, setDisplayedYogaForPeVideos] = useState<Video[]>([])
+  const [displayedRelaxationVideos, setDisplayedRelaxationVideos] = useState<Video[]>([])
+  
+  // State for current display index in each category
+  const [meditationStartIndex, setMeditationStartIndex] = useState(0)
+  const [yogaForPeStartIndex, setYogaForPeStartIndex] = useState(0)
+  const [relaxationStartIndex, setRelaxationStartIndex] = useState(0)
+  
   // State for loading status in each category
   const [isLoadingMeditation, setIsLoadingMeditation] = useState(false)
   const [isLoadingYoga, setIsLoadingYoga] = useState(false)
@@ -55,11 +65,6 @@ export default function VideosPage() {
   const [yogaForPePage, setYogaForPePage] = useState(1)
   const [relaxationPage, setRelaxationPage] = useState(1)
   
-  // State for loading indicators
-  const [loadingMeditation, setLoadingMeditation] = useState(false)
-  const [loadingYogaForPe, setLoadingYogaForPe] = useState(false)
-  const [loadingRelaxation, setLoadingRelaxation] = useState(false)
-  
   // For demo purposes, we'll use Bronze tier (free) as the default user tier
   // In a real app, this would come from authentication
   const [userSubscriptionTier, setUserSubscriptionTier] = useState<SubscriptionTier>(SubscriptionTier.BRONZE)
@@ -67,24 +72,30 @@ export default function VideosPage() {
   // Load initial videos for each category
   useEffect(() => {
     const fetchInitialVideos = async () => {
-      setLoadingMeditation(true);
-      setLoadingYogaForPe(true);
-      setLoadingRelaxation(true);
+      setIsLoadingMeditation(true);
+      setIsLoadingYoga(true);
+      setIsLoadingRelaxation(true);
       
       try {
-        const meditationData = await getVideosByCategory(VideoCategory.MEDITATION, 1, 3);
-        const yogaForPeData = await getVideosByCategory(VideoCategory.YOGA_FOR_PE, 1, 3);
-        const relaxationData = await getVideosByCategory(VideoCategory.RELAXATION, 1, 3);
+        // Fetch 9 videos for each category to have enough for rotation
+        const meditationData = await getVideosByCategory(VideoCategory.MEDITATION, 1, 9);
+        const yogaForPeData = await getVideosByCategory(VideoCategory.YOGA_FOR_PE, 1, 9);
+        const relaxationData = await getVideosByCategory(VideoCategory.RELAXATION, 1, 9);
         
         setMeditationVideos(meditationData);
         setYogaForPeVideos(yogaForPeData);
         setRelaxationVideos(relaxationData);
+        
+        // Set initial displayed videos (first 3 of each category)
+        setDisplayedMeditationVideos(meditationData.slice(0, 3));
+        setDisplayedYogaForPeVideos(yogaForPeData.slice(0, 3));
+        setDisplayedRelaxationVideos(relaxationData.slice(0, 3));
       } catch (error) {
         console.error('Error fetching videos:', error);
       } finally {
-        setLoadingMeditation(false);
-        setLoadingYogaForPe(false);
-        setLoadingRelaxation(false);
+        setIsLoadingMeditation(false);
+        setIsLoadingYoga(false);
+        setIsLoadingRelaxation(false);
       }
     };
     
@@ -95,89 +106,122 @@ export default function VideosPage() {
   const loadMoreVideos = async (category: VideoCategory) => {
     switch (category) {
       case VideoCategory.MEDITATION:
-        setIsLoadingMeditation(true)
+        setIsLoadingMeditation(true);
         try {
-          const newMeditationVideos = await getVideosByCategory(VideoCategory.MEDITATION, meditationPage + 1)
-          setMeditationVideos(prev => [...prev, ...newMeditationVideos])
-          setMeditationPage(meditationPage + 1)
+          // If we've shown all videos, fetch more
+          if (meditationStartIndex + 3 >= meditationVideos.length) {
+            const newMeditationVideos = await getVideosByCategory(VideoCategory.MEDITATION, meditationPage + 1, 6);
+            if (newMeditationVideos.length > 0) {
+              setMeditationVideos(prev => [...prev, ...newMeditationVideos]);
+              setMeditationPage(meditationPage + 1);
+            }
+          }
+          
+          // Calculate next start index with wraparound
+          const nextMeditationIndex = (meditationStartIndex + 3) % meditationVideos.length;
+          setMeditationStartIndex(nextMeditationIndex);
+          
+          const endIndex = Math.min(nextMeditationIndex + 3, meditationVideos.length);
+          let nextVideos = meditationVideos.slice(nextMeditationIndex, endIndex);
+          
+          // If not enough videos, wrap around
+          if (nextVideos.length < 3 && meditationVideos.length > 3) {
+            const remaining = 3 - nextVideos.length;
+            nextVideos = [...nextVideos, ...meditationVideos.slice(0, remaining)];
+          }
+          
+          setDisplayedMeditationVideos(nextVideos);
         } catch (error) {
           console.error('Error loading more meditation videos:', error);
         } finally {
-          setIsLoadingMeditation(false)
+          setIsLoadingMeditation(false);
         }
-        break
+        break;
         
       case VideoCategory.YOGA_FOR_PE:
-        setLoadingYogaForPe(true);
+        setIsLoadingYoga(true);
         try {
-          const nextPage = yogaForPePage + 1;
-          const newVideos = await getVideosByCategory(VideoCategory.YOGA_FOR_PE, nextPage, 3);
-          if (newVideos.length > 0) {
-            setYogaForPeVideos([...yogaForPeVideos, ...newVideos]);
-            setYogaForPePage(nextPage);
+          // If we've shown all videos, fetch more
+          if (yogaForPeStartIndex + 3 >= yogaForPeVideos.length) {
+            const newVideos = await getVideosByCategory(VideoCategory.YOGA_FOR_PE, yogaForPePage + 1, 6);
+            if (newVideos.length > 0) {
+              setYogaForPeVideos(prev => [...prev, ...newVideos]);
+              setYogaForPePage(yogaForPePage + 1);
+            }
           }
+          
+          // Calculate next start index with wraparound
+          const nextYogaIndex = (yogaForPeStartIndex + 3) % yogaForPeVideos.length;
+          setYogaForPeStartIndex(nextYogaIndex);
+          
+          const endIndex = Math.min(nextYogaIndex + 3, yogaForPeVideos.length);
+          let nextVideos = yogaForPeVideos.slice(nextYogaIndex, endIndex);
+          
+          // If not enough videos, wrap around
+          if (nextVideos.length < 3 && yogaForPeVideos.length > 3) {
+            const remaining = 3 - nextVideos.length;
+            nextVideos = [...nextVideos, ...yogaForPeVideos.slice(0, remaining)];
+          }
+          
+          setDisplayedYogaForPeVideos(nextVideos);
         } catch (error) {
           console.error('Error loading more yoga videos:', error);
         } finally {
-          setLoadingYogaForPe(false);
+          setIsLoadingYoga(false);
         }
         break;
         
       case VideoCategory.RELAXATION:
-        setLoadingRelaxation(true);
+        setIsLoadingRelaxation(true);
         try {
-          const nextPage = relaxationPage + 1;
-          const newVideos = await getVideosByCategory(VideoCategory.RELAXATION, nextPage, 3);
-          if (newVideos.length > 0) {
-            setRelaxationVideos([...relaxationVideos, ...newVideos]);
-            setRelaxationPage(nextPage);
+          // If we've shown all videos, fetch more
+          if (relaxationStartIndex + 3 >= relaxationVideos.length) {
+            const newVideos = await getVideosByCategory(VideoCategory.RELAXATION, relaxationPage + 1, 6);
+            if (newVideos.length > 0) {
+              setRelaxationVideos(prev => [...prev, ...newVideos]);
+              setRelaxationPage(relaxationPage + 1);
+            }
           }
+          
+          // Calculate next start index with wraparound
+          const nextRelaxIndex = (relaxationStartIndex + 3) % relaxationVideos.length;
+          setRelaxationStartIndex(nextRelaxIndex);
+          
+          const endIndex = Math.min(nextRelaxIndex + 3, relaxationVideos.length);
+          let nextVideos = relaxationVideos.slice(nextRelaxIndex, endIndex);
+          
+          // If not enough videos, wrap around
+          if (nextVideos.length < 3 && relaxationVideos.length > 3) {
+            const remaining = 3 - nextVideos.length;
+            nextVideos = [...nextVideos, ...relaxationVideos.slice(0, remaining)];
+          }
+          
+          setDisplayedRelaxationVideos(nextVideos);
         } catch (error) {
           console.error('Error loading more relaxation videos:', error);
         } finally {
-          setLoadingRelaxation(false);
+          setIsLoadingRelaxation(false);
         }
         break;
     }
   };
   
-  // Get all videos for filtering
-  const allVideos = [...meditationVideos, ...yogaForPeVideos, ...relaxationVideos];
-  
-  // Filter videos based on search and category
-  const filteredVideos = allVideos.filter(video => {
-    // Filter by search query
-    const matchesSearch = video.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          video.description.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    // Filter by category
-    const matchesCategory = selectedCategory === 'all' || 
-                            video.category === selectedCategory ||
-                            video.level.toLowerCase() === selectedCategory.toLowerCase();
-    
-    return matchesSearch && matchesCategory;
-  })
-  
+  // Handle video click - check access and show premium modal if needed
   const handleVideoClick = (video: Video) => {
-    // Check if user has access to this video based on their subscription tier
-    const hasAccess = video.tier === SubscriptionTier.BRONZE || 
-                     (userSubscriptionTier === SubscriptionTier.SILVER && 
-                      [SubscriptionTier.BRONZE, SubscriptionTier.SILVER].includes(video.tier)) ||
-                     userSubscriptionTier === SubscriptionTier.GOLD;
-    
-    if (!hasAccess) {
-      // Show premium modal if user doesn't have access
+    if (hasAccessToVideo(video, userSubscriptionTier)) {
+      // User has access - play video
+      // In a real app, redirect to video player or open modal with player
+      console.log(`Playing video: ${video.title}`);
+    } else {
+      // User doesn't have access - show premium modal
       setSelectedTier(video.tier);
       setShowPremiumModal(true);
-    } else {
-      // Handle video play - in a real app, redirect to video player
-      console.log(`Playing video: ${video.title}`);
     }
-  }
+  };
   
   return (
     <>
-      <main>
+      <main className="min-h-screen">
         {/* Hero Banner */}
         <section className="bg-gradient-to-r from-primary-800 to-primary-900 text-white py-12">
           <div className="container">
@@ -191,223 +235,277 @@ export default function VideosPage() {
           <div className="container">
             <div className="flex flex-col md:flex-row justify-between gap-4">
               {/* Search Bar */}
-              <div className="relative flex-grow max-w-xl">
+              <div className="relative flex-grow max-w-md">
                 <input
                   type="text"
                   placeholder="Search videos..."
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full pl-10 pr-4 py-2 border rounded-lg"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <FiSearch className="absolute left-3 top-3 text-gray-400" />
               </div>
               
-              {/* Filter Dropdown - simplified for this example */}
-              <div className="flex items-center">
-                <FiFilter className="mr-2 text-gray-500" />
-                <span className="mr-2 text-gray-700">Filter:</span>
-                <select 
-                  className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                >
-                  {videoCategories.map(category => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
+              {/* Filter Dropdown */}
+              <div className="relative">
+                <div className="flex items-center border rounded-lg px-4 py-2 cursor-pointer">
+                  <FiFilter className="mr-2" />
+                  <select 
+                    className="bg-transparent appearance-none focus:outline-none"
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                  >
+                    {videoCategories.map(category => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
           </div>
         </section>
         
-        {/* Video Sections */}
-        <section className="bg-gray-50 py-12">
+        {/* Video Content */}
+        <section className="py-12">
           <div className="container">
-            {selectedCategory === 'all' ? (
-              // Display all three sections when no specific category is selected
-              videoSections.map(section => {
-                // Get the appropriate videos for this section
-                let sectionVideos: Video[] = [];
+            {/* Filter videos by search and category */}
+            {(() => {
+              const filteredVideos = [...meditationVideos, ...yogaForPeVideos, ...relaxationVideos].filter(video => {
+                // Filter by search query
+                const matchesSearch = searchQuery === '' || 
+                  video.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                  video.description.toLowerCase().includes(searchQuery.toLowerCase());
                 
-                switch(section.id) {
-                  case VideoCategory.MEDITATION:
-                    sectionVideos = meditationVideos;
-                    break;
-                  case VideoCategory.YOGA_FOR_PE:
-                    sectionVideos = yogaForPeVideos;
-                    break;
-                  case VideoCategory.RELAXATION:
-                    sectionVideos = relaxationVideos;
-                    break;
-                }
+                // Filter by category
+                const matchesCategory = selectedCategory === 'all' || 
+                  video.category === selectedCategory ||
+                  (selectedCategory === 'beginner' && video.level === 'beginner') ||
+                  (selectedCategory === 'intermediate' && video.level === 'intermediate') ||
+                  (selectedCategory === 'advanced' && video.level === 'advanced');
                 
+                return matchesSearch && matchesCategory;
+              });
+              
+              // Show filtered videos or category sections
+              if (selectedCategory !== 'all' || searchQuery !== '') {
                 return (
-                  <div key={section.id} className="mb-16">
-                    <div className="mb-8">
-                      <h2 className="text-2xl md:text-3xl font-bold mb-2">{section.title}</h2>
-                      <p className="text-gray-600">{section.description}</p>
-                    </div>
+                  <div>
+                    <h2 className="text-2xl font-bold mb-6">
+                      {selectedCategory !== 'all' 
+                        ? videoCategories.find(c => c.id === selectedCategory)?.name 
+                        : 'Search Results'}
+                    </h2>
                     
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {sectionVideos
-                        .filter(video => video.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                                        video.description.toLowerCase().includes(searchQuery.toLowerCase()))
-                        .map(video => (
-                          <div key={video.id} className="card group cursor-pointer" onClick={() => handleVideoClick(video)}>
-                            <div className="relative aspect-video overflow-hidden bg-gray-300">
-                              {/* This would be the video thumbnail */}
-                              <div className="absolute inset-0 bg-gradient-to-br from-primary-500/20 to-primary-800/20 group-hover:from-primary-500/30 group-hover:to-primary-800/30 transition-all" />
-                              <div className="flex items-center justify-center w-full h-full text-white">
-                                <span className="text-lg font-medium">Video Thumbnail</span>
+                    {filteredVideos.length === 0 ? (
+                      <p className="text-gray-500">No videos found matching your criteria.</p>
+                    ) : (
+                      <>
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {filteredVideos.map(video => (
+                            <div 
+                              key={video.id} 
+                              className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+                              onClick={() => handleVideoClick(video)}
+                            >
+                              {/* Video thumbnail with play button overlay */}
+                              <div className="relative aspect-video bg-gray-200">
+                                {/* Thumbnail placeholder - in a real app, use video.thumbnail */}
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  <div className="w-16 h-16 rounded-full bg-primary-500/80 flex items-center justify-center">
+                                    {video.tier !== SubscriptionTier.BRONZE && 
+                                     !hasAccessToVideo(video, userSubscriptionTier) ? (
+                                      <FiLock className="text-white text-2xl" />
+                                    ) : (
+                                      <FiPlay className="text-white text-2xl" />
+                                    )}
+                                  </div>
+                                </div>
+                                
+                                {/* Subscription tier badge */}
+                                <div className="absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium" 
+                                  style={{
+                                    backgroundColor: video.tier === SubscriptionTier.GOLD 
+                                      ? 'rgba(234, 179, 8, 0.9)' 
+                                      : video.tier === SubscriptionTier.SILVER 
+                                        ? 'rgba(148, 163, 184, 0.9)' 
+                                        : 'rgba(59, 130, 246, 0.9)',
+                                    color: 'white'
+                                  }}
+                                >
+                                  {video.tier === SubscriptionTier.GOLD 
+                                    ? 'Gold' 
+                                    : video.tier === SubscriptionTier.SILVER 
+                                      ? 'Silver' 
+                                      : 'Free'}
+                                </div>
+                                
+                                {/* Duration badge */}
+                                <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 text-white rounded text-xs">
+                                  {video.duration}
+                                </div>
                               </div>
                               
-                              {/* Play button */}
+                              <div className="p-4">
+                                <h3 className="font-bold mb-1">{video.title}</h3>
+                                <p className="text-sm text-gray-600 line-clamp-2 mb-2">{video.description}</p>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-xs px-2 py-1 bg-gray-100 rounded-full">{video.level}</span>
+                                  <span className="text-xs text-gray-500">
+                                    {video.tier === SubscriptionTier.BRONZE 
+                                      ? 'Free' 
+                                      : video.tier === SubscriptionTier.SILVER 
+                                        ? 'Silver ($7.99)' 
+                                        : 'Gold ($9.99)'}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        {/* Load more button for filtered results */}
+                        <div className="mt-8 text-center">
+                          <button 
+                            className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center mx-auto"
+                            onClick={() => {
+                              // Handle load more videos for filtered results
+                              if (selectedCategory === VideoCategory.MEDITATION) {
+                                loadMoreVideos(VideoCategory.MEDITATION);
+                              } else if (selectedCategory === VideoCategory.YOGA_FOR_PE) {
+                                loadMoreVideos(VideoCategory.YOGA_FOR_PE);
+                              } else if (selectedCategory === VideoCategory.RELAXATION) {
+                                loadMoreVideos(VideoCategory.RELAXATION);
+                              }
+                            }}
+                            disabled={isLoadingMeditation || isLoadingYoga || isLoadingRelaxation}
+                          >
+                            {isLoadingMeditation || isLoadingYoga || isLoadingRelaxation ? (
+                              <span>Loading...</span>
+                            ) : (
+                              <>
+                                <span>Show Next Videos</span>
+                                <FiRefreshCw className="ml-2" />
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              } else {
+                // Show all three categories in separate sections
+                return videoSections.map(section => {
+                  let sectionVideos: Video[] = [];
+                  let isLoading = false;
+                  
+                  switch(section.id) {
+                    case VideoCategory.MEDITATION:
+                      sectionVideos = displayedMeditationVideos;
+                      isLoading = isLoadingMeditation;
+                      break;
+                    case VideoCategory.YOGA_FOR_PE:
+                      sectionVideos = displayedYogaForPeVideos;
+                      isLoading = isLoadingYoga;
+                      break;
+                    case VideoCategory.RELAXATION:
+                      sectionVideos = displayedRelaxationVideos;
+                      isLoading = isLoadingRelaxation;
+                      break;
+                  }
+                  
+                  return (
+                    <div key={section.id} className="mb-16">
+                      <h2 className="text-2xl font-bold mb-2">{section.title}</h2>
+                      <p className="text-gray-600 mb-6">{section.description}</p>
+                      
+                      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {sectionVideos.map(video => (
+                          <div 
+                            key={video.id} 
+                            className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+                            onClick={() => handleVideoClick(video)}
+                          >
+                            {/* Video thumbnail with play button overlay */}
+                            <div className="relative aspect-video bg-gray-200">
+                              {/* Thumbnail placeholder - in a real app, use video.thumbnail */}
                               <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-16 h-16 rounded-full bg-primary-600/90 text-white flex items-center justify-center transition-transform group-hover:scale-110">
-                                  <FiPlay size={24} />
+                                <div className="w-16 h-16 rounded-full bg-primary-500/80 flex items-center justify-center">
+                                  {video.tier !== SubscriptionTier.BRONZE && 
+                                   !hasAccessToVideo(video, userSubscriptionTier) ? (
+                                    <FiLock className="text-white text-2xl" />
+                                  ) : (
+                                    <FiPlay className="text-white text-2xl" />
+                                  )}
                                 </div>
                               </div>
                               
-                              {/* Premium badge */}
-                              {video.tier !== SubscriptionTier.BRONZE && (
-                                <div className="absolute top-3 right-3 bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center">
-                                  <FiLock className="mr-1" size={12} />
-                                  {video.tier === SubscriptionTier.SILVER ? 'Silver' : 'Gold'}
-                                </div>
-                              )}
+                              {/* Subscription tier badge */}
+                              <div className="absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium" 
+                                style={{
+                                  backgroundColor: video.tier === SubscriptionTier.GOLD 
+                                    ? 'rgba(234, 179, 8, 0.9)' 
+                                    : video.tier === SubscriptionTier.SILVER 
+                                      ? 'rgba(148, 163, 184, 0.9)' 
+                                      : 'rgba(59, 130, 246, 0.9)',
+                                  color: 'white'
+                                }}
+                              >
+                                {video.tier === SubscriptionTier.GOLD 
+                                  ? 'Gold' 
+                                  : video.tier === SubscriptionTier.SILVER 
+                                    ? 'Silver' 
+                                    : 'Free'}
+                              </div>
                               
-                              {/* Duration */}
-                              <div className="absolute bottom-3 right-3 bg-black/70 text-white px-2 py-1 rounded text-xs">
+                              {/* Duration badge */}
+                              <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 text-white rounded text-xs">
                                 {video.duration}
                               </div>
                             </div>
                             
                             <div className="p-4">
-                              <h3 className="font-bold text-lg mb-1 group-hover:text-primary-600 transition-colors">{video.title}</h3>
-                              <p className="text-gray-600 text-sm mb-2">{video.description}</p>
+                              <h3 className="font-bold mb-1">{video.title}</h3>
+                              <p className="text-sm text-gray-600 line-clamp-2 mb-2">{video.description}</p>
                               <div className="flex justify-between items-center">
-                                <span className="text-xs bg-gray-100 px-2 py-1 rounded">{video.level}</span>
-                                {video.tier !== SubscriptionTier.BRONZE ? (
-                                  <span className="text-xs text-yellow-600">{video.tier === SubscriptionTier.SILVER ? 'Silver' : 'Gold'} Subscription</span>
-                                ) : (
-                                  <span className="text-xs text-primary-600">Free</span>
-                                )}
+                                <span className="text-xs px-2 py-1 bg-gray-100 rounded-full">{video.level}</span>
+                                <span className="text-xs text-gray-500">
+                                  {video.tier === SubscriptionTier.BRONZE 
+                                    ? 'Free' 
+                                    : video.tier === SubscriptionTier.SILVER 
+                                      ? 'Silver ($7.99)' 
+                                      : 'Gold ($9.99)'}
+                                </span>
                               </div>
                             </div>
                           </div>
-                      ))}
-                    </div>
-                    
-                    {/* Load More button for this section */}
-                    {((section.id === VideoCategory.MEDITATION && meditationVideos.length >= meditationPage * 3) ||
-                      (section.id === VideoCategory.YOGA_FOR_PE && yogaForPeVideos.length >= yogaForPePage * 3) ||
-                      (section.id === VideoCategory.RELAXATION && relaxationVideos.length >= relaxationPage * 3)) && (
-                      <div className="mt-6 text-center">
-                        <button 
-                          className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-                          onClick={() => loadMoreVideos(section.id)}
-                          disabled={
-                            (section.id === VideoCategory.MEDITATION && loadingMeditation) ||
-                            (section.id === VideoCategory.YOGA_FOR_PE && loadingYogaForPe) ||
-                            (section.id === VideoCategory.RELAXATION && loadingRelaxation)
-                          }
-                        >
-                          {(section.id === VideoCategory.MEDITATION && loadingMeditation) ||
-                           (section.id === VideoCategory.YOGA_FOR_PE && loadingYogaForPe) ||
-                           (section.id === VideoCategory.RELAXATION && loadingRelaxation)
-                            ? 'Loading...'
-                            : 'Load More'}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                );
-              })
-            ) : filteredVideos.length > 0 ? (
-              // Display filtered videos when a category is selected
-              <div>
-                <div className="mb-8">
-                  <h2 className="text-2xl md:text-3xl font-bold mb-2">
-                    {videoCategories.find(cat => cat.id === selectedCategory)?.name || 'Videos'}
-                  </h2>
-                </div>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredVideos.map(video => (
-                    <div key={video.id} className="card group cursor-pointer" onClick={() => handleVideoClick(video)}>
-                      <div className="relative aspect-video overflow-hidden bg-gray-300">
-                        {/* This would be the video thumbnail */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-primary-500/20 to-primary-800/20 group-hover:from-primary-500/30 group-hover:to-primary-800/30 transition-all" />
-                        <div className="flex items-center justify-center w-full h-full text-white">
-                          <span className="text-lg font-medium">Video Thumbnail</span>
-                        </div>
-                        
-                        {/* Play button */}
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-16 h-16 rounded-full bg-primary-600/90 text-white flex items-center justify-center transition-transform group-hover:scale-110">
-                            <FiPlay size={24} />
-                          </div>
-                        </div>
-                        
-                        {/* Premium badge */}
-                        {video.tier !== SubscriptionTier.BRONZE && (
-                          <div className="absolute top-3 right-3 bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center">
-                            <FiLock className="mr-1" size={12} />
-                            {video.tier === SubscriptionTier.SILVER ? 'Silver' : 'Gold'}
-                          </div>
-                        )}
-                        
-                        {/* Duration */}
-                        <div className="absolute bottom-3 right-3 bg-black/70 text-white px-2 py-1 rounded text-xs">
-                          {video.duration}
-                        </div>
+                        ))}
                       </div>
                       
-                      <div className="p-4">
-                        <h3 className="font-bold text-lg mb-1 group-hover:text-primary-600 transition-colors">{video.title}</h3>
-                        <p className="text-gray-600 text-sm mb-2">{video.description}</p>
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs bg-gray-100 px-2 py-1 rounded">{video.level}</span>
-                          {video.tier !== SubscriptionTier.BRONZE ? (
-                            <span className="text-xs text-yellow-600">{video.tier === SubscriptionTier.SILVER ? 'Silver' : 'Gold'} Subscription</span>
+                      {/* Load more button for each section */}
+                      <div className="mt-6 text-center">
+                        <button 
+                          className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center mx-auto"
+                          onClick={() => loadMoreVideos(section.id)}
+                          disabled={isLoading}
+                        >
+                          {isLoading ? (
+                            <span>Loading...</span>
                           ) : (
-                            <span className="text-xs text-primary-600">Free</span>
+                            <>
+                              <span>Show Next Videos</span>
+                              <FiRefreshCw className="ml-2" />
+                            </>
                           )}
-                        </div>
+                        </button>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <h3 className="text-xl font-medium mb-2">No videos found</h3>
-                <p className="text-gray-600">Try adjusting your search or filter criteria</p>
-              </div>
-            )}
-            
-            {/* Load More Button for filtered results */}
-            {filteredVideos.length > 0 && selectedCategory !== 'all' && (
-              <div className="mt-12 text-center">
-                <button 
-                  className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-                  onClick={() => {
-                    // Determine which category to load more videos for
-                    if (selectedCategory === VideoCategory.MEDITATION) {
-                      loadMoreVideos(VideoCategory.MEDITATION);
-                    } else if (selectedCategory === VideoCategory.YOGA_FOR_PE) {
-                      loadMoreVideos(VideoCategory.YOGA_FOR_PE);
-                    } else if (selectedCategory === VideoCategory.RELAXATION) {
-                      loadMoreVideos(VideoCategory.RELAXATION);
-                    }
-                  }}
-                  disabled={loadingMeditation || loadingYogaForPe || loadingRelaxation}
-                >
-                  {loadingMeditation || loadingYogaForPe || loadingRelaxation ? 'Loading...' : 'Load More Videos'}
-                </button>
-              </div>
-            )}
+                  );
+                });
+              }
+            })()}
           </div>
         </section>
         
@@ -447,7 +545,7 @@ export default function VideosPage() {
               {selectedTier !== null && subscriptionTierDetails[selectedTier].name} Subscription Required
             </h3>
             <p className="mb-6">
-              {selectedTier !== null && 
+              {selectedTier !== null &&
                 `This video requires a ${subscriptionTierDetails[selectedTier].name} subscription ($${subscriptionTierDetails[selectedTier].price.toFixed(2)}/month). ${subscriptionTierDetails[selectedTier].description}.`
               }
             </p>
@@ -473,7 +571,7 @@ export default function VideosPage() {
             </div>
             
             <div className="flex justify-between">
-              <button 
+              <button
                 className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                 onClick={() => {
                   // Redirect to Vimeo OTT subscription page
@@ -489,7 +587,7 @@ export default function VideosPage() {
                 Subscribe Now
               </button>
               
-              <button 
+              <button
                 className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 onClick={() => setShowPremiumModal(false)}
               >
@@ -500,5 +598,4 @@ export default function VideosPage() {
         </div>
       )}
     </>
-  )
-}
+  );
