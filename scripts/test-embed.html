@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vimeo Embed Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .video-container {
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+        }
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Vimeo Embed Test</h1>
+    <p>This page tests direct embedding of Vimeo videos without going through the Next.js application.</p>
+
+    <div class="video-container">
+        <h2>Bronze Tier: Ab Circle 1</h2>
+        <p>Video ID: 1095788590</p>
+        <div class="video-wrapper">
+            <iframe 
+                src="https://player.vimeo.com/video/1095788590?autoplay=0&title=0&byline=0&portrait=0" 
+                frameborder="0" 
+                allow="autoplay; fullscreen; picture-in-picture" 
+                allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+
+    <div class="video-container">
+        <h2>Silver Tier: Body Scan with Flowers</h2>
+        <p>Video ID: 452426275</p>
+        <div class="video-wrapper">
+            <iframe 
+                src="https://player.vimeo.com/video/452426275?autoplay=0&title=0&byline=0&portrait=0" 
+                frameborder="0" 
+                allow="autoplay; fullscreen; picture-in-picture" 
+                allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+
+    <div class="video-container">
+        <h2>Gold Tier: Ab Circle 2</h2>
+        <p>Video ID: 1095789404</p>
+        <div class="video-wrapper">
+            <iframe 
+                src="https://player.vimeo.com/video/1095789404?autoplay=0&title=0&byline=0&portrait=0" 
+                frameborder="0" 
+                allow="autoplay; fullscreen; picture-in-picture" 
+                allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+
+    <script>
+        // Log when iframes load or fail
+        document.addEventListener('DOMContentLoaded', () => {
+            const iframes = document.querySelectorAll('iframe');
+            iframes.forEach(iframe => {
+                iframe.addEventListener('load', () => {
+                    console.log(`Iframe for ${iframe.src} loaded successfully`);
+                });
+                iframe.addEventListener('error', () => {
+                    console.error(`Error loading iframe for ${iframe.src}`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
