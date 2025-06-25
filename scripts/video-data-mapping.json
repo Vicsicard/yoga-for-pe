@@ -1,5 +1,68 @@
 [
   {
+    "id": "1095932798",
+    "title": "Open the Gate, Release the Drama",
+    "category": "yoga-for-pe",
+    "tier": "silver",
+    "description": "This hip-opening sequence focuses on gate pose variations to release tension and stress from the hips and lower back. Perfect for students who sit for long periods or experience hip tightness."
+  },
+  {
+    "id": "1095936528",
+    "title": "IT bands, it's not techy it's stretchy",
+    "category": "yoga-for-pe",
+    "tier": "gold",
+    "description": "This IT band-focused practice helps release tension in the outer thighs and hips, improving mobility and reducing discomfort. Great for runners, cyclists, and anyone with tight IT bands."
+  },
+  {
+    "id": "1095940220",
+    "title": "Sun Salutation Foundations: Your Yoga Foundation",
+    "category": "yoga-for-pe",
+    "tier": "bronze",
+    "description": "Learn the fundamentals of Sun Salutation, the foundation of many yoga practices. This sequence builds strength, flexibility, and focus while connecting movement to breath."
+  },
+  {
+    "id": "1095941884",
+    "title": "Rise & Shine: Sun Salutation with positive Affirmations (Because You're a Superhero)",
+    "category": "yoga-for-pe",
+    "tier": "silver",
+    "description": "Energize your day with this uplifting Sun Salutation practice that incorporates positive affirmations to boost confidence and mood while building strength and flexibility."
+  },
+  {
+    "id": "1095944160",
+    "title": "Firefighter Flow: Shoulder & Hip Rescue",
+    "category": "yoga-for-pe",
+    "tier": "gold",
+    "description": "This targeted practice releases tension in the shoulders and hips, areas where we often hold stress. Perfect for anyone with shoulder or hip tightness."
+  },
+  {
+    "id": "1095947445",
+    "title": "Sunrise Salutation: Flowing with Lake Michigan's First Light",
+    "category": "yoga-for-pe",
+    "tier": "silver",
+    "description": "Flow with the rhythm of nature in this Sun Salutation practice filmed at sunrise on Lake Michigan. Connect with the natural world while building strength and flexibility."
+  },
+  {
+    "id": "1095949456",
+    "title": "The Wonder of Warriors",
+    "category": "yoga-for-pe",
+    "tier": "gold",
+    "description": "Explore the power and stability of warrior poses in this strength-building practice. Develop leg strength, core stability, and mental focus through these empowering poses."
+  },
+  {
+    "id": "1095785550",
+    "title": "Branch Out",
+    "category": "yoga-for-pe",
+    "tier": "silver",
+    "description": "This tree pose-focused practice helps improve balance, concentration, and posture. Connect with your inner strength while finding stability in movement."
+  },
+  {
+    "id": "1095962512",
+    "title": "Inhale Peace, Exhale Stress",
+    "category": "yoga-for-pe",
+    "tier": "bronze",
+    "description": "This breath-centered practice helps calm the nervous system and release tension. Learn to use your breath as a tool for managing stress and finding peace."
+  },
+  {
     "id": "1095790317",
     "title": "Dog Days & Core Plays",
     "category": "yoga-for-pe",
@@ -40,5 +103,180 @@
     "category": "relaxation",
     "tier": "silver",
     "description": "This audio body scan helps students tune into their body by guiding them through the body parts and connecting to the breath. Using anatomical terms for muscle and joint identification and basic physiological functions allows the students to truly connect the body and mind. This is a great introductory mindful activity to do in a standard classroom, physical education setting or at home."
+  },
+  {
+    "id": "1095977504",
+    "title": "Nostril Navigator: Alt Nostril Breath",
+    "category": "relaxation",
+    "tier": "silver",
+    "description": "Take a breath on both sides! This fun and simple practice alternates your breath between the left and right sides, helping you feel balanced, calm, and ready to take on the day."
+  },
+  {
+    "id": "1095979488",
+    "title": "Nostril Navigator: Alt Nostril Breath",
+    "category": "relaxation",
+    "tier": "bronze",
+    "description": "This easy and effective practice alternates your breath between the left and right sides, supporting a sense of balance, calm, and readiness for the day ahead."
+  },
+  {
+    "id": "1095962512",
+    "title": "Breath in Peace & Out Stress The basics of Long Deep Breath",
+    "category": "relaxation",
+    "tier": "silver",
+    "description": "Long Deep Breath is a foundational breath practice that helps to calm the nervous system. It's a great tool for moments of stress and can be done anywhere."
+  },
+  {
+    "id": "1095964031",
+    "title": "The Warm Fuzzy Tale",
+    "category": "relaxation",
+    "tier": "bronze",
+    "description": "A heartwarming story that teaches the importance of kindness and sharing positive energy with others. Perfect for creating a calm, reflective atmosphere."
+  },
+  {
+    "id": "457053392",
+    "title": "High-5 Meditation",
+    "category": "meditation",
+    "tier": "bronze",
+    "description": "This is a great breath pattern for bringing awareness to your breathing. Tracing your hand helps create a connection between the body, breath, and mind."
+  },
+  {
+    "id": "1095975280",
+    "title": "Calming Heart at the Royal Arch",
+    "category": "meditation",
+    "tier": "gold",
+    "description": "Calming Heart is a meditation from the Kundalini Yoga lineage. It involves placing one hand at the heart center to create a still point, while the other hand is held in a receptive position of peace. This practice fosters a deep sense of calm and tranquility."
+  },
+  {
+    "id": "1095977504",
+    "title": "Nostril Navigator: Alt Nostril Breath",
+    "category": "meditation",
+    "tier": "gold",
+    "description": "Take a breath on both sides!This fun and simple practice alternates your breath between the left and right sides, helping you feel balanced, calm, and ready to take on the day."
+  },
+  {
+    "id": "1095979488",
+    "title": "Nostril Navigator: Alt Nostril Breath",
+    "category": "meditation",
+    "tier": "gold",
+    "description": "This easy and effective practice alternates your breath between the left and right sides, supporting a sense of balance, calm, and readiness for the day ahead."
+  },
+  {
+    "id": "1095981781",
+    "title": "Box Breath Flowing into Calming Heart",
+    "category": "meditation",
+    "tier": "silver",
+    "description": "Box Breath is a simple breathing technique used to create a steady rhythm in the breath. It's a great tool for moments of stress and can be done anywhere. We followed up this Box Breath with the Calming Heart Meditation to give it some extra power!"
+  },
+  {
+    "id": "1095984408",
+    "title": "I AM Flow Mediation",
+    "category": "meditation",
+    "tier": "silver",
+    "description": "I AM is a meditation from the Kundalini Yoga linage. Helping us dissolve the lables we give ourselves. The first I AM causes the brain to search for an answer BUT followed by the second I AM, the answer becomes I AM what I AM."
+  },
+  {
+    "id": "1095986619",
+    "title": "I AM Instructions & Flow Meditation",
+    "category": "meditation",
+    "tier": "gold",
+    "description": "I AM is a meditation from the Kundalini Yoga linage. Helping us dissolve the lables we give ourselves. The first I AM causes the brain to search for an answer BUT followed by the second I AM, the answer becomes I AM what I AM."
+  },
+  {
+    "id": "1095962512",
+    "title": "Breath in Peace & Out Stress The basics of Long Deep Breath",
+    "category": "meditation",
+    "tier": "bronze",
+    "description": "Long Deep Breath is a foundational breath practice that helps to calm the nervous system. It's a great tool for moments of stress and can be done anywhere."
+  },
+  {
+    "id": "1095989893",
+    "title": "Kirtan Kriya",
+    "category": "meditation",
+    "tier": "gold",
+    "description": "Kirtan Kriya is a meditation from the Kundalini Yoga lineage. It involves chanting the mantra 'Sa Ta Na Ma' while touching each finger to the thumb in sequence. This practice is known for its benefits to brain health and emotional well-being."
+  },
+  {
+    "id": "1095972331",
+    "title": "The Flower by Michael Franti & Spearhead, Victoria Canal",
+    "category": "mindful-movements",
+    "tier": "bronze",
+    "description": "A mindful movement practice set to 'The Flower' by Michael Franti & Spearhead featuring Victoria Canal. This gentle flow helps students connect movement with music and breath."
+  },
+  {
+    "id": "1095972355",
+    "title": "Fight Song by Rachel Platten",
+    "category": "mindful-movements",
+    "tier": "silver",
+    "description": "An empowering mindful movement practice set to 'Fight Song' by Rachel Platten. This sequence builds confidence and inner strength through synchronized movement and breath."
+  },
+  {
+    "id": "1095972897",
+    "title": "The Champion by Carrie Underwood, Ludacris",
+    "category": "mindful-movements",
+    "tier": "gold",
+    "description": "A dynamic mindful movement practice set to 'The Champion' by Carrie Underwood featuring Ludacris. This energizing sequence celebrates personal power and resilience."
+  },
+  {
+    "id": "1095973459",
+    "title": "Thunder by Imagine Dragons",
+    "category": "mindful-movements",
+    "tier": "silver",
+    "description": "An electrifying mindful movement practice set to 'Thunder' by Imagine Dragons. This sequence encourages students to express themselves boldly through movement and breath."
+  },
+  {
+    "id": "1095979488",
+    "title": "Nostril Navigator: Alt Nostril Breath",
+    "category": "meditation",
+    "tier": "gold",
+    "description": "This easy and effective practice alternates your breath between the left and right sides, supporting a sense of balance, calm, and readiness for the day ahead."
+  },
+  {
+    "id": "1095979488",
+    "title": "Nostril Navigator: Alt Nostril Breath",
+    "category": "relaxation",
+    "tier": "silver",
+    "description": "This easy and effective practice alternates your breath between the left and right sides, supporting a sense of balance, calm, and readiness for the day ahead."
+  },
+  {
+    "id": "1095787991",
+    "title": "Chop Shop Countdown with Instructions",
+    "category": "yoga-for-pe",
+    "tier": "gold",
+    "description": "This instructional rep-based yoga flow starts at 5 and works its way down to 1---crushing stress, tension, and distractions with every breath and movement. A playful countdown that blends strength, stretching, and focus to leave you grounded and energized."
+  },
+  {
+    "id": "1095940220",
+    "title": "Sun Salutation Foundations with instsructions",
+    "category": "yoga-for-pe",
+    "tier": "bronze",
+    "description": "Learn the fundamentals of Sun Salutation, the foundation of many yoga practices. This sequence builds strength, flexibility, and focus while connecting movement to breath."
+  },
+  {
+    "id": "1095947445",
+    "title": "Sunrise Salutation: Instructions to flow with Lake Michigan's First Light",
+    "category": "yoga-for-pe",
+    "tier": "silver",
+    "description": "Flow with the rhythm of nature in this Sun Salutation practice filmed at sunrise on Lake Michigan. Connect with the natural world while building strength and flexibility."
+  },
+  {
+    "id": "1095979488",
+    "title": "Nostril Navigator: Alt Nostril Breath",
+    "category": "meditation",
+    "tier": "silver",
+    "description": "This easy and effective practice alternates your breath between the left and right sides, supporting a sense of balance, calm, and readiness for the day ahead."
+  },
+  {
+    "id": "1095979488",
+    "title": "Nostril Navigator: Alt Nostril Breath",
+    "category": "relaxation",
+    "tier": "bronze",
+    "description": "This easy and effective practice alternates your breath between the left and right sides, supporting a sense of balance, calm, and readiness for the day ahead."
+  },
+  {
+    "id": "1095787991",
+    "title": "Chop Shop Countdown with Instructions",
+    "category": "yoga-for-pe",
+    "tier": "bronze",
+    "description": "This instructional rep-based yoga flow starts at 5 and works its way down to 1---crushing stress, tension, and distractions with every breath and movement. A playful countdown that blends strength, stretching, and focus to leave you grounded and energized."
   }
 ]
