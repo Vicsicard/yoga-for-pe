@@ -13,6 +13,7 @@ import { FiUsers, FiAward, FiHeart, FiBook, FiCheckCircle, FiArrowRight, FiPlay 
 import { useState, useEffect } from 'react'
 import { getFeaturedFreeVideos, Video, SubscriptionTier, VideoCategory } from '../lib/vimeo-browser'
 import Link from 'next/link'
+import FeaturedVideos from '../components/FeaturedVideos'
 
 // Content bubbles for Bend, Brighten, Bloom section
 const contentBubbles = [
@@ -230,57 +231,7 @@ export default function Home() {
           align="center"
         />
         
-        <div className="grid md:grid-cols-3 gap-8 mt-12">
-          {isLoading ? (
-            <div className="col-span-3 text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Loading featured videos...</p>
-            </div>
-          ) : (
-            featuredVideos.map(video => (
-              <Link href={`/videos?video=${video.id}`} key={video.id} className="block">
-                <Card key={video.id} hover={true}>
-                  <div className="relative aspect-video overflow-hidden bg-gray-300">
-                    {/* Video thumbnail */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary-500/20 to-primary-800/20 group-hover:from-primary-500/30 group-hover:to-primary-800/30 transition-all" />
-                    <div className="flex items-center justify-center w-full h-full text-white">
-                      <span className="text-lg font-medium">Video Thumbnail</span>
-                    </div>
-                    
-                    {/* Play button */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-16 h-16 rounded-full bg-primary-600/90 text-white flex items-center justify-center transition-transform hover:scale-110">
-                        <FiPlay size={24} />
-                      </div>
-                    </div>
-                    
-                    {/* Category and Free badge */}
-                    <div className="absolute top-3 right-3 bg-primary-600 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center">
-                      {(video.category === 'meditation' ? 'Meditation' : 
-                       video.category === 'yoga-for-pe' ? 'Yoga for PE' : 'Relaxation')} • Free
-                    </div>
-                    
-                    {/* Duration */}
-                    <div className="absolute bottom-3 right-3 bg-black/70 text-white px-2 py-1 rounded text-xs">
-                      {video.duration}
-                    </div>
-                  </div>
-                  
-                  <CardContent>
-                    <CardTitle>{video.title}</CardTitle>
-                    <CardDescription>{video.description}</CardDescription>
-                  </CardContent>
-                  <CardFooter>
-                    <div className="flex justify-between items-center w-full">
-                      <span className="text-xs bg-gray-100 px-2 py-1 rounded">{video.level}</span>
-                      <span className="text-xs text-primary-600">Free</span>
-                    </div>
-                  </CardFooter>
-                </Card>
-              </Link>
-            ))
-          )}
-        </div>
+        <FeaturedVideos videos={featuredVideos} isLoading={isLoading} />
         
         <div className="text-center mt-8">
           <Button href="/videos" variant="default">
