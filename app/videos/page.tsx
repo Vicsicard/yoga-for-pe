@@ -15,11 +15,6 @@ import SubscriptionCTA from '../../components/SubscriptionCTA'
 // Section definitions
 const videoSections = [
   {
-    id: VideoCategory.MEDITATION,
-    title: 'Meditation',
-    description: 'Take a breath—you\'ve got this. Mindfulness offers simple, science-backed tools to help you feel calmer, more focused, and grounded.',
-  },
-  {
     id: VideoCategory.YOGA_FOR_PE,
     title: 'Yoga for PE',
     description: 'Bring the benefits of yoga to your PE curriculum with these classroom-ready sequences and activities.',
@@ -28,6 +23,11 @@ const videoSections = [
     id: VideoCategory.RELAXATION,
     title: 'Relaxation',
     description: 'Help students unwind, restore, and find balance with these calming sequences and techniques.',
+  },
+  {
+    id: VideoCategory.MEDITATION,
+    title: 'Meditation',
+    description: 'Take a breath—you\'ve got this. Mindfulness offers simple, science-backed tools to help you feel calmer, more focused, and grounded.',
   },
   {
     id: VideoCategory.MINDFUL_MOVEMENTS,
@@ -53,26 +53,37 @@ export default function VideosPage() {
   const [meditationVideos, setMeditationVideos] = useState<Video[]>([])
   const [yogaForPeVideos, setYogaForPeVideos] = useState<Video[]>([])
   const [relaxationVideos, setRelaxationVideos] = useState<Video[]>([])
+  const [mindfulMovementsVideos, setMindfulMovementsVideos] = useState<Video[]>([])
   
-  // State for displayed videos in each category (3 at a time)
+  // State for displayed videos in each category (3 or 6 at a time)
   const [displayedMeditationVideos, setDisplayedMeditationVideos] = useState<Video[]>([])
   const [displayedYogaForPeVideos, setDisplayedYogaForPeVideos] = useState<Video[]>([])
   const [displayedRelaxationVideos, setDisplayedRelaxationVideos] = useState<Video[]>([])
+  const [displayedMindfulMovementsVideos, setDisplayedMindfulMovementsVideos] = useState<Video[]>([])
+  
+  // State for tracking which sections are expanded (showing 6 videos instead of 3)
+  const [isMeditationExpanded, setIsMeditationExpanded] = useState(false)
+  const [isYogaForPeExpanded, setIsYogaForPeExpanded] = useState(false)
+  const [isRelaxationExpanded, setIsRelaxationExpanded] = useState(false)
+  const [isMindfulMovementsExpanded, setIsMindfulMovementsExpanded] = useState(false)
   
   // State for current display index in each category
   const [meditationStartIndex, setMeditationStartIndex] = useState(0)
   const [yogaForPeStartIndex, setYogaForPeStartIndex] = useState(0)
   const [relaxationStartIndex, setRelaxationStartIndex] = useState(0)
+  const [mindfulMovementsStartIndex, setMindfulMovementsStartIndex] = useState(0)
   
   // State for loading status in each category
   const [isLoadingMeditation, setIsLoadingMeditation] = useState(false)
   const [isLoadingYoga, setIsLoadingYoga] = useState(false)
   const [isLoadingRelaxation, setIsLoadingRelaxation] = useState(false)
+  const [isLoadingMindfulMovements, setIsLoadingMindfulMovements] = useState(false)
   
   // State for pagination in each category
   const [meditationPage, setMeditationPage] = useState(1)
   const [yogaForPePage, setYogaForPePage] = useState(1)
   const [relaxationPage, setRelaxationPage] = useState(1)
+  const [mindfulMovementsPage, setMindfulMovementsPage] = useState(1)
   
   // For demo purposes, we'll use Bronze tier (free) as the default user tier
   // In a real app, this would come from authentication
@@ -84,27 +95,33 @@ export default function VideosPage() {
       setIsLoadingMeditation(true);
       setIsLoadingYoga(true);
       setIsLoadingRelaxation(true);
+      setIsLoadingMindfulMovements(true);
       
       try {
         // Fetch videos from our catalog data
         const meditationData = await getVideosFromCatalog(VideoCategory.MEDITATION, 1, 9);
         const yogaForPeData = await getVideosFromCatalog(VideoCategory.YOGA_FOR_PE, 1, 9);
         const relaxationData = await getVideosFromCatalog(VideoCategory.RELAXATION, 1, 9);
+        const mindfulMovementsData = await getVideosFromCatalog(VideoCategory.MINDFUL_MOVEMENTS, 1, 9);
         
-        setMeditationVideos(meditationData);
-        setYogaForPeVideos(yogaForPeData);
-        setRelaxationVideos(relaxationData);
+        // Set all videos
+        setMeditationVideos(meditationData || []);
+        setYogaForPeVideos(yogaForPeData || []);
+        setRelaxationVideos(relaxationData || []);
+        setMindfulMovementsVideos(mindfulMovementsData || []);
         
         // Set initial displayed videos (first 3 of each category)
-        setDisplayedMeditationVideos(meditationData.slice(0, 3));
-        setDisplayedYogaForPeVideos(yogaForPeData.slice(0, 3));
-        setDisplayedRelaxationVideos(relaxationData.slice(0, 3));
+        setDisplayedMeditationVideos(meditationData ? meditationData.slice(0, 3) : []);
+        setDisplayedYogaForPeVideos(yogaForPeData ? yogaForPeData.slice(0, 3) : []);
+        setDisplayedRelaxationVideos(relaxationData ? relaxationData.slice(0, 3) : []);
+        setDisplayedMindfulMovementsVideos(mindfulMovementsData ? mindfulMovementsData.slice(0, 3) : []);
       } catch (error) {
         console.error('Error fetching videos:', error);
       } finally {
         setIsLoadingMeditation(false);
         setIsLoadingYoga(false);
         setIsLoadingRelaxation(false);
+        setIsLoadingMindfulMovements(false);
       }
     };
     
@@ -117,29 +134,70 @@ export default function VideosPage() {
       case VideoCategory.MEDITATION:
         setIsLoadingMeditation(true);
         try {
-          // If we've shown all videos, fetch more
-          if (meditationStartIndex + 3 >= meditationVideos.length) {
-            const newMeditationVideos = await getVideosFromCatalog(VideoCategory.MEDITATION, meditationPage + 1, 6);
-            if (newMeditationVideos.length > 0) {
-              setMeditationVideos(prev => [...prev, ...newMeditationVideos]);
-              setMeditationPage(meditationPage + 1);
+          // Toggle expanded state if not expanded yet
+          if (!isMeditationExpanded) {
+            setIsMeditationExpanded(true);
+            
+            // Calculate the next 3 videos to add (after the initial 3)
+            const nextStartIndex = 3;
+            const endIndex = Math.min(nextStartIndex + 3, meditationVideos.length);
+            
+            // If we need more videos, fetch them
+            if (endIndex > meditationVideos.length) {
+              const newVideos = await getVideosFromCatalog(VideoCategory.MEDITATION, meditationPage + 1, 6);
+              if (newVideos.length > 0) {
+                setMeditationVideos(prev => [...prev, ...newVideos]);
+                setMeditationPage(meditationPage + 1);
+              }
+            }
+            
+            // Get the next 3 videos to add to the display
+            const nextVideos = meditationVideos.slice(nextStartIndex, Math.min(nextStartIndex + 3, meditationVideos.length));
+            
+            // Combine the current 3 videos with the next 3
+            setDisplayedMeditationVideos([...displayedMeditationVideos, ...nextVideos]);
+            setMeditationStartIndex(3); // Track that we're showing videos 0-5
+          } else {
+            // Already expanded, replace the bottom row (last 3 videos)
+            
+            // Calculate the next 3 videos to show
+            const nextStartIndex = meditationStartIndex + 3;
+            
+            // Check if we need to wrap around to the beginning
+            if (nextStartIndex >= meditationVideos.length) {
+              // We've shown all videos, start over from the beginning
+              const nextVideos = meditationVideos.slice(0, 3);
+              setDisplayedMeditationVideos([...displayedMeditationVideos.slice(0, 3), ...nextVideos]);
+              setMeditationStartIndex(0);
+            } else {
+              // Get the next 3 videos
+              const endIndex = Math.min(nextStartIndex + 3, meditationVideos.length);
+              
+              // If we need more videos, fetch them
+              if (endIndex > meditationVideos.length) {
+                const newVideos = await getVideosFromCatalog(VideoCategory.MEDITATION, meditationPage + 1, 6);
+                if (newVideos.length > 0) {
+                  setMeditationVideos(prev => [...prev, ...newVideos]);
+                  setMeditationPage(meditationPage + 1);
+                }
+              }
+              
+              // Get the next 3 videos
+              const nextVideos = meditationVideos.slice(nextStartIndex, Math.min(nextStartIndex + 3, meditationVideos.length));
+              
+              // If we don't have enough videos to fill the row, we need to wrap around
+              if (nextVideos.length < 3 && meditationVideos.length > 3) {
+                const remaining = 3 - nextVideos.length;
+                const wrappedVideos = meditationVideos.slice(0, remaining);
+                setDisplayedMeditationVideos([...displayedMeditationVideos.slice(0, 3), ...nextVideos, ...wrappedVideos]);
+                setMeditationStartIndex(0);
+              } else {
+                // Replace the bottom row with the next 3 videos
+                setDisplayedMeditationVideos([...displayedMeditationVideos.slice(0, 3), ...nextVideos]);
+                setMeditationStartIndex(nextStartIndex);
+              }
             }
           }
-          
-          // Calculate next start index with wraparound
-          const nextMeditationIndex = (meditationStartIndex + 3) % meditationVideos.length;
-          setMeditationStartIndex(nextMeditationIndex);
-          
-          const endIndex = Math.min(nextMeditationIndex + 3, meditationVideos.length);
-          let nextVideos = meditationVideos.slice(nextMeditationIndex, endIndex);
-          
-          // If not enough videos, wrap around
-          if (nextVideos.length < 3 && meditationVideos.length > 3) {
-            const remaining = 3 - nextVideos.length;
-            nextVideos = [...nextVideos, ...meditationVideos.slice(0, remaining)];
-          }
-          
-          setDisplayedMeditationVideos(nextVideos);
         } catch (error) {
           console.error('Error loading more meditation videos:', error);
         } finally {
@@ -150,31 +208,65 @@ export default function VideosPage() {
       case VideoCategory.YOGA_FOR_PE:
         setIsLoadingYoga(true);
         try {
-          // If we've shown all videos, fetch more
-          if (yogaForPeStartIndex + 3 >= yogaForPeVideos.length) {
-            const newVideos = await getVideosFromCatalog(VideoCategory.YOGA_FOR_PE, yogaForPePage + 1, 6);
-            if (newVideos.length > 0) {
-              setYogaForPeVideos(prev => [...prev, ...newVideos]);
-              setYogaForPePage(yogaForPePage + 1);
+          // Toggle expanded state if not expanded yet
+          if (!isYogaForPeExpanded) {
+            setIsYogaForPeExpanded(true);
+            
+            // Calculate the next 3 videos to add (after the initial 3)
+            const nextStartIndex = 3;
+            const endIndex = Math.min(nextStartIndex + 3, yogaForPeVideos.length);
+            
+            // If we need more videos, fetch them
+            if (endIndex > yogaForPeVideos.length) {
+              const newVideos = await getVideosFromCatalog(VideoCategory.YOGA_FOR_PE, yogaForPePage + 1, 6);
+              if (newVideos.length > 0) {
+                setYogaForPeVideos(prev => [...prev, ...newVideos]);
+                setYogaForPePage(yogaForPePage + 1);
+              }
+            }
+            
+            // Get the next 3 videos to add to the display
+            const nextVideos = yogaForPeVideos.slice(nextStartIndex, Math.min(nextStartIndex + 3, yogaForPeVideos.length));
+            
+            // Combine the current 3 videos with the next 3
+            setDisplayedYogaForPeVideos([...displayedYogaForPeVideos, ...nextVideos]);
+            setYogaForPeStartIndex(3); // Track that we're showing videos 0-5
+          } else {
+            // Already expanded, replace the bottom row (last 3 videos)
+            
+            // Calculate the next 3 videos to show
+            const nextStartIndex = yogaForPeStartIndex + 3;
+            
+            // Check if we need to wrap around to the beginning
+            if (nextStartIndex >= yogaForPeVideos.length) {
+              // We've shown all videos, start over from the beginning
+              const nextVideos = yogaForPeVideos.slice(0, 3);
+              setDisplayedYogaForPeVideos([...displayedYogaForPeVideos.slice(0, 3), ...nextVideos]);
+              setYogaForPeStartIndex(0);
+            } else {
+              // Get the next 3 videos
+              const endIndex = Math.min(nextStartIndex + 3, yogaForPeVideos.length);
+              
+              // If we need more videos, fetch them
+              if (endIndex > yogaForPeVideos.length) {
+                const newVideos = await getVideosFromCatalog(VideoCategory.YOGA_FOR_PE, yogaForPePage + 1, 6);
+                if (newVideos.length > 0) {
+                  setYogaForPeVideos(prev => [...prev, ...newVideos]);
+                  setYogaForPePage(yogaForPePage + 1);
+                }
+              }
+              
+              // Get the top row (first 3 videos)
+              const topRow = displayedYogaForPeVideos.slice(0, 3);
+              
+              // Get the next 3 videos for the bottom row
+              const bottomRow = yogaForPeVideos.slice(nextStartIndex, nextStartIndex + 3);
+              
+              // Update the displayed videos and start index
+              setDisplayedYogaForPeVideos([...topRow, ...bottomRow]);
+              setYogaForPeStartIndex(nextStartIndex);
             }
           }
-          
-          // Calculate next start index with wraparound
-          const nextYogaIndex = (yogaForPeStartIndex + 3) % yogaForPeVideos.length;
-          setYogaForPeStartIndex(nextYogaIndex);
-          
-          const endIndex = Math.min(nextYogaIndex + 3, yogaForPeVideos.length);
-          let nextVideos = yogaForPeVideos.slice(nextYogaIndex, endIndex);
-          
-          // If not enough videos, wrap around
-          if (nextVideos.length < 3 && yogaForPeVideos.length > 3) {
-            const remaining = 3 - nextVideos.length;
-            nextVideos = [...nextVideos, ...yogaForPeVideos.slice(0, remaining)];
-          }
-          
-          setDisplayedYogaForPeVideos(nextVideos);
-        } catch (error) {
-          console.error('Error loading more yoga videos:', error);
         } finally {
           setIsLoadingYoga(false);
         }
@@ -183,33 +275,98 @@ export default function VideosPage() {
       case VideoCategory.RELAXATION:
         setIsLoadingRelaxation(true);
         try {
-          // If we've shown all videos, fetch more
-          if (relaxationStartIndex + 3 >= relaxationVideos.length) {
-            const newVideos = await getVideosFromCatalog(VideoCategory.RELAXATION, relaxationPage + 1, 6);
-            if (newVideos.length > 0) {
-              setRelaxationVideos(prev => [...prev, ...newVideos]);
-              setRelaxationPage(relaxationPage + 1);
+          if (!relaxationVideos || relaxationVideos.length === 0) {
+            const initialVideos = await getVideosFromCatalog(VideoCategory.RELAXATION, 1, 9);
+            if (initialVideos && initialVideos.length > 0) {
+              setRelaxationVideos(initialVideos);
+              setDisplayedRelaxationVideos(initialVideos.slice(0, 3));
+            } else {
+              console.error('No relaxation videos available');
+              setIsLoadingRelaxation(false);
+              return;
             }
           }
           
-          // Calculate next start index with wraparound
-          const nextRelaxIndex = (relaxationStartIndex + 3) % relaxationVideos.length;
-          setRelaxationStartIndex(nextRelaxIndex);
-          
-          const endIndex = Math.min(nextRelaxIndex + 3, relaxationVideos.length);
-          let nextVideos = relaxationVideos.slice(nextRelaxIndex, endIndex);
-          
-          // If not enough videos, wrap around
-          if (nextVideos.length < 3 && relaxationVideos.length > 3) {
-            const remaining = 3 - nextVideos.length;
-            nextVideos = [...nextVideos, ...relaxationVideos.slice(0, remaining)];
+          // If not expanded yet, show 6 videos
+          if (!isRelaxationExpanded) {
+            setDisplayedRelaxationVideos(relaxationVideos.slice(0, 6));
+            setIsRelaxationExpanded(true);
+          } else {
+            // If already expanded, rotate the bottom row
+            const topRow = displayedRelaxationVideos.slice(0, 3);
+            
+            // Calculate next page start index
+            let nextStartIndex = relaxationStartIndex + 3;
+            
+            // If we've reached the end, wrap around to the beginning
+            if (nextStartIndex >= relaxationVideos.length) {
+              nextStartIndex = 0;
+              setRelaxationPage(1);
+            } else {
+              setRelaxationPage(relaxationPage + 1);
+            }
+            
+            // Get the next 3 videos for the bottom row
+            const bottomRow = relaxationVideos.slice(nextStartIndex, nextStartIndex + 3);
+            
+            // Update the displayed videos and start index
+            setDisplayedRelaxationVideos([...topRow, ...bottomRow]);
+            setRelaxationStartIndex(nextStartIndex);
           }
-          
-          setDisplayedRelaxationVideos(nextVideos);
-        } catch (error) {
-          console.error('Error loading more relaxation videos:', error);
         } finally {
           setIsLoadingRelaxation(false);
+        }
+        break;
+        
+      case VideoCategory.MINDFUL_MOVEMENTS:
+        setIsLoadingMindfulMovements(true);
+        try {
+          // Ensure we have videos to work with
+          if (!mindfulMovementsVideos || mindfulMovementsVideos.length === 0) {
+            const initialVideos = await getVideosFromCatalog(VideoCategory.MINDFUL_MOVEMENTS, 1, 9);
+            if (initialVideos && initialVideos.length > 0) {
+              setMindfulMovementsVideos(initialVideos);
+              setDisplayedMindfulMovementsVideos(initialVideos.slice(0, 3));
+            } else {
+              console.error('No mindful movements videos available');
+              setIsLoadingMindfulMovements(false);
+              return;
+            }
+          }
+          
+          // If not expanded yet, show 6 videos (or all if less than 6)
+          if (!isMindfulMovementsExpanded) {
+            const videosToShow = mindfulMovementsVideos.slice(0, Math.min(6, mindfulMovementsVideos.length));
+            setDisplayedMindfulMovementsVideos(videosToShow);
+            setIsMindfulMovementsExpanded(true);
+          } else {
+            // If already expanded, rotate the bottom row
+            const topRow = displayedMindfulMovementsVideos.slice(0, 3);
+            
+            // Calculate next page start index
+            let nextStartIndex = mindfulMovementsStartIndex + 3;
+            
+            // If we've reached the end, wrap around to the beginning
+            if (nextStartIndex >= mindfulMovementsVideos.length) {
+              nextStartIndex = 0;
+              setMindfulMovementsPage(1);
+            } else {
+              setMindfulMovementsPage(mindfulMovementsPage + 1);
+            }
+            
+            // Get the next 3 videos for the bottom row (or fewer if not enough)
+            const remainingCount = mindfulMovementsVideos.length - nextStartIndex;
+            const bottomRowCount = Math.min(3, remainingCount);
+            const bottomRow = mindfulMovementsVideos.slice(nextStartIndex, nextStartIndex + bottomRowCount);
+            
+            // Update the displayed videos and start index
+            setDisplayedMindfulMovementsVideos([...topRow, ...bottomRow]);
+            setMindfulMovementsStartIndex(nextStartIndex);
+          }
+        } catch (error) {
+          console.error('Error loading more mindful movements videos:', error);
+        } finally {
+          setIsLoadingMindfulMovements(false);
         }
         break;
     }
@@ -236,6 +393,8 @@ export default function VideosPage() {
       loadMoreVideos(VideoCategory.YOGA_FOR_PE);
     } else if (selectedCategory === VideoCategory.RELAXATION) {
       loadMoreVideos(VideoCategory.RELAXATION);
+    } else if (selectedCategory === VideoCategory.MINDFUL_MOVEMENTS) {
+      loadMoreVideos(VideoCategory.MINDFUL_MOVEMENTS);
     }
   };
   
@@ -307,43 +466,56 @@ export default function VideosPage() {
                 onLoadMore={handleFilteredLoadMore}
               />
             ) : (
-              // Show all three categories in separate sections
-              videoSections.map(section => {
-                let sectionVideos: Video[] = [];
-                let isLoading = false;
-                let loadMoreHandler = () => {};
+              // Show all categories in separate sections
+              <>
+                {/* Yoga for PE Videos */}
+                <VideoSection
+                  title="Yoga for PE Videos"
+                  description="Bring the benefits of yoga to your PE curriculum with these classroom-ready sequences and activities."
+                  videos={displayedYogaForPeVideos}
+                  isLoading={isLoadingYoga}
+                  userSubscriptionTier={userSubscriptionTier}
+                  onVideoClick={handleVideoClick}
+                  onLoadMore={() => loadMoreVideos(VideoCategory.YOGA_FOR_PE)}
+                  isExpanded={isYogaForPeExpanded}
+                />
                 
-                switch(section.id) {
-                  case VideoCategory.MEDITATION:
-                    sectionVideos = displayedMeditationVideos;
-                    isLoading = isLoadingMeditation;
-                    loadMoreHandler = () => loadMoreVideos(VideoCategory.MEDITATION);
-                    break;
-                  case VideoCategory.YOGA_FOR_PE:
-                    sectionVideos = displayedYogaForPeVideos;
-                    isLoading = isLoadingYoga;
-                    loadMoreHandler = () => loadMoreVideos(VideoCategory.YOGA_FOR_PE);
-                    break;
-                  case VideoCategory.RELAXATION:
-                    sectionVideos = displayedRelaxationVideos;
-                    isLoading = isLoadingRelaxation;
-                    loadMoreHandler = () => loadMoreVideos(VideoCategory.RELAXATION);
-                    break;
-                }
+                {/* Relaxation Videos */}
+                <VideoSection
+                  title="Relaxation Videos"
+                  description="Help students unwind, restore, and find balance with these calming sequences and techniques."
+                  videos={displayedRelaxationVideos}
+                  isLoading={isLoadingRelaxation}
+                  userSubscriptionTier={userSubscriptionTier}
+                  onVideoClick={handleVideoClick}
+                  onLoadMore={() => loadMoreVideos(VideoCategory.RELAXATION)}
+                  isExpanded={isRelaxationExpanded}
+                />
                 
-                return (
-                  <VideoSection
-                    key={section.id}
-                    title={section.title}
-                    description={section.description}
-                    videos={sectionVideos}
-                    isLoading={isLoading}
-                    userSubscriptionTier={userSubscriptionTier}
-                    onVideoClick={handleVideoClick}
-                    onLoadMore={loadMoreHandler}
-                  />
-                );
-              })
+                {/* Meditation Videos */}
+                <VideoSection
+                  title="Meditation Videos"
+                  description="Take a breath—you've got this. Mindfulness offers simple, science-backed tools to help you feel calmer, more focused, and grounded."
+                  videos={displayedMeditationVideos}
+                  isLoading={isLoadingMeditation}
+                  userSubscriptionTier={userSubscriptionTier}
+                  onVideoClick={handleVideoClick}
+                  onLoadMore={() => loadMoreVideos(VideoCategory.MEDITATION)}
+                  isExpanded={isMeditationExpanded}
+                />
+                
+                {/* Mindful Movements Videos */}
+                <VideoSection
+                  title="Mindful Movements Videos"
+                  description="Positive, inspirational songs set to yoga and functional strength movements for cardio workouts and SEL discussions."
+                  videos={displayedMindfulMovementsVideos || []}
+                  isLoading={isLoadingMindfulMovements}
+                  userSubscriptionTier={userSubscriptionTier}
+                  onVideoClick={handleVideoClick}
+                  onLoadMore={() => loadMoreVideos(VideoCategory.MINDFUL_MOVEMENTS)}
+                  isExpanded={isMindfulMovementsExpanded}
+                />
+              </>
             )}
           </div>
         </section>

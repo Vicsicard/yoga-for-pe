@@ -35,6 +35,9 @@ export function loadVideosFromCatalog(category: VideoCategory): Video[] {
   // Get videos from the catalog
   const categoryVideos = videoCatalogData[categoryKey as keyof typeof videoCatalogData] || [];
   
+  // For debugging
+  console.log(`Loading videos for category: ${category}, found ${categoryVideos.length} videos`);
+  
   // Convert to Video objects
   return categoryVideos.map((video: any, index: number) => ({
     id: parseInt(video.id.replace(/\D/g, '') || index.toString()),

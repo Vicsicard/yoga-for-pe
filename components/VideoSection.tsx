@@ -13,6 +13,7 @@ interface VideoSectionProps {
   userSubscriptionTier: SubscriptionTier;
   onVideoClick: (video: Video) => void;
   onLoadMore: () => void;
+  isExpanded?: boolean; // New prop to track if this section is showing 6 videos
 }
 
 export default function VideoSection({ 
@@ -22,7 +23,8 @@ export default function VideoSection({
   isLoading, 
   userSubscriptionTier,
   onVideoClick,
-  onLoadMore
+  onLoadMore,
+  isExpanded = false
 }: VideoSectionProps) {
   return (
     <div className="mb-16">
@@ -51,7 +53,7 @@ export default function VideoSection({
             <span>Loading...</span>
           ) : (
             <>
-              <span>Show Next Videos</span>
+              <span>{isExpanded ? 'Show Next Videos' : 'Show More Videos'}</span>
               <FiRefreshCw className="ml-2" />
             </>
           )}

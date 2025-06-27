@@ -36,6 +36,9 @@ export function Navbar() {
             <Link href="/videos" className="text-gray-700 hover:text-primary-600 transition-colors">
               Videos
             </Link>
+            <Link href="/guest-speaking" className="text-gray-700 hover:text-primary-600 transition-colors">
+              Guest Speaking & Consult
+            </Link>
             <Link href="/contact" className="text-gray-700 hover:text-primary-600 transition-colors">
               Contact
             </Link>
@@ -72,6 +75,9 @@ export function Navbar() {
             <nav className="flex flex-col space-y-4">
               <Link href="/videos" className="text-gray-700 hover:text-primary-600 transition-colors">
                 Videos
+              </Link>
+              <Link href="/guest-speaking" className="text-gray-700 hover:text-primary-600 transition-colors">
+                Guest Speaking & Consult
               </Link>
               <Link href="/contact" className="text-gray-700 hover:text-primary-600 transition-colors">
                 Contact

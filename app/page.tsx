@@ -19,15 +19,6 @@ import FeaturedVideos from '../components/FeaturedVideos'
 const contentBubbles = [
   {
     id: 1,
-    title: 'Meditation',
-    description: 'Take a breath—you\'ve got this. Whether you\'re teaching or tackling a full day, mindfulness offers simple, science-backed tools to help you feel calmer, more focused, and grounded.',
-    longDescription: 'Unlock the power of mindfulness and meditation to reduce stress, sharpen focus, and boost emotional awareness. Like a workout for your brain, it helps you bend the body, brighten the mind, and bloom the soul—becoming a calmer, clearer, and more balanced version of yourself!',
-    actionText: 'Try it now',
-    url: '/videos?category=meditation',
-    image: '/images/meditation.jpg'
-  },
-  {
-    id: 2,
     title: 'Yoga for PE',
     description: 'Bend the body, strengthen the mind, and energize your PE classes with yoga that inspires growth and builds confidence. Watch students build mental and physical strength, boost flexibility, and unlock their full potential—one pose at a time!',
     longDescription: 'Bend the body, brighten the mind, and bloom the soul in your PE classes! Explore adaptable yoga poses and sequences for all skill levels, helping students build strength, flexibility, and focus—while making the experience fun and uplifting.',
@@ -36,13 +27,22 @@ const contentBubbles = [
     image: '/images/yoga-for-pe.jpg'
   },
   {
-    id: 3,
+    id: 2,
     title: 'Relaxation',
     description: 'Relax and recharge with science-backed techniques that calm the mind and relax the body. These practices reduce stress, balance hormones, and promote well-being, allowing your soul to bloom with balance and mental clarity.',
     longDescription: 'Relax and recharge with science-backed techniques that calm the mind and relax the body. These practices reduce stress, balance hormones, and promote well-being, allowing your soul to bloom with balance and mental clarity.',
     actionText: 'Begin your relaxation journey',
     url: '/videos?category=relaxation',
     image: '/images/relaxation.jpg'
+  },
+  {
+    id: 3,
+    title: 'Meditation',
+    description: 'Take a breath—you\'ve got this. Whether you\'re teaching or tackling a full day, mindfulness offers simple, science-backed tools to help you feel calmer, more focused, and grounded.',
+    longDescription: 'Unlock the power of mindfulness and meditation to reduce stress, sharpen focus, and boost emotional awareness. Like a workout for your brain, it helps you bend the body, brighten the mind, and bloom the soul—becoming a calmer, clearer, and more balanced version of yourself!',
+    actionText: 'Try it now',
+    url: '/videos?category=meditation',
+    image: '/images/meditation.jpg'
   }
 ]
 

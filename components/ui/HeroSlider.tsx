@@ -6,36 +6,32 @@ import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 
 const sliderImages = [
   {
-    src: '/slider-images/Beach Yoga.png',
-    alt: 'Beach Yoga',
+    src: '/slider-images/Albert Einstein Quote.JPG',
+    alt: 'Albert Einstein Quote',
   },
   {
-    src: '/slider-images/Believe.png',
-    alt: 'Believe',
+    src: '/slider-images/Focus & Concentration.jpeg',
+    alt: 'Focus and Concentration',
   },
   {
-    src: '/slider-images/Bubbles.png',
-    alt: 'Bubbles',
+    src: '/slider-images/Physical Fitness.jpeg',
+    alt: 'Physical Fitness',
   },
   {
-    src: '/slider-images/Human Yoga.png',
-    alt: 'Human Yoga',
+    src: '/slider-images/Pic 1 Y4PE & Everybody.jpeg',
+    alt: 'Yoga for PE and Everybody',
   },
   {
-    src: '/slider-images/India Hands.png',
-    alt: 'India Hands',
+    src: '/slider-images/Pic 2 Relaxation.JPG',
+    alt: 'Relaxation',
   },
   {
-    src: '/slider-images/Jumping.png',
-    alt: 'Jumping',
+    src: '/slider-images/Pic 3 Meditation Cecil.JPG',
+    alt: 'Meditation Cecil',
   },
   {
-    src: '/slider-images/Mandala Star.png',
-    alt: 'Mandala Star',
-  },
-  {
-    src: '/slider-images/V Teaching at SHAPE.png',
-    alt: 'V Teaching at SHAPE',
+    src: '/slider-images/Stress & Anxiety 2.JPG',
+    alt: 'Stress and Anxiety Reduction',
   }
 ]
 
