@@ -1,17 +1,12 @@
-"use client"
-
-export function Logo() {
+export default function Logo() {
   return (
-    <img 
-      src="/images/logo.png" 
-      alt="Yoga for PE Logo" 
-      width={200}
-      height={40}
-      style={{
-        display: 'block',
-        marginTop: '4px',
-        marginBottom: '4px'
-      }}
-    />
+    <div className="flex items-center justify-center h-full w-full">
+      <img 
+        src="/images/logo-cropped.png" 
+        alt="Yoga for PE Logo" 
+        className="w-auto object-contain"
+        style={{ height: '80px', maxHeight: '80px' }}
+      />
+    </div>
   )
 }
