@@ -288,8 +288,8 @@ export default function Home() {
             }
           ]}
           imagePosition="right"
-          imageSrc="https://images.unsplash.com/photo-1556711905-b3f402e1f160?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80"
-          imageAlt="Teacher guiding students in yoga"
+          imageSrc="/images/high-school-yoga (2).JPG"
+          imageAlt="High school students practicing yoga in PE class"
         />
       </Section>
       
