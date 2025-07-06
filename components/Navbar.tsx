@@ -2,13 +2,15 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
-import { FiMenu, FiX, FiChevronDown } from 'react-icons/fi'
+import { FiMenu, FiX, FiChevronDown, FiUser, FiLogOut } from 'react-icons/fi'
 import { Button } from './ui/Button'
 import Logo from './Logo'
+import { useAuth } from '../lib/hooks/useAuth'
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
+  const { user, isAuthenticated, logout } = useAuth()
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
@@ -42,17 +44,47 @@ export function Navbar() {
             <Link href="/contact" className="text-gray-700 hover:text-primary-600 transition-colors">
               Contact
             </Link>
-          </nav>
 
-          {/* Sign In/Sign Up buttons */}
-          <div className="hidden md:flex items-center space-x-4">
-            <Button href="/login" variant="outline" size="sm">
-              Sign In
-            </Button>
-            <Button href="/signup" size="sm">
-              Sign Up
-            </Button>
-          </div>
+            {/* Auth buttons */}
+            {isAuthenticated ? (
+              <div className="relative group">
+                <button 
+                  onClick={() => toggleDropdown('user')}
+                  className="flex items-center text-gray-700 hover:text-primary-600 transition-colors"
+                >
+                  <span className="mr-1">{user?.name || 'Account'}</span>
+                  <FiChevronDown className="h-4 w-4" />
+                </button>
+                
+                {activeDropdown === 'user' && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                    <Link href="/account" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      <FiUser className="inline mr-2" /> My Account
+                    </Link>
+                    <button 
+                      onClick={() => logout()}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      <FiLogOut className="inline mr-2" /> Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <Link href="/sign-in" className="inline-block">
+                  <Button variant="outline" className="mr-2">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/sign-up" className="inline-block">
+                  <Button>
+                    Sign Up
+                  </Button>
+                </Link>
+              </>
+            )}
+          </nav>
 
           {/* Mobile menu button */}
           <button 
@@ -84,12 +116,28 @@ export function Navbar() {
               </Link>
               
               <div className="pt-4 border-t border-gray-100 flex flex-col space-y-2">
-                <Button href="/login" variant="outline" fullWidth>
-                  Sign In
-                </Button>
-                <Button href="/signup" fullWidth>
-                  Sign Up
-                </Button>
+                {isAuthenticated ? (
+                  <>
+                    <Link href="/account" className="flex items-center text-gray-700 py-2">
+                      <FiUser className="mr-2" /> My Account
+                    </Link>
+                    <button 
+                      onClick={() => logout()}
+                      className="flex items-center text-gray-700 py-2"
+                    >
+                      <FiLogOut className="mr-2" /> Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Button href="/sign-in" variant="outline" fullWidth>
+                      Sign In
+                    </Button>
+                    <Button href="/sign-up" fullWidth>
+                      Sign Up
+                    </Button>
+                  </>
+                )}
               </div>
             </nav>
           </div>

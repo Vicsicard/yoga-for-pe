@@ -185,10 +185,43 @@ function getVideoTier(video: any): SubscriptionTier {
 }
 
 // Function to check if a user has access to a video based on their subscription tier
-export async function hasAccessToVideo(video: Video, userTier: SubscriptionTier = SubscriptionTier.BRONZE): Promise<boolean> {
+export async function hasAccessToVideo(video: Video, userId?: string | null, userTier?: SubscriptionTier): Promise<boolean> {
   try {
-    // Users can access videos of their tier or lower
-    return userTier >= video.tier;
+    // If no userId is provided, use the passed userTier or default to BRONZE
+    if (!userId) {
+      return (userTier || SubscriptionTier.BRONZE) >= video.tier;
+    }
+    
+    // If we have a userId, check their subscription status from the service
+    // This is a server-side only import to avoid issues with browser bundling
+    if (typeof window === 'undefined') {
+      const { getSubscriptionServiceInstance } = await import('./subscription/subscription-service-factory');
+      const subscriptionService = getSubscriptionServiceInstance();
+      
+      // Check if the user has access to this video's tier
+      return await subscriptionService.hasAccessToTier(userId, video.tier);
+    } else {
+      // For client-side, we'll need to make an API call
+      try {
+        const response = await fetch(`/api/subscription/check-access?videoTier=${video.tier}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to check subscription access');
+        }
+        
+        const data = await response.json();
+        return data.hasAccess;
+      } catch (apiError) {
+        console.error('Error checking subscription access via API:', apiError);
+        // Fall back to the provided tier or BRONZE if API call fails
+        return (userTier || SubscriptionTier.BRONZE) >= video.tier;
+      }
+    }
   } catch (error) {
     console.error('Error checking video access:', error);
     // Default to no access on error

@@ -8,10 +8,50 @@ interface VideoCardProps {
   video: Video;
   userSubscriptionTier: SubscriptionTier;
   onClick: (video: Video) => void;
+  section?: string; // Optional section parameter
 }
 
-export default function VideoCard({ video, userSubscriptionTier, onClick }: VideoCardProps) {
-  const hasAccess = hasAccessToVideo(video, userSubscriptionTier);
+// Helper function to determine the folder name based on video data and section
+function getCategoryFolder(video: Video, videoSection?: string): string {
+  // If we know the section directly, use it
+  if (videoSection) {
+    return videoSection;
+  }
+  
+  // Otherwise fall back to checking the video title keywords
+  const title = video.title.toLowerCase();
+  
+  if (title.includes('warrior') || 
+      title.includes('sun salutation') || 
+      title.includes('ab circle') ||
+      title.includes('chop shop') ||
+      title.includes('firefighter') ||
+      title.includes('branch out') ||
+      title.includes('open the gate') ||
+      title.includes('dog days') ||
+      title.includes('it bands')) {
+    return 'yoga-for-pe';
+  }
+  
+  if (title.includes('meditation') || title.includes('breath')) {
+    return 'meditation';
+  }
+  
+  if (title.includes('relax')) {
+    return 'relaxation';
+  }
+  
+  if (title.includes('champion') || title.includes('thunder') || title.includes('fight song')) {
+    return 'mindful-movements';
+  }
+  
+  // Default to yoga-for-pe if we can't determine the category
+  return 'yoga-for-pe';
+}
+
+export default function VideoCard({ video, userSubscriptionTier, onClick, section }: VideoCardProps) {
+  // Use the proper type for hasAccessToVideo
+  const hasAccess = hasAccessToVideo(video, null, userSubscriptionTier);
   const [showFullDescription, setShowFullDescription] = useState(false);
   
   // Handle mouse events
@@ -28,7 +68,16 @@ export default function VideoCard({ video, userSubscriptionTier, onClick }: Vide
     >
       {/* Video thumbnail with play button overlay */}
       <div className="relative aspect-video bg-gray-200">
-        {/* Thumbnail placeholder - in a real app, use video.thumbnail */}
+        {/* Try to load thumbnail from section-specific subfolder by title, fallback to placeholder */}
+        <img 
+          src={`/thumbnails/${getCategoryFolder(video, section)}/${encodeURIComponent(video.title)}.jpg`} 
+          alt={video.title}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            // If thumbnail fails to load, hide the broken image
+            (e.target as HTMLImageElement).style.display = 'none';
+          }}
+        />
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-16 h-16 rounded-full bg-primary-500/80 flex items-center justify-center">
             {video.tier !== SubscriptionTier.BRONZE && !hasAccess ? (
