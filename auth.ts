@@ -39,14 +39,21 @@ export const authConfig = {
         }
 
         try {
-          await connectDB();
-          
+          // Only try to connect to DB if we're not in Edge Runtime
+          if (typeof process !== 'undefined' && 
+              process.versions != null && 
+              process.versions.node != null &&
+              !process.env.NEXT_RUNTIME) {
+            await connectDB();
+          }
+
           // Find user by email
           // Use type assertion to handle the mongoose model in TypeScript
-          const userModel = User as any;
-          const user = await userModel.findOne({ email: credentials.email }).select('+password') as UserDocument;
+          const user = await User.findOne({ email: credentials.email }).select('+password') as UserDocument;
           
+          // User not found
           if (!user) {
+            console.log('User not found');
             return null;
           }
           
