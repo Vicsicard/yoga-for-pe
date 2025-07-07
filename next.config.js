@@ -6,8 +6,7 @@ const nextConfig = {
   // Force compilation settings for compatibility
   experimental: {
     serverComponentsExternalPackages: ['mongoose', 'bcryptjs', 'mongodb'],
-    appDir: true,
-    serverActions: true,
+    // Remove deprecated options
   },
   // Set default runtime globally
   serverRuntimeConfig: {
