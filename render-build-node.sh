@@ -322,54 +322,9 @@ echo "Converting TypeScript files to JavaScript to bypass validation..."
 echo "Removing TypeScript configuration..."
 rm -f tsconfig.json
 
-# Create a simple script to convert TS to JS files
-cat > convert-ts-to-js.js << 'EOL'
-const fs = require('fs');
-const path = require('path');
-
-function convertTsToJs(dir) {
-  const files = fs.readdirSync(dir, { withFileTypes: true });
-  
-  for (const file of files) {
-    const filePath = path.join(dir, file.name);
-    
-    if (file.isDirectory()) {
-      // Skip node_modules and .next directories
-      if (file.name !== 'node_modules' && file.name !== '.next') {
-        convertTsToJs(filePath);
-      }
-    } else if (file.name.endsWith('.ts') || file.name.endsWith('.tsx')) {
-      // Rename .ts to .js files
-      const newName = file.name.replace(/\.tsx?$/, '.js');
-      const newPath = path.join(dir, newName);
-      
-      // Read the file content
-      let content = fs.readFileSync(filePath, 'utf8');
-      
-      // Replace TypeScript specific syntax
-      content = content.replace(/^import\s+type\s+.*?;\s*$/mg, ''); // Remove type imports
-      content = content.replace(/:\s*[A-Za-z\[\]\{\}\|\&\<\>\,\s\?\!]+(?=(\s*[=;,)]|\s*\{|\s*=>))/g, ''); // Remove type annotations
-      content = content.replace(/^export\s+type\s+.*?;\s*$/mg, ''); // Remove type exports
-      content = content.replace(/^export\s+interface\s+.*?\{[^\}]*\}\s*$/mg, ''); // Remove interfaces
-      content = content.replace(/\<[^\>]+\>/g, ''); // Remove generic type parameters
-      content = content.replace(/^\s*interface\s+.*?\{[^\}]*\}\s*$/mg, ''); // Remove interfaces
-      content = content.replace(/([a-zA-Z0-9_$]+)\s*:\s*React\.FC(\<.*?\>)?/g, '$1'); // Replace React.FC
-      
-      // Write the converted JS file
-      fs.writeFileSync(newPath, content);
-      
-      // Delete the original TS file
-      fs.unlinkSync(filePath);
-    }
-  }
-}
-
-convertTsToJs(process.cwd());
-console.log('Converted TypeScript files to JavaScript');
-EOL
-
-# Run the conversion script
-node convert-ts-to-js.js
+# Use the more robust converter script that we've created
+echo "Running TypeScript to JavaScript converter with advanced syntax fixes..."
+node ts-converter.js
 
 # Install TypeScript dependencies explicitly
 echo "Installing TypeScript dependencies..."
