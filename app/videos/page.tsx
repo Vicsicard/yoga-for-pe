@@ -149,6 +149,23 @@ export default function VideosPage() {
     fetchInitialVideos();
   }, []);
   
+  // Utility function to ensure we always have exactly 6 videos
+  // If there aren't enough unique videos, it will cycle through the available ones
+  const ensureExactlySixVideos = (videos: Video[], startIndex: number = 0): Video[] => {
+    if (!videos || videos.length === 0) return [];
+    
+    // Prepare result array to hold exactly 6 videos
+    const result: Video[] = [];
+    
+    // Fill the result with 6 videos, cycling through the available ones if needed
+    for (let i = 0; i < 6; i++) {
+      const index = (startIndex + i) % videos.length;
+      result.push(videos[index]);
+    }
+    
+    return result;
+  };
+  
   // Function to load more videos for a specific category
   const loadMoreVideos = async (category: VideoCategory) => {
     switch (category) {
@@ -159,12 +176,8 @@ export default function VideosPage() {
           if (!isMeditationExpanded) {
             setIsMeditationExpanded(true);
             
-            // Calculate the next 3 videos to add (after the initial 3)
-            const nextStartIndex = 3;
-            const endIndex = Math.min(nextStartIndex + 3, meditationVideos.length);
-            
-            // If we need more videos, fetch them
-            if (endIndex > meditationVideos.length) {
+            // If we don't have enough videos, fetch more first
+            if (meditationVideos.length < 6) {
               const newVideos = await getVideosFromCatalog(VideoCategory.MEDITATION, meditationPage + 1, 6);
               if (newVideos.length > 0) {
                 setMeditationVideos(prev => [...prev, ...newVideos]);
@@ -172,52 +185,29 @@ export default function VideosPage() {
               }
             }
             
-            // Get the next 3 videos to add to the display
-            const nextVideos = meditationVideos.slice(nextStartIndex, Math.min(nextStartIndex + 3, meditationVideos.length));
-            
-            // Combine the current 3 videos with the next 3
-            setDisplayedMeditationVideos([...displayedMeditationVideos, ...nextVideos]);
-            setMeditationStartIndex(3); // Track that we're showing videos 0-5
+            // Always ensure we display exactly 6 videos
+            const sixVideos = ensureExactlySixVideos(meditationVideos, 0);
+            setDisplayedMeditationVideos(sixVideos);
+            setMeditationStartIndex(0); // Track that we're showing from the beginning
           } else {
             // Already expanded, replace the bottom row (last 3 videos)
             
             // Calculate the next 3 videos to show
-            const nextStartIndex = meditationStartIndex + 3;
+            const nextStartIndex = (meditationStartIndex + 3) % meditationVideos.length;
             
-            // Check if we need to wrap around to the beginning
-            if (nextStartIndex >= meditationVideos.length) {
-              // We've shown all videos, start over from the beginning
-              const nextVideos = meditationVideos.slice(0, 3);
-              setDisplayedMeditationVideos([...displayedMeditationVideos.slice(0, 3), ...nextVideos]);
-              setMeditationStartIndex(0);
-            } else {
-              // Get the next 3 videos
-              const endIndex = Math.min(nextStartIndex + 3, meditationVideos.length);
-              
-              // If we need more videos, fetch them
-              if (endIndex > meditationVideos.length) {
-                const newVideos = await getVideosFromCatalog(VideoCategory.MEDITATION, meditationPage + 1, 6);
-                if (newVideos.length > 0) {
-                  setMeditationVideos(prev => [...prev, ...newVideos]);
-                  setMeditationPage(meditationPage + 1);
-                }
-              }
-              
-              // Get the next 3 videos
-              const nextVideos = meditationVideos.slice(nextStartIndex, Math.min(nextStartIndex + 3, meditationVideos.length));
-              
-              // If we don't have enough videos to fill the row, we need to wrap around
-              if (nextVideos.length < 3 && meditationVideos.length > 3) {
-                const remaining = 3 - nextVideos.length;
-                const wrappedVideos = meditationVideos.slice(0, remaining);
-                setDisplayedMeditationVideos([...displayedMeditationVideos.slice(0, 3), ...nextVideos, ...wrappedVideos]);
-                setMeditationStartIndex(0);
-              } else {
-                // Replace the bottom row with the next 3 videos
-                setDisplayedMeditationVideos([...displayedMeditationVideos.slice(0, 3), ...nextVideos]);
-                setMeditationStartIndex(nextStartIndex);
-              }
+            // Keep the top row intact
+            const topRow = displayedMeditationVideos.slice(0, 3);
+            
+            // Create the bottom row with exactly 3 videos, cycling through if needed
+            const bottomRow = [];
+            for (let i = 0; i < 3; i++) {
+              const index = (nextStartIndex + i) % meditationVideos.length;
+              bottomRow.push(meditationVideos[index]);
             }
+            
+            // Update the displayed videos with both rows
+            setDisplayedMeditationVideos([...topRow, ...bottomRow]);
+            setMeditationStartIndex(nextStartIndex);
           }
         } catch (error) {
           console.error('Error loading more meditation videos:', error);
@@ -233,12 +223,8 @@ export default function VideosPage() {
           if (!isYogaForPeExpanded) {
             setIsYogaForPeExpanded(true);
             
-            // Calculate the next 3 videos to add (after the initial 3)
-            const nextStartIndex = 3;
-            const endIndex = Math.min(nextStartIndex + 3, yogaForPeVideos.length);
-            
-            // If we need more videos, fetch them
-            if (endIndex > yogaForPeVideos.length) {
+            // If we don't have enough videos, fetch more first
+            if (yogaForPeVideos.length < 6) {
               const newVideos = await getVideosFromCatalog(VideoCategory.YOGA_FOR_PE, yogaForPePage + 1, 6);
               if (newVideos.length > 0) {
                 setYogaForPeVideos(prev => [...prev, ...newVideos]);
@@ -246,47 +232,29 @@ export default function VideosPage() {
               }
             }
             
-            // Get the next 3 videos to add to the display
-            const nextVideos = yogaForPeVideos.slice(nextStartIndex, Math.min(nextStartIndex + 3, yogaForPeVideos.length));
-            
-            // Combine the current 3 videos with the next 3
-            setDisplayedYogaForPeVideos([...displayedYogaForPeVideos, ...nextVideos]);
-            setYogaForPeStartIndex(3); // Track that we're showing videos 0-5
+            // Always ensure we display exactly 6 videos
+            const sixVideos = ensureExactlySixVideos(yogaForPeVideos, 0);
+            setDisplayedYogaForPeVideos(sixVideos);
+            setYogaForPeStartIndex(0); // Track that we're showing from the beginning
           } else {
             // Already expanded, replace the bottom row (last 3 videos)
             
             // Calculate the next 3 videos to show
-            const nextStartIndex = yogaForPeStartIndex + 3;
+            const nextStartIndex = (yogaForPeStartIndex + 3) % yogaForPeVideos.length;
             
-            // Check if we need to wrap around to the beginning
-            if (nextStartIndex >= yogaForPeVideos.length) {
-              // We've shown all videos, start over from the beginning
-              const nextVideos = yogaForPeVideos.slice(0, 3);
-              setDisplayedYogaForPeVideos([...displayedYogaForPeVideos.slice(0, 3), ...nextVideos]);
-              setYogaForPeStartIndex(0);
-            } else {
-              // Get the next 3 videos
-              const endIndex = Math.min(nextStartIndex + 3, yogaForPeVideos.length);
-              
-              // If we need more videos, fetch them
-              if (endIndex > yogaForPeVideos.length) {
-                const newVideos = await getVideosFromCatalog(VideoCategory.YOGA_FOR_PE, yogaForPePage + 1, 6);
-                if (newVideos.length > 0) {
-                  setYogaForPeVideos(prev => [...prev, ...newVideos]);
-                  setYogaForPePage(yogaForPePage + 1);
-                }
-              }
-              
-              // Get the top row (first 3 videos)
-              const topRow = displayedYogaForPeVideos.slice(0, 3);
-              
-              // Get the next 3 videos for the bottom row
-              const bottomRow = yogaForPeVideos.slice(nextStartIndex, nextStartIndex + 3);
-              
-              // Update the displayed videos and start index
-              setDisplayedYogaForPeVideos([...topRow, ...bottomRow]);
-              setYogaForPeStartIndex(nextStartIndex);
+            // Keep the top row intact
+            const topRow = displayedYogaForPeVideos.slice(0, 3);
+            
+            // Create the bottom row with exactly 3 videos, cycling through if needed
+            const bottomRow = [];
+            for (let i = 0; i < 3; i++) {
+              const index = (nextStartIndex + i) % yogaForPeVideos.length;
+              bottomRow.push(yogaForPeVideos[index]);
             }
+            
+            // Update the displayed videos and start index
+            setDisplayedYogaForPeVideos([...topRow, ...bottomRow]);
+            setYogaForPeStartIndex(nextStartIndex);
           }
         } finally {
           setIsLoadingYoga(false);
@@ -310,25 +278,24 @@ export default function VideosPage() {
           
           // If not expanded yet, show 6 videos
           if (!isRelaxationExpanded) {
-            setDisplayedRelaxationVideos(relaxationVideos.slice(0, 6));
+            // Always ensure we display exactly 6 videos
+            const sixVideos = ensureExactlySixVideos(relaxationVideos, 0);
+            setDisplayedRelaxationVideos(sixVideos);
             setIsRelaxationExpanded(true);
+            setRelaxationStartIndex(0);
           } else {
             // If already expanded, rotate the bottom row
             const topRow = displayedRelaxationVideos.slice(0, 3);
             
             // Calculate next page start index
-            let nextStartIndex = relaxationStartIndex + 3;
+            const nextStartIndex = (relaxationStartIndex + 3) % relaxationVideos.length;
             
-            // If we've reached the end, wrap around to the beginning
-            if (nextStartIndex >= relaxationVideos.length) {
-              nextStartIndex = 0;
-              setRelaxationPage(1);
-            } else {
-              setRelaxationPage(relaxationPage + 1);
+            // Create the bottom row with exactly 3 videos, cycling through if needed
+            const bottomRow = [];
+            for (let i = 0; i < 3; i++) {
+              const index = (nextStartIndex + i) % relaxationVideos.length;
+              bottomRow.push(relaxationVideos[index]);
             }
-            
-            // Get the next 3 videos for the bottom row
-            const bottomRow = relaxationVideos.slice(nextStartIndex, nextStartIndex + 3);
             
             // Update the displayed videos and start index
             setDisplayedRelaxationVideos([...topRow, ...bottomRow]);
@@ -355,30 +322,26 @@ export default function VideosPage() {
             }
           }
           
-          // If not expanded yet, show 6 videos (or all if less than 6)
+          // If not expanded yet, show exactly 6 videos
           if (!isMindfulMovementsExpanded) {
-            const videosToShow = mindfulMovementsVideos.slice(0, Math.min(6, mindfulMovementsVideos.length));
-            setDisplayedMindfulMovementsVideos(videosToShow);
+            // Always ensure we display exactly 6 videos
+            const sixVideos = ensureExactlySixVideos(mindfulMovementsVideos, 0);
+            setDisplayedMindfulMovementsVideos(sixVideos);
             setIsMindfulMovementsExpanded(true);
+            setMindfulMovementsStartIndex(0);
           } else {
             // If already expanded, rotate the bottom row
             const topRow = displayedMindfulMovementsVideos.slice(0, 3);
             
             // Calculate next page start index
-            let nextStartIndex = mindfulMovementsStartIndex + 3;
+            const nextStartIndex = (mindfulMovementsStartIndex + 3) % mindfulMovementsVideos.length;
             
-            // If we've reached the end, wrap around to the beginning
-            if (nextStartIndex >= mindfulMovementsVideos.length) {
-              nextStartIndex = 0;
-              setMindfulMovementsPage(1);
-            } else {
-              setMindfulMovementsPage(mindfulMovementsPage + 1);
+            // Create the bottom row with exactly 3 videos, cycling through if needed
+            const bottomRow = [];
+            for (let i = 0; i < 3; i++) {
+              const index = (nextStartIndex + i) % mindfulMovementsVideos.length;
+              bottomRow.push(mindfulMovementsVideos[index]);
             }
-            
-            // Get the next 3 videos for the bottom row (or fewer if not enough)
-            const remainingCount = mindfulMovementsVideos.length - nextStartIndex;
-            const bottomRowCount = Math.min(3, remainingCount);
-            const bottomRow = mindfulMovementsVideos.slice(nextStartIndex, nextStartIndex + bottomRowCount);
             
             // Update the displayed videos and start index
             setDisplayedMindfulMovementsVideos([...topRow, ...bottomRow]);
@@ -458,7 +421,7 @@ export default function VideosPage() {
     <>
       <main className="min-h-screen">
         {/* Hero Banner */}
-        <section className="bg-gradient-to-r from-primary-800 to-primary-900 text-white py-12">
+        <section className="text-white py-12" style={{ background: 'linear-gradient(to right, #1B90A4, #167A8C)' }}>
           <div className="container">
             <h1 className="text-3xl md:text-4xl font-bold mb-4">Yoga Videos for PE Classes</h1>
             <p className="text-xl max-w-2xl text-white font-medium">Discover our collection of instructional videos designed to help you integrate yoga into your physical education curriculum.</p>
@@ -499,6 +462,7 @@ export default function VideosPage() {
                   onVideoClick={handleVideoClick}
                   onLoadMore={() => loadMoreVideos(VideoCategory.YOGA_FOR_PE)}
                   isExpanded={isYogaForPeExpanded}
+                  sectionName="yoga-for-pe"
                 />
                 
                 {/* Relaxation Videos */}
@@ -511,6 +475,7 @@ export default function VideosPage() {
                   onVideoClick={handleVideoClick}
                   onLoadMore={() => loadMoreVideos(VideoCategory.RELAXATION)}
                   isExpanded={isRelaxationExpanded}
+                  sectionName="relaxation"
                 />
                 
                 {/* Meditation Videos */}
@@ -523,6 +488,7 @@ export default function VideosPage() {
                   onVideoClick={handleVideoClick}
                   onLoadMore={() => loadMoreVideos(VideoCategory.MEDITATION)}
                   isExpanded={isMeditationExpanded}
+                  sectionName="meditation"
                 />
                 
                 {/* Mindful Movements Videos */}
@@ -535,6 +501,7 @@ export default function VideosPage() {
                   onVideoClick={handleVideoClick}
                   onLoadMore={() => loadMoreVideos(VideoCategory.MINDFUL_MOVEMENTS)}
                   isExpanded={isMindfulMovementsExpanded}
+                  sectionName="mindful-movements"
                 />
               </>
             )}

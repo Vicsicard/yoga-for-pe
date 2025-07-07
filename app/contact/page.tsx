@@ -9,7 +9,7 @@ export default function ContactPage() {
   return (
     <main>
       {/* Hero Section with Image Slider */}
-      <HeroSlider height="h-[400px] md:h-[500px]" overlayOpacity="medium" autoplayInterval={6000}>
+      <HeroSlider height="h-[400px] md:h-[500px]" overlayOpacity="medium" autoplayInterval={6000} pageType="contact">
         <HeroSliderContent>
           <h1 className="text-4xl md:text-5xl font-bold mb-6 drop-shadow-md">Get in Touch</h1>
           <p className="text-xl mb-8 max-w-3xl mx-auto drop-shadow-md text-white font-medium">
@@ -42,7 +42,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-medium">Phone</h3>
-                    <p className="text-gray-600">(555) 123-4567</p>
+                    <p className="text-gray-600">720.514.9820</p>
                   </div>
                 </div>
 
@@ -52,7 +52,8 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-medium">Location</h3>
-                    <p className="text-gray-600">Denver, Colorado (Available for travel worldwide)</p>
+                    <p className="text-gray-600">Colorado (Available for worldwide travel)</p>
+                    <p className="text-gray-600 mt-1">Wholistic Mechanics, INC</p>
                   </div>
                 </div>
               </div>

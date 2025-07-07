@@ -4,33 +4,58 @@ import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 
-const sliderImages = [
+// Home page slider images
+const homeSliderImages = [
   {
-    src: '/slider-images/Albert Einstein Quote.JPG',
-    alt: 'Albert Einstein Quote',
+    src: '/slider-images/home/Student Teach 3 DD.jpeg',
+    alt: 'Student Teaching',
   },
   {
-    src: '/slider-images/Focus & Concentration.jpeg',
+    src: '/slider-images/home/Mandala Star Taylor.JPG',
+    alt: 'Mandala Star',
+  },
+  {
+    src: '/slider-images/home/India Hands 2007 (189).JPG',
+    alt: 'India Hands',
+  },
+  {
+    src: '/slider-images/home/Human Yoga Spelled out copy.jpeg',
+    alt: 'Human Yoga Spelled Out',
+  },
+  {
+    src: '/slider-images/home/bubble classroom .JPG',
+    alt: 'Bubble Classroom',
+  },
+  {
+    src: '/slider-images/home/Believe copy.jpeg',
+    alt: 'Believe',
+  },
+  {
+    src: '/slider-images/home/Beach Yoga Anabel & Emily.jpg',
+    alt: 'Beach Yoga',
+  }
+]
+
+// Contact page slider images
+const contactSliderImages = [
+  {
+    src: '/slider-images/contact/Focus & Concentration.jpeg',
     alt: 'Focus and Concentration',
   },
   {
-    src: '/slider-images/Physical Fitness.jpeg',
+    src: '/slider-images/contact/Physical Fitness.jpeg',
     alt: 'Physical Fitness',
   },
   {
-    src: '/slider-images/Pic 1 Y4PE & Everybody.jpeg',
+    src: '/slider-images/contact/Pic 1 Y4PE & Everybody.jpeg',
     alt: 'Yoga for PE and Everybody',
   },
   {
-    src: '/slider-images/Pic 2 Relaxation.JPG',
-    alt: 'Relaxation',
-  },
-  {
-    src: '/slider-images/Pic 3 Meditation Cecil.JPG',
+    src: '/slider-images/contact/Pic 3 Meditation Cecil.JPG',
     alt: 'Meditation Cecil',
   },
   {
-    src: '/slider-images/Stress & Anxiety 2.JPG',
+    src: '/slider-images/contact/Stress & Anxiety 2.JPG',
     alt: 'Stress and Anxiety Reduction',
   }
 ]
@@ -42,16 +67,21 @@ interface HeroSliderProps {
   showOverlay?: boolean
   height?: string
   children?: React.ReactNode
+  pageType?: 'home' | 'contact'  // New prop to determine which image set to use
 }
 
 export function HeroSlider({
   overlayOpacity = 'medium',
   autoplayInterval = 5000,
   showControls = true,
+  pageType = 'home',  // Default to home page images
   showOverlay = true,
   height = 'h-96 md:h-[500px] lg:h-[600px]',
   children
 }: HeroSliderProps) {
+  // Determine which image set to use based on pageType
+  const sliderImages = pageType === 'contact' ? contactSliderImages : homeSliderImages
+
   const [currentSlide, setCurrentSlide] = useState(0)
   
   const overlayClasses = {

@@ -197,7 +197,7 @@ export default function Home() {
   return (
     <main>
       {/* Hero Section with Image Slider */}
-      <HeroSlider height="h-[600px] md:h-[700px]" overlayOpacity="medium" autoplayInterval={6000}>
+      <HeroSlider height="h-[600px] md:h-[700px]" overlayOpacity="medium" autoplayInterval={6000} pageType="home">
         <HeroSliderContent>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 drop-shadow-md">
             Bend the Body, Brighten the Mind, Bloom the Soul

@@ -8,6 +8,7 @@ export const thumbnailMapping: Record<string, string> = {
   'Box Breath Flowing into Calming Heart': 'Box Breath flowing into Calming Heart.jpg',
   'High-5 Meditation': 'High-5 Meditation.jpg',
   'I AM Flow Mediation': 'I Am.jpg',
+  'I AM Instructions & Flow Meditation': 'I Am.jpg',
   'Breath in Peace & Out Stress': 'Breath in Peace & Out Stress.jpg',
   'Kirtan Kriya': 'Kirtan Kriya.jpg',
 
@@ -17,7 +18,10 @@ export const thumbnailMapping: Record<string, string> = {
   'Chop Shop Cranking it out': 'Chop Shop Cranking it out.jpg',
   'The Wonder of Warriors': 'The Wonder of Warriors.jpg',
   'Sun Salutation Foundations': 'Sun Salutation Foundations.jpg',
+  'Sun Salutation Foundation for Yoga': 'Sun Salutation Foundations.jpg',
+  'Sun Salutation Foundation': 'Sun Salutation Foundations.jpg',
   'Sunrise Sun Salutation Extra': 'Sunrise Sun Salutation Extra .jpg',
+  'Sunrise Salutation: Flowing with Lake Michigan\'s First Light': 'Sunrise Sun Salutation Extra .jpg',
   'Ab Circle 1': 'Ab Circle 1.jpg',
   'Ab Circle 2': 'Ab Circle 2.jpg',
   'Branch Out': 'Branch Out.jpg',
@@ -33,8 +37,10 @@ export const thumbnailMapping: Record<string, string> = {
   // Mindful Movements videos
   'The Flower by Michael Franti & Spearhead, Victoria Canal': 'The Flower.jpg',
   'The Champion': 'The Champion.jpg',
+  'Champion by Carrie Underwood, Ludacris': 'The Champion.jpg',
   'Thunder': 'Thunder.jpg',
-  'Fight Song': 'Fight Song.jpg'
+  'Fight Song': 'Fight Song.jpg',
+  'Fight Song by Rachel Platten': 'Fight Song.jpg'
 };
 
 // Function to get thumbnail path using the mapping
@@ -44,6 +50,16 @@ export function getThumbnailPath(title: string, category: string): string {
     return `/thumbnails/${category}/${thumbnailMapping[title]}`;
   }
   
-  // Try with URL-encoded title
-  return `/thumbnails/${category}/${encodeURIComponent(title)}.jpg`;
+  // Check for partial matches in the mapping keys
+  const lowerTitle = title.toLowerCase();
+  for (const key in thumbnailMapping) {
+    // If the title contains the key (case insensitive) or vice versa
+    if (lowerTitle.includes(key.toLowerCase()) || key.toLowerCase().includes(lowerTitle)) {
+      return `/thumbnails/${category}/${thumbnailMapping[key]}`;
+    }
+  }
+  
+  // Last resort: use a default placeholder based on category
+  console.log(`No thumbnail found for "${title}" in category "${category}". Using default.`);
+  return `/thumbnails/${category}/default.jpg`;
 }

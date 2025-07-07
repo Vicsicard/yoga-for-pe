@@ -5,6 +5,7 @@ import { FiPlay } from 'react-icons/fi'
 import { Video } from '../lib/vimeo-browser'
 import { Card, CardContent, CardTitle, CardDescription, CardFooter } from '../components/ui/Card'
 import VideoPlayer from './VideoPlayer'
+import { getThumbnailPath } from '../lib/thumbnail-mapping'
 
 interface FeaturedVideosProps {
   videos: Video[];
@@ -36,9 +37,12 @@ export default function FeaturedVideos({ videos, isLoading }: FeaturedVideosProp
                   {/* Video thumbnail */}
                   <div className="w-full h-full bg-gray-700">
                     <img 
-                      src={video.thumbnail}
+                      src={video.thumbnail || getThumbnailPath(video.title, video.category)}
                       alt={`${video.title}`} 
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        console.log(`Failed to load featured thumbnail: ${video.title}`);
+                      }}
                     />
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-br from-primary-500/20 to-primary-800/20 group-hover:from-primary-500/30 group-hover:to-primary-800/30 transition-all" />

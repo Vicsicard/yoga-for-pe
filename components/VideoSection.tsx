@@ -14,6 +14,7 @@ interface VideoSectionProps {
   onVideoClick: (video: Video) => void;
   onLoadMore: () => void;
   isExpanded?: boolean; // New prop to track if this section is showing 6 videos
+  sectionName?: string; // Optional section name to help with thumbnail mapping
 }
 
 export default function VideoSection({ 
@@ -24,7 +25,8 @@ export default function VideoSection({
   userSubscriptionTier,
   onVideoClick,
   onLoadMore,
-  isExpanded = false
+  isExpanded = false,
+  sectionName
 }: VideoSectionProps) {
   return (
     <div className="mb-16">
@@ -38,6 +40,9 @@ export default function VideoSection({
             video={video} 
             userSubscriptionTier={userSubscriptionTier}
             onClick={onVideoClick}
+            section={sectionName || (title.toLowerCase().includes('meditation') ? 'meditation' : 
+                    title.toLowerCase().includes('yoga') ? 'yoga-for-pe' : 
+                    title.toLowerCase().includes('relaxation') ? 'relaxation' : undefined)}
           />
         ))}
       </div>

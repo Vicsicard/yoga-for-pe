@@ -36,6 +36,7 @@ export default function FilteredVideoResults({
                 video={video} 
                 userSubscriptionTier={userSubscriptionTier}
                 onClick={onVideoClick}
+                section={video.category}
               />
             ))}
           </div>
