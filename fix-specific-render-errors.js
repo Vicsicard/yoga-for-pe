@@ -1,4 +1,4 @@
-// Script to fix specific render conversion errors
+// Enhanced script to fix specific render conversion errors
 const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
@@ -8,32 +8,40 @@ const writeFile = promisify(fs.writeFile);
 const exists = promisify(fs.exists);
 
 // Specific fixes for files with exact issues from the build logs
+// Using more robust patterns for better matching
 const specificFixes = [
   {
     file: 'components/Footer.js',
-    search: '</span></a>',
-    replace: '</a>'
+    search: /(<\/span><\/a>|<\/span>\s*<\/a>)/g,
+    replace: '</a>',
+    exact: false
   },
   {
     file: 'components/Navbar.js',
-    search: 'else:',
-    replace: 'else'
+    search: /else\s*:/g,
+    replace: 'else',
+    exact: false
   },
   {
     file: 'components/PremiumModal.js',
-    search: 'function logDebug(message, data  {',
-    replace: 'function logDebug(message, data) {'
+    // Use more general regex to catch missing parenthesis
+    search: /function\s+logDebug\s*\(\s*message[^()]*\{/g,
+    replace: 'function logDebug(message, data) {',
+    exact: false
   },
   {
     file: 'components/SubscriptionCTA.js', 
     // Making sure h2 tag is properly closed
-    search: '<h2 className="text-3xl font-bold mb-4">Unlock Premium Content',
-    replace: '<h2 className="text-3xl font-bold mb-4">Unlock Premium Content</h2>'
+    search: /(<h2[^>]*>Unlock Premium Content)(?!<\/h2>)/g,
+    replace: '$1</h2>',
+    exact: false
   },
   {
     file: 'components/VideoCard.js',
-    search: 'videoSection : string:',
-    replace: 'videoSection) {'
+    // More robust type annotation handling
+    search: /function\s+getCategoryFolder\s*\([^{)]*\)\s*:[^{]*/g,
+    replace: 'function getCategoryFolder(video, videoSection) {',
+    exact: false
   }
 ];
 
@@ -49,13 +57,29 @@ async function applySpecificFixes() {
         console.log(`Checking ${fix.file} for issues...`);
         let content = await readFile(filePath, 'utf8');
         
-        if (content.includes(fix.search)) {
-          content = content.replace(new RegExp(fix.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), fix.replace);
-          await writeFile(filePath, content, 'utf8');
-          console.log(`✅ Fixed issue in ${fix.file}`);
-          fixCount++;
+        if (fix.exact) {
+          // Exact string matching
+          if (content.includes(fix.search)) {
+            content = content.replace(new RegExp(fix.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), fix.replace);
+            await writeFile(filePath, content, 'utf8');
+            console.log(`✅ Fixed issue in ${fix.file} using exact match`);
+            fixCount++;
+          } else {
+            console.log(`⚠️ Could not find the exact issue pattern in ${fix.file}`);
+          }
         } else {
-          console.log(`⚠️ Could not find the issue pattern in ${fix.file}`);
+          // Regex pattern matching
+          const regex = fix.search instanceof RegExp ? fix.search : new RegExp(fix.search, 'g');
+          const originalContent = content;
+          content = content.replace(regex, fix.replace);
+          
+          if (content !== originalContent) {
+            await writeFile(filePath, content, 'utf8');
+            console.log(`✅ Fixed issue in ${fix.file} using regex match`);
+            fixCount++;
+          } else {
+            console.log(`⚠️ Could not find the regex issue pattern in ${fix.file}`);
+          }
         }
       } else {
         console.log(`⚠️ File not found: ${filePath}`);
@@ -99,26 +123,35 @@ async function findAndFixAllJsFiles() {
   for (const file of jsFiles) {
     try {
       let content = await readFile(file, 'utf8');
-      const originalContent = content;
+      let originalContent = content;
       
-      // Fix common conversion issues
-      content = content
-        // Fix missing JSX closing tags
-        .replace(/<([a-zA-Z]+)[^>]*>([^<]*)<\/span>/g, '<$1>$2</$1>')
-        
-        // Fix malformed parameter definitions
-        .replace(/\(\s*([a-zA-Z0-9_]+)\s*:\s*([a-zA-Z0-9_]+)\s*:\s*{/g, '($1) {')
-        
-        // Fix syntax errors in if-else statements
-        .replace(/}\s*else\s*:/g, '} else {');
+      // General TypeScript syntax cleanup in JavaScript files
+      // Remove type annotations
+      content = content.replace(/:\s*([A-Za-z0-9_<>\[\]\|\{\}.,\s]+)(?=(\s*[=;,)]|\s*\|\s*undefined|\s*\|\s*null))/g, '');
       
+      // Remove return type annotations
+      content = content.replace(/\)\s*:\s*([A-Za-z0-9_<>\[\]\|\{\}.,\s]+)\s*{/g, ') {');
+      
+      // Remove optional parameter indicators
+      content = content.replace(/(\w+)\?\s*:/g, '$1:');
+      content = content.replace(/(\w+)\?(\s*[,)])/g, '$1$2');
+      
+      // Fix general broken parameter lists that are missing closing parens
+      content = content.replace(/function\s+(\w+)\s*\(([^()]*[^)])\s*{/g, function(match, funcName, params) {
+        // If there's no closing parenthesis, add one
+        return `function ${funcName}(${params}) {`;
+      });
+      
+      // Fix double opening braces that might be introduced by previous fixes
+      content = content.replace(/\)\s*\{\s*\{/g, ') {');
+
       if (content !== originalContent) {
         await writeFile(file, content, 'utf8');
         console.log(`Applied general fixes to ${path.relative(rootDir, file)}`);
         fixCount++;
       }
     } catch (error) {
-      console.error(`Error applying general fixes to ${file}:`, error);
+      console.error(`❌ Error fixing ${path.relative(rootDir, file)}:`, error);
     }
   }
   
@@ -127,17 +160,16 @@ async function findAndFixAllJsFiles() {
 
 async function main() {
   try {
-    // First apply the specific fixes
     const specificFixCount = await applySpecificFixes();
     console.log(`Applied ${specificFixCount} specific fixes`);
     
-    // Then apply general fixes to all JS files
     const generalFixCount = await findAndFixAllJsFiles();
     console.log(`Applied general fixes to ${generalFixCount} files`);
     
     console.log('All fixes completed!');
   } catch (error) {
-    console.error('Error running fix script:', error);
+    console.error('Error applying fixes:', error);
+    process.exit(1);
   }
 }
 
