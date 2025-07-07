@@ -12,6 +12,53 @@ echo "Cleaning existing node_modules..."
 rm -rf node_modules
 rm -rf .next
 
+# Create runtime config file to globally set Node.js runtime
+echo "Creating Next.js runtime config files..."
+
+# Create runtime file for middleware
+echo "export const runtime = 'nodejs';" > middleware.config.js
+
+# Create config files for all API routes
+mkdir -p app/api/config
+echo "export const runtime = 'nodejs';\nexport const dynamic = 'force-dynamic';" > app/api/config.js
+
+# Ensure mongoose doesn't get bundled with client code
+echo "Creating browser mock for mongoose..."
+cat > db-mock.js << 'EOL'
+// This is a mock file used as an alias for mongoose/mongodb in client bundles
+// It prevents Edge Runtime errors by providing empty implementations
+
+// Mock mongoose exports
+module.exports = {
+  // Mock basic mongoose functionality with empty functions
+  connect: () => Promise.resolve(),
+  model: () => ({}),
+  Schema: function() { return {} },
+  connection: {
+    on: () => {},
+    once: () => {},
+  },
+  
+  // Mock MongoDB functionality
+  MongoClient: function() {
+    return {
+      connect: () => Promise.resolve({
+        db: () => ({})
+      }),
+      close: () => Promise.resolve(),
+    };
+  },
+  
+  // Additional mongoose properties that might be referenced
+  models: {},
+  modelNames: () => [],
+  
+  // Add any other functions that might be called
+  disconnect: () => Promise.resolve(),
+  set: () => {},
+};
+EOL
+
 # Create required configuration files
 echo "Creating TailwindCSS configuration files..."
 

@@ -1,14 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-  // Completely disable Edge Runtime
+  // Use Server Components for compatibility with mongoose
+  output: 'standalone',
+  reactStrictMode: false,
+  // Force compilation settings for compatibility
   experimental: {
-    serverComponentsExternalPackages: ['mongoose', 'bcryptjs'],
-    disableOptimizedLoading: true,
-    esmExternals: 'loose',
-    serverActions: {
-      bodySizeLimit: '2mb',
-    },
+    serverComponentsExternalPackages: ['mongoose', 'bcryptjs', 'mongodb'],
+    appDir: true,
+    serverActions: true,
+  },
+  // Set default runtime globally
+  serverRuntimeConfig: {
+    PROJECT_ROOT: __dirname,
   },
   // Disable error checking during builds to bypass issues
   eslint: {
@@ -29,13 +32,23 @@ const nextConfig = {
     domains: ['vimeo.com', 'player.vimeo.com', 'i.vimeocdn.com'],
   },
   // Configure webpack to prevent Mongoose from being included in client bundles
-  // and to properly handle TailwindCSS
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer, dev }) => {
+    // Create empty modules for server-only packages in client bundles
     if (!isServer) {
-      // Don't bundle mongoose on the client
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'mongoose': require.resolve('./db-mock.js'),
+        'mongodb': require.resolve('./db-mock.js'),
+      };
+      
+      // Also set explicit fallbacks
       config.resolve.fallback = {
         ...config.resolve.fallback,
         mongoose: false,
+        mongodb: false,
+        'mongodb-client-encryption': false,
+        aws4: false,
+        'mongoose-legacy-pluralize': false,
       };
     }
 
