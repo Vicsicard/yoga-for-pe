@@ -307,6 +307,47 @@ rm -f tsconfig.json
 echo "Running TypeScript to JavaScript converter with advanced syntax fixes..."
 node ts-converter.js
 
+# Copy pre-fixed files to replace problematic ones
+echo "Copying pre-fixed JS files over problematic ones..."
+
+# Check if pre-fixed-js directory exists
+if [ -d "pre-fixed-js" ]; then
+  echo "Found pre-fixed JS files directory"
+  
+  # Copy each pre-fixed file to its corresponding location
+  if [ -f "pre-fixed-js/Footer.js" ]; then
+    echo "Copying pre-fixed Footer.js"
+    cp pre-fixed-js/Footer.js components/Footer.js
+  fi
+  
+  if [ -f "pre-fixed-js/Navbar.js" ]; then
+    echo "Copying pre-fixed Navbar.js"
+    cp pre-fixed-js/Navbar.js components/Navbar.js
+  fi
+  
+  if [ -f "pre-fixed-js/PremiumModal.js" ]; then
+    echo "Copying pre-fixed PremiumModal.js"
+    cp pre-fixed-js/PremiumModal.js components/PremiumModal.js
+  fi
+  
+  if [ -f "pre-fixed-js/SubscriptionCTA.js" ]; then
+    echo "Copying pre-fixed SubscriptionCTA.js"
+    cp pre-fixed-js/SubscriptionCTA.js components/SubscriptionCTA.js
+  fi
+  
+  if [ -f "pre-fixed-js/VideoCard.js" ]; then
+    echo "Copying pre-fixed VideoCard.js"
+    cp pre-fixed-js/VideoCard.js components/VideoCard.js
+  fi
+  
+  if [ -f "pre-fixed-js/Button.js" ]; then
+    echo "Copying pre-fixed Button.js"
+    cp pre-fixed-js/Button.js components/Button.js
+  fi
+else
+  echo "WARNING: pre-fixed-js directory not found!"
+fi
+
 # Run our script to fix any import syntax errors and other JS syntax errors
 echo "Running script to fix import syntax errors and other JS syntax issues..."
 cat > fix-render-imports.js << 'EOL'
