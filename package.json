@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "preinstall": "npm install -g tailwindcss postcss autoprefixer", 
+    "prebuild": "tailwindcss init -p",
+    "build": "NODE_ENV=production NODE_OPTIONS='--max-old-space-size=4096' next build",
     "start": "next start",
     "lint": "next lint"
   },

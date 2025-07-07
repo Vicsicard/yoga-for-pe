@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: yoga-for-pe-nextjs
+    env: node
+    buildCommand: chmod +x ./render-build.sh && ./render-build.sh
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_OPTIONS
+        value: --max-old-space-size=4096
