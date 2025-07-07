@@ -1,112 +1,151 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { FiX, FiLock, FiPlayCircle } from 'react-icons/fi';
 import Link from 'next/link';
-import { FaTimes, FaLock } from 'react-icons/fa';
-
-// Import the useAuth hook for user authentication
 import { useAuth } from '../lib/hooks/useAuth';
 
-// Debug logging function with proper parameter declaration
-function logDebug(message, data) {
-  if (process.env.NODE_ENV !== 'production') {
-    console.log(`[PremiumModal] ${message}`, data || '');
-  }
-}
-
-export default function PremiumModal({ onClose, showSubscribeButton = true }) {
-  // Track if the modal has been shown to prevent repeated displays
-  const [hasShownModal, setHasShownModal] = useState(false);
+/**
+ * PremiumModal Component
+ * Displays a modal when users try to access premium content without subscription
+ * 
+ * @param {boolean} isOpen - Whether the modal is open
+ * @param {function} onClose - Function to close the modal
+ * @param {string} videoTitle - Title of the video being accessed
+ * @returns {JSX.Element}
+ */
+export default function PremiumModal({ isOpen, onClose, videoTitle }) {
+  const router = useRouter();
   
-  // Animation state
+  if (!isOpen) return null;
+  
+  // Track visibility for animation
   const [isVisible, setIsVisible] = useState(false);
   
-  // Track sign-in status
+  // Track sign-in status - Fixed const reassignment issue
   const [isSignedIn, setIsSignedIn] = useState(false);
   let userId = null;
+  let authChecked = false;
   
   try {
     const { user, isAuthenticated } = useAuth();
-    isSignedIn = isAuthenticated;
+    // Instead of reassigning const variable, we use useState's setter
+    if (isAuthenticated !== isSignedIn) {
+      setIsSignedIn(isAuthenticated);
+    }
     userId = user?.id || null;
+    authChecked = true;
   } catch (error) {
     console.error('Error accessing auth context:', error);
+    authChecked = true;
   }
 
-  // Animate in on mount
+  // Debug logging function
+  const logDebug = (message) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`PremiumModal Debug: ${message}`);
+    }
+  };
+  
+  // Animation effect
   useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Handle close with animation
+    if (isOpen) {
+      setIsVisible(true);
+    } else {
+      setIsVisible(false);
+    }
+  }, [isOpen]);
+  
+  // Close modal and redirect if necessary
   const handleClose = () => {
     setIsVisible(false);
     setTimeout(() => {
-      if (onClose) onClose();
+      onClose();
     }, 300);
   };
-
+  
+  // Redirect to sign in page
+  const handleSignIn = () => {
+    handleClose();
+    setTimeout(() => {
+      router.push('/sign-in');
+    }, 300);
+  };
+  
+  // Redirect to pricing page
+  const handleSubscribe = () => {
+    handleClose();
+    setTimeout(() => {
+      router.push('/pricing');
+    }, 300);
+  };
+  
   return (
     <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
-      <div className="fixed inset-0 bg-black bg-opacity-50" onClick={handleClose}></div>
+      <div className="absolute inset-0 bg-black bg-opacity-75" onClick={handleClose}></div>
       
-      <div className={`bg-white rounded-lg shadow-xl max-w-md w-full transition-all duration-300 transform ${isVisible ? 'scale-100' : 'scale-95'}`}>
+      <div className="relative bg-white rounded-lg max-w-md w-full p-6 shadow-xl transform transition-all duration-300 scale-100">
         {/* Close button */}
-        <button 
-          onClick={handleClose}
-          className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
-          aria-label="Close modal"
-        >
-          <FaTimes size={24} />
+        <button onClick={handleClose} className="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
+          <FiX size={24} />
         </button>
-
-        {/* Premium content image */}
-        <div className="relative h-48 rounded-t-lg overflow-hidden">
-          <Image 
-            src="/images/premium-banner.jpg" 
-            alt="Premium Content" 
-            fill
-            style={{ objectFit: 'cover' }}
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-50"></div>
-          <div className="absolute bottom-4 left-4 flex items-center">
-            <FaLock className="text-yellow-400 mr-2" size={20} />
-            <span className="text-white font-semibold text-lg">Premium Content</span>
+        
+        {/* Lock icon */}
+        <div className="flex justify-center mb-4">
+          <div className="bg-blue-100 p-3 rounded-full">
+            <FiLock size={28} className="text-blue-600" />
           </div>
         </div>
-
-        {/* Modal content */}
-        <div className="p-6">
-          <h3 className="text-2xl font-bold text-gray-800 mb-2">Unlock Premium Videos</h3>
-          <p className="text-gray-600 mb-6">
-            This video is exclusive to our premium subscribers. Sign up now to access our complete library 
-            of yoga and mindfulness videos.
-          </p>
-
-          {/* Action buttons */}
-          <div className="flex flex-col gap-3 sm:flex-row">
-            {showSubscribeButton && (
-              <Link 
-                href="/sign-up"
-                className="flex-1 bg-gradient-to-r from-blue-500 to-teal-400 text-white py-2 px-4 rounded-lg font-medium text-center hover:from-blue-600 hover:to-teal-500 transition-all"
-              >
-                Subscribe Now
-              </Link>
-            )}
+        
+        {/* Content */}
+        <h3 className="text-xl font-bold text-center mb-2">Premium Content</h3>
+        
+        <p className="text-gray-600 text-center mb-6">
+          {videoTitle ? (
+            <>"{videoTitle}" is available with our premium subscription.</>
+          ) : (
+            <>This content is available with our premium subscription.</>
+          )}
+        </p>
+        
+        {isSignedIn ? (
+          <>
+            <p className="text-center text-gray-600 mb-4">
+              You're signed in, but need a premium subscription to access this content.
+            </p>
             
-            {!isSignedIn && (
-              <Link 
-                href="/sign-in"
-                className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded-lg font-medium text-center hover:bg-gray-50 transition-all"
+            <button
+              onClick={handleSubscribe}
+              className="w-full py-3 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+            >
+              <FiPlayCircle size={20} />
+              <span>Subscribe Now</span>
+            </button>
+          </>
+        ) : (
+          <>
+            <p className="text-center text-gray-600 mb-4">
+              Sign in to access premium content or subscribe now.
+            </p>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={handleSignIn}
+                className="py-3 px-4 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition-colors"
               >
                 Sign In
-              </Link>
-            )}
-          </div>
-        </div>
+              </button>
+              
+              <button
+                onClick={handleSubscribe}
+                className="py-3 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Subscribe
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
