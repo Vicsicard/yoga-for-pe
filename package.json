@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "render-build": "chmod +x ./render-build-node.sh && ./render-build-node.sh"
   },
   "dependencies": {
     "tailwindcss": "3.4.1",
