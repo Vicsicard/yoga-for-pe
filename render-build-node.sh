@@ -13,13 +13,12 @@ rm -rf node_modules
 rm -rf .next
 rm -rf package-lock.json
 
-# Create extremely simplified Next.js config
-echo "Creating minimal Next.js config..."
+# Create super simple Next.js config with basic syntax
+echo "Creating ultra-minimal Next.js config..."
 cat > next.config.js << 'EOL'
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: false,
-  output: 'standalone',
+module.exports = {
+  output: "standalone",
   images: {
     domains: ["vimeo.com", "player.vimeo.com", "i.vimeocdn.com"]
   },
@@ -30,8 +29,6 @@ const nextConfig = {
     ignoreDuringBuilds: true
   }
 };
-
-module.exports = nextConfig;
 EOL
 
 # Create an empty placeholder file to mock mongoose in client bundles
