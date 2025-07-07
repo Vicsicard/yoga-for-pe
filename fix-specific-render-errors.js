@@ -10,37 +10,80 @@ const exists = promisify(fs.exists);
 // Specific fixes for files with exact issues from the build logs
 // Using more robust patterns for better matching
 const specificFixes = [
+  // Fix mismatched JSX closing tags in Footer
   {
     file: 'components/Footer.js',
     search: /(<\/span><\/a>|<\/span>\s*<\/a>)/g,
     replace: '</a>',
     exact: false
   },
+  // Fix missing h2 closing tag in Footer (from build log)
+  {
+    file: 'components/Footer.js',
+    search: /(<h2[^>]*>[^<]*?)(?!<\/h2>)(<\/div>)/g,
+    replace: '$1</h2>$2',
+    exact: false
+  },
+  // Fix incorrect else syntax
   {
     file: 'components/Navbar.js',
     search: /else\s*:/g,
     replace: 'else',
     exact: false
   },
+  // Fix PremiumModal missing parenthesis
   {
     file: 'components/PremiumModal.js',
-    // Use more general regex to catch missing parenthesis
     search: /function\s+logDebug\s*\(\s*message[^()]*\{/g,
     replace: 'function logDebug(message, data) {',
     exact: false
   },
+  // Fix PremiumModal incorrect const: syntax (from build log)
+  {
+    file: 'components/PremiumModal.js',
+    search: /const\s*:\s*{/g,
+    replace: 'const {',
+    exact: false
+  },
+  // Fix missing h2 closing tag
   {
     file: 'components/SubscriptionCTA.js', 
-    // Making sure h2 tag is properly closed
     search: /(<h2[^>]*>Unlock Premium Content)(?!<\/h2>)/g,
     replace: '$1</h2>',
     exact: false
   },
+  // Fix VideoCard type annotation
   {
     file: 'components/VideoCard.js',
-    // More robust type annotation handling
     search: /function\s+getCategoryFolder\s*\([^{)]*\)\s*:[^{]*/g,
     replace: 'function getCategoryFolder(video, videoSection) {',
+    exact: false
+  },
+  // Fix export outside of module (from build log)
+  {
+    file: 'components/VideoCard.js',
+    search: /export default function VideoCard/g,
+    replace: 'function VideoCard',
+    exact: false
+  },
+  {
+    file: 'components/VideoCard.js',
+    search: /}\s*$/,
+    replace: '}\n\nexport default VideoCard;',
+    exact: false
+  },
+  // Fix ternary operator in VideoSection (from build log)
+  {
+    file: 'components/VideoSection.js',
+    search: /(title\.toLowerCase\(\)\.includes\('relaxation'\)\s*\?\s*'relaxation'\s*)\)/g,
+    replace: '$1 : \'other\')',
+    exact: false
+  },
+  // Fix Button.js export syntax (from build log)
+  {
+    file: 'components/ui/Button.js',
+    search: /export\s*,\s*ref\)/g,
+    replace: 'export default function Button({ children, href, className, variant, size, icon, onClick }, ref)',
     exact: false
   }
 ];
