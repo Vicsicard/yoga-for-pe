@@ -192,7 +192,27 @@ export const authConfig = {
   },
 };
 
-export default NextAuth(authConfig);
+// This is the NextAuth handler
+const handler = NextAuth(authConfig);
+
+// Create auth export to maintain compatibility with existing code
+export const auth = {
+  signIn: async (email, password) => {
+    console.log('Mock auth.signIn called');
+    return { success: false, message: 'This is a mock auth service' };
+  },
+  signUp: async (userData) => {
+    console.log('Mock auth.signUp called');
+    return { success: false, message: 'This is a mock auth service' };
+  },
+  checkAuth: async (token) => {
+    console.log('Mock auth.checkAuth called');
+    return { isAuthenticated: false };
+  }
+};
+
+// Export the NextAuth handler as default
+export default handler;
 EOL
 
 # Force Node.js runtime in key files
