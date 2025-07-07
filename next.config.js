@@ -22,9 +22,8 @@ const nextConfig = {
     }
     return config;
   },
-  // Explicitly set which routes should NOT use Edge Runtime
+  // Explicitly set which packages should be treated as external
   experimental: {
-    runtime: 'nodejs',
     serverComponentsExternalPackages: ['mongoose', 'bcryptjs'],
   },
 }
