@@ -486,6 +486,82 @@ EOL
 
 node fix-render-imports.js
 
+# Add our enhanced specific fixes for known build errors
+echo 'Creating enhanced specific fixes script...'
+cat > fix-specific-render-errors.js << 'EOL'
+// Script to fix specific render conversion errors
+const fs = require('fs');
+const path = require('path');
+
+// Specific fixes for files with exact issues from the build logs
+const specificFixes = [
+  {
+    file: 'components/Footer.js',
+    search: '</span></a>',
+    replace: '</a>'
+  },
+  {
+    file: 'components/Navbar.js',
+    search: 'else:',
+    replace: 'else'
+  },
+  {
+    file: 'components/PremiumModal.js',
+    search: 'function logDebug(message, data  {',
+    replace: 'function logDebug(message, data) {'
+  },
+  {
+    file: 'components/SubscriptionCTA.js', 
+    // Making sure h2 tag is properly closed
+    search: '<h2 className="text-3xl font-bold mb-4">Unlock Premium Content',
+    replace: '<h2 className="text-3xl font-bold mb-4">Unlock Premium Content</h2>'
+  },
+  {
+    file: 'components/VideoCard.js',
+    search: 'videoSection : string:',
+    replace: 'videoSection) {'
+  }
+];
+
+// Root directory
+const rootDir = process.cwd();
+
+// Process each file with a specific fix
+for (const fix of specificFixes) {
+  const filePath = path.join(rootDir, fix.file);
+  
+  if (fs.existsSync(filePath)) {
+    console.log(`Checking ${fix.file} for issues...`);
+    
+    try {
+      // Read the file
+      let content = fs.readFileSync(filePath, 'utf-8');
+      
+      if (content.includes(fix.search)) {
+        // Apply the specific fix
+        content = content.replace(new RegExp(fix.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), fix.replace);
+        
+        // Write back to the file
+        fs.writeFileSync(filePath, content, 'utf-8');
+        
+        console.log(`✅ Fixed issue in ${fix.file}`);
+      } else {
+        console.log(`⚠️ Could not find the issue pattern in ${fix.file}`);
+      }
+    } catch (error) {
+      console.error(`❌ Error fixing ${fix.file}:`, error);
+    }
+  } else {
+    console.warn(`⚠️ File not found: ${filePath}`);
+  }
+}
+
+console.log('All specific fixes applied!');
+EOL
+
+echo "Running enhanced specific fixes script..."
+node fix-specific-render-errors.js
+
 # Install TypeScript dependencies explicitly
 echo "Installing TypeScript dependencies..."
 npm install --no-package-lock typescript @types/react @types/node @types/react-dom
