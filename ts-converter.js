@@ -26,7 +26,7 @@ function convertTsToJs(content, filePath) {
     .replace(/import\s+\{\s*type\s+[^}]+\}\s+from\s+[^;]+;/g, '');
 
   // Fix all import statements - CRITICAL for auth routes
-  jsContent = jsContent.replace(/import:\s*\{([^}]+)\}\s+from\s+(['"])([^'"]+)\2/g, 'import {$1} from $2$3$2');
+  jsContent = jsContent.replace(/import \s*\{([^}]+)\}\s+from\s+(['"])([^'"]+)\2/g, 'import {$1} from $2$3$2');
   
   // Fix remaining imports
   jsContent = jsContent.replace(/import\s+\{([^}]+)\}\s+from/g, (match, imports) => {
@@ -45,8 +45,8 @@ function fixSyntaxIssues(content, filePath) {
   let fixedContent = content;
   
   // Fix import statements with colons - this is the critical issue
-  fixedContent = fixedContent.replace(/import:\s*\{/g, 'import {');
-  fixedContent = fixedContent.replace(/import:\s*([A-Za-z0-9_]+)\s+from/g, 'import $1 from');
+  fixedContent = fixedContent.replace(/import \s*\{/g, 'import {');
+  fixedContent = fixedContent.replace(/import \s*([A-Za-z0-9_]+)\s+from/g, 'import $1 from');
   
   // Fix try blocks with colons
   fixedContent = fixedContent.replace(/try:\s*\{/g, 'try {');
@@ -68,10 +68,10 @@ function fixSyntaxIssues(content, filePath) {
   // Fix class declarations with extends but no colon
   fixedContent = fixedContent.replace(/class\s+(\w+)\s+extends\s+(\w+)\s*\{/g, 'class $1 extends $2 {');
 
-  // Special case for auth routes that have the import: { ... } syntax
+  // Special case for auth routes that have the import { ... } syntax
   if (filePath && filePath.includes('/api/auth/')) {
     console.log(`Applying special fixes for auth route: ${filePath}`);
-    fixedContent = fixedContent.replace(/import:\s*\{([^}]+)\}\s+from\s+(['"])([^'"]+)\2/g, 'import {$1} from $2$3$2');
+    fixedContent = fixedContent.replace(/import \s*\{([^}]+)\}\s+from\s+(['"])([^'"]+)\2/g, 'import {$1} from $2$3$2');
     // Fix try-catch blocks in auth routes
     fixedContent = fixedContent.replace(/try:\s*\{/g, 'try {');
   }
