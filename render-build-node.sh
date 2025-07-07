@@ -307,6 +307,81 @@ rm -f tsconfig.json
 echo "Running TypeScript to JavaScript converter with advanced syntax fixes..."
 node ts-converter.js
 
+# Run our script to fix any import syntax errors
+echo "Running script to fix import syntax errors..."
+cat > fix-render-imports.js << 'EOL'
+// Script to fix incorrect import statements in converted JS files
+const fs = require('fs');
+const path = require('path');
+const { promisify } = require('util');
+
+const readdir = promisify(fs.readdir);
+const readFile = promisify(fs.readFile);
+const writeFile = promisify(fs.writeFile);
+const stat = promisify(fs.stat);
+
+// Function to fix import statements in a file
+async function fixImportsInFile(filePath) {
+  try {
+    const content = await readFile(filePath, 'utf8');
+    
+    // Check if file contains the problematic pattern
+    if (content.includes('import:')) {
+      console.log(`Found incorrect imports in: ${filePath}`);
+      
+      // Fix the imports by removing colons
+      const fixedContent = content.replace(/import\s*:\s*/g, 'import ');
+      
+      // Write the fixed content back to the file
+      await writeFile(filePath, fixedContent, 'utf8');
+      console.log(`Fixed imports in: ${filePath}`);
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error(`Error processing file ${filePath}:`, error);
+    return false;
+  }
+}
+
+// Function to recursively process all JS files in a directory
+async function processDirectory(directoryPath) {
+  try {
+    const files = await readdir(directoryPath);
+    let fixCount = 0;
+    
+    for (const file of files) {
+      const filePath = path.join(directoryPath, file);
+      const fileStat = await stat(filePath);
+      
+      if (fileStat.isDirectory()) {
+        // Recursive call for subdirectories
+        fixCount += await processDirectory(filePath);
+      } else if (filePath.endsWith('.js') || filePath.endsWith('.jsx')) {
+        // Process JavaScript files
+        const fixed = await fixImportsInFile(filePath);
+        if (fixed) fixCount++;
+      }
+    }
+    
+    return fixCount;
+  } catch (error) {
+    console.error(`Error processing directory ${directoryPath}:`, error);
+    return 0;
+  }
+}
+
+// Start processing from the current directory
+const rootDir = process.cwd();
+console.log(`Starting to fix imports from root directory: ${rootDir}`);
+
+processDirectory(rootDir)
+  .then(fixCount => console.log(`Fixed imports in ${fixCount} files. Completed fixing imports.`))
+  .catch(error => console.error('Error fixing imports:', error));
+EOL
+
+node fix-render-imports.js
+
 # Install TypeScript dependencies explicitly
 echo "Installing TypeScript dependencies..."
 npm install --no-package-lock typescript @types/react @types/node @types/react-dom
