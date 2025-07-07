@@ -13,38 +13,22 @@ rm -rf node_modules
 rm -rf .next
 rm -rf package-lock.json
 
-# Create a simple next.config.js that completely disables bundling of mongoose
-echo "Creating simplified Next.js config..."
+# Create extremely simplified Next.js config
+echo "Creating minimal Next.js config..."
 cat > next.config.js << 'EOL'
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
   output: 'standalone',
   images: {
-    domains: ['vimeo.com', 'player.vimeo.com', 'i.vimeocdn.com'],
+    domains: ["vimeo.com", "player.vimeo.com", "i.vimeocdn.com"]
   },
-  // Completely disable TypeScript checking
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: true
   },
-  // Disable ESLint
   eslint: {
-    ignoreDuringBuilds: true,
-  },
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      // Don't bundle mongoose on the client
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        "mongoose": false,
-        "mongodb": false,
-        "mongodb-client-encryption": false,
-        "aws4": false,
-        "mongoose-legacy-pluralize": false
-      };
-    }
-    return config;
-  },
+    ignoreDuringBuilds: true
+  }
 };
 
 module.exports = nextConfig;

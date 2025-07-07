@@ -3,16 +3,26 @@
 
 // Mock mongoose exports
 module.exports = {
-  // Mock basic mongoose functionality with empty functions
   connect: () => Promise.resolve(),
-  model: () => ({}),
-  Schema: function() { return {} },
-  connection: {
+  connection: { 
     on: () => {},
-    once: () => {},
+    once: () => {}
   },
-  
-  // Mock MongoDB functionality
+  Schema: function() { 
+    return { 
+      methods: {},
+      statics: {} 
+    }; 
+  },
+  model: () => ({
+    findOne: () => Promise.resolve(null),
+    find: () => ({ exec: () => Promise.resolve([]) }),
+    create: () => Promise.resolve({})
+  }),
+  // Other mongoose exports that might be used
+  Types: {
+    ObjectId: (id) => id
+  },
   MongoClient: function() {
     return {
       connect: () => Promise.resolve({
