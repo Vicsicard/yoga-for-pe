@@ -342,7 +342,22 @@ if [ -d "pre-fixed-js" ]; then
   
   if [ -f "pre-fixed-js/Button.js" ]; then
     echo "Copying pre-fixed Button.js"
-    cp pre-fixed-js/Button.js components/Button.js
+    cp pre-fixed-js/Button.js components/ui/Button.js
+  fi
+  
+  if [ -f "pre-fixed-js/Features.js" ]; then
+    echo "Copying pre-fixed Features.js"
+    cp pre-fixed-js/Features.js components/ui/Features.js
+  fi
+  
+  if [ -f "pre-fixed-js/HeroSlider.js" ]; then
+    echo "Copying pre-fixed HeroSlider.js"
+    cp pre-fixed-js/HeroSlider.js components/ui/HeroSlider.js
+  fi
+  
+  if [ -f "pre-fixed-js/VideoSection.js" ]; then
+    echo "Copying pre-fixed VideoSection.js"
+    cp pre-fixed-js/VideoSection.js components/VideoSection.js
   fi
 else
   echo "WARNING: pre-fixed-js directory not found!"
