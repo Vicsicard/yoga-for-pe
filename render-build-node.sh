@@ -307,10 +307,10 @@ rm -f tsconfig.json
 echo "Running TypeScript to JavaScript converter with advanced syntax fixes..."
 node ts-converter.js
 
-# Run our script to fix any import syntax errors
-echo "Running script to fix import syntax errors..."
+# Run our script to fix any import syntax errors and other JS syntax errors
+echo "Running script to fix import syntax errors and other JS syntax issues..."
 cat > fix-render-imports.js << 'EOL'
-// Script to fix incorrect import statements in converted JS files
+// Script to fix incorrect import statements and other syntax issues in converted JS files
 const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
@@ -320,24 +320,61 @@ const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
 const stat = promisify(fs.stat);
 
-// Function to fix import statements in a file
-async function fixImportsInFile(filePath) {
+// Function to fix various issues in a file
+async function fixFileIssues(filePath) {
   try {
-    const content = await readFile(filePath, 'utf8');
+    let content = await readFile(filePath, 'utf8');
+    let wasFixed = false;
     
-    // Check if file contains the problematic pattern
+    // Store the original content for comparison
+    const originalContent = content;
+    
+    // Fix 1: Incorrect import statements with colons
     if (content.includes('import:')) {
-      console.log(`Found incorrect imports in: ${filePath}`);
-      
-      // Fix the imports by removing colons
-      const fixedContent = content.replace(/import\s*:\s*/g, 'import ');
-      
-      // Write the fixed content back to the file
-      await writeFile(filePath, fixedContent, 'utf8');
-      console.log(`Fixed imports in: ${filePath}`);
+      content = content.replace(/import\s*:\s*/g, 'import ');
+      console.log(`Fixed import syntax in: ${filePath}`);
+      wasFixed = true;
+    }
+    
+    // Fix 2: Fix TypeScript optional parameter syntax (data?) in JS
+    const optionalParamRegex = /\b(\w+)\?\s*[:)]/g;
+    if (optionalParamRegex.test(content)) {
+      content = content.replace(optionalParamRegex, '$1 ');
+      console.log(`Fixed optional parameter syntax in: ${filePath}`);
+      wasFixed = true;
+    }
+    
+    // Fix 3: Fix try: { syntax error (should be try {)
+    if (content.includes('try:')) {
+      content = content.replace(/try\s*:/g, 'try');
+      console.log(`Fixed try: syntax in: ${filePath}`);
+      wasFixed = true;
+    }
+    
+    // Fix 4: Fix missing closing span tags
+    const openSpanRegex = /<span[^>]*>[^<]*(?!<\/span>)(?=[<])/g;
+    if (openSpanRegex.test(content)) {
+      content = content.replace(openSpanRegex, (match) => match + '</span>');
+      console.log(`Fixed missing span closing tags in: ${filePath}`);
+      wasFixed = true;
+    }
+    
+    // Fix 5: Fix complex ternary expressions in JSX
+    // Look for patterns like: {(video.category === 'meditation' ? 'Meditation' === 'yoga-for-pe' ? 'Yoga for PE' : 'Relaxation')} • Free
+    if (filePath.includes('FeaturedVideos.js') && content.includes("{(video.category === 'meditation' ? 'Meditation' === 'yoga-for-pe' ? 'Yoga for PE' : 'Relaxation')} • Free")) {
+      content = content.replace("{(video.category === 'meditation' ? 'Meditation' === 'yoga-for-pe' ? 'Yoga for PE' : 'Relaxation')} • Free", 
+        "{video.category === 'meditation' ? 'Meditation' : (video.category === 'yoga-for-pe' ? 'Yoga for PE' : 'Relaxation')} • Free");
+      console.log(`Fixed complex ternary in FeaturedVideos.js`);
+      wasFixed = true;
+    }
+    
+    // Write the fixed content back to the file if any changes were made
+    if (wasFixed && content !== originalContent) {
+      await writeFile(filePath, content, 'utf8');
       return true;
     }
-    return false;
+    
+    return wasFixed;
   } catch (error) {
     console.error(`Error processing file ${filePath}:`, error);
     return false;
@@ -359,7 +396,7 @@ async function processDirectory(directoryPath) {
         fixCount += await processDirectory(filePath);
       } else if (filePath.endsWith('.js') || filePath.endsWith('.jsx')) {
         // Process JavaScript files
-        const fixed = await fixImportsInFile(filePath);
+        const fixed = await fixFileIssues(filePath);
         if (fixed) fixCount++;
       }
     }
@@ -371,13 +408,80 @@ async function processDirectory(directoryPath) {
   }
 }
 
+// Function to fix specific files that need special handling
+async function fixSpecificFiles() {
+  const specificFixes = [
+    {
+      file: 'components/FilteredVideoResults.js',
+      search: '<span>Show Next Videos\n                   <FiRefreshCw className="ml-2" />',
+      replace: '<span>Show Next Videos</span>\n                   <FiRefreshCw className="ml-2" />'
+    },
+    {
+      file: 'components/Footer.js',
+      search: '<span className="sr-only">Facebook',
+      replace: '<span className="sr-only">Facebook</span>'
+    },
+    {
+      file: 'components/Footer.js',
+      search: '<span className="sr-only">Instagram',
+      replace: '<span className="sr-only">Instagram</span>'
+    },
+    {
+      file: 'components/Footer.js',
+      search: '<span className="sr-only">Twitter',
+      replace: '<span className="sr-only">Twitter</span>'
+    },
+    {
+      file: 'components/Footer.js',
+      search: '<span className="sr-only">YouTube',
+      replace: '<span className="sr-only">YouTube</span>'
+    }
+  ];
+
+  let fixCount = 0;
+  const rootDir = process.cwd();
+  
+  for (const fix of specificFixes) {
+    const filePath = path.join(rootDir, fix.file);
+    try {
+      if (fs.existsSync(filePath)) {
+        let content = await readFile(filePath, 'utf8');
+        if (content.includes(fix.search)) {
+          content = content.replace(fix.search, fix.replace);
+          await writeFile(filePath, content, 'utf8');
+          console.log(`Applied specific fix to ${fix.file}`);
+          fixCount++;
+        }
+      }
+    } catch (error) {
+      console.error(`Error applying specific fix to ${fix.file}:`, error);
+    }
+  }
+  
+  return fixCount;
+}
+
 // Start processing from the current directory
 const rootDir = process.cwd();
-console.log(`Starting to fix imports from root directory: ${rootDir}`);
+console.log(`Starting to fix imports and syntax issues from root directory: ${rootDir}`);
 
-processDirectory(rootDir)
-  .then(fixCount => console.log(`Fixed imports in ${fixCount} files. Completed fixing imports.`))
-  .catch(error => console.error('Error fixing imports:', error));
+async function runFixes() {
+  try {
+    // First apply general fixes
+    const generalFixCount = await processDirectory(rootDir);
+    console.log(`Fixed general issues in ${generalFixCount} files.`);
+    
+    // Then apply specific fixes
+    const specificFixCount = await fixSpecificFiles();
+    console.log(`Applied ${specificFixCount} specific fixes.`);
+    
+    console.log(`Completed fixing all issues. Total files fixed: ${generalFixCount + specificFixCount}`);
+  } catch (error) {
+    console.error('Error fixing issues:', error);
+  }
+}
+
+runFixes();
 EOL
 
 node fix-render-imports.js
