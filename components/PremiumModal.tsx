@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth, SignInButton, SignUpButton } from '@clerk/nextjs';
+import { useAuth } from '../lib/hooks/useAuth';
+import Link from 'next/link';
 import { SubscriptionTier, subscriptionTierDetails } from '../lib/vimeo-browser';
 import { SubscriptionPlan } from '../lib/subscription/types';
 
@@ -26,21 +27,23 @@ export default function PremiumModal({ selectedTier, onClose }: PremiumModalProp
   const [showAuthOptions, setShowAuthOptions] = useState(false);
   const [showSubscriptionOptions, setShowSubscriptionOptions] = useState(false);
   
-  // Wrap Clerk hooks in try-catch
+  // Use our fixed auth logic safely
   let isSignedIn = false;
-  let userId: string | null = null;
+  let userId = null;
   
   try {
-    const auth = useAuth();
-    isSignedIn = auth.isSignedIn;
-    userId = auth.userId;
-    
-    // Log auth state on each render
-    logDebug('Auth state:', { isSignedIn, userId });
-  } catch (err: any) {
-    console.error('[PREMIUM-MODAL] Error in useAuth hook:', err);
-    setError(`Auth Error: ${err.message || 'Unknown error in authentication'}`);
+    const { user, isAuthenticated } = useAuth();
+    isSignedIn = isAuthenticated;
+    userId = user?.id || null;
+  } catch (error) {
+    console.error('Auth error in PremiumModal:', error);
+    // Fall back to defaults set above
   }
+  
+  // Log on component mount only
+  useEffect(() => {
+    logDebug('PremiumModal mounted');
+  }, []);
   
   // Track component renders
   useEffect(() => {
@@ -151,25 +154,25 @@ export default function PremiumModal({ selectedTier, onClose }: PremiumModalProp
           
           <div className="space-y-4 mb-6">
             <div className="w-full">
-              <SignInButton mode="modal">
+              <Link href="/sign-in">
                 <button 
                   className="w-full px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                   onClick={handleAuthSuccess}
                 >
                   Sign In
                 </button>
-              </SignInButton>
+              </Link>
             </div>
             
             <div className="w-full">
-              <SignUpButton mode="modal">
+              <Link href="/sign-up">
                 <button 
                   className="w-full px-6 py-2 border border-primary-600 text-primary-600 rounded-lg hover:bg-primary-50 transition-colors"
                   onClick={handleAuthSuccess}
                 >
                   Create Account
                 </button>
-              </SignUpButton>
+              </Link>
             </div>
           </div>
           

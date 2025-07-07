@@ -4,7 +4,7 @@ import { Montserrat } from 'next/font/google'
 import './globals.css'
 import { Navbar } from '../components/Navbar'
 import { Footer } from '../components/Footer'
-import { AuthProvider } from '../lib/hooks/useAuth'
+import { Providers } from './providers'
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -24,14 +24,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={montserrat.variable}>
+      <head>
+        {/* Head content */}
+      </head>
       <body className="min-h-screen bg-gray-50 font-sans flex flex-col">
-        <AuthProvider>
+        <Providers>
           <Navbar />
           <main className="flex-grow">
             {children}
           </main>
           <Footer />
-        </AuthProvider>
+        </Providers>
       </body>
     </html>
   )

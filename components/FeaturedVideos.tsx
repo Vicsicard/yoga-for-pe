@@ -34,10 +34,14 @@ export default function FeaturedVideos({ videos, isLoading }: FeaturedVideosProp
               <Card hover={true} className="cursor-pointer">
                 <div className="relative aspect-video overflow-hidden bg-gray-300">
                   {/* Video thumbnail */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary-500/20 to-primary-800/20 group-hover:from-primary-500/30 group-hover:to-primary-800/30 transition-all" />
-                  <div className="flex items-center justify-center w-full h-full text-white">
-                    <span className="text-lg font-medium">Video Thumbnail</span>
+                  <div className="w-full h-full bg-gray-700">
+                    <img 
+                      src={video.thumbnail}
+                      alt={`${video.title}`} 
+                      className="w-full h-full object-cover"
+                    />
                   </div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary-500/20 to-primary-800/20 group-hover:from-primary-500/30 group-hover:to-primary-800/30 transition-all" />
                   
                   {/* Play button */}
                   <div className="absolute inset-0 flex items-center justify-center">

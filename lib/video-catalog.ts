@@ -1,5 +1,6 @@
 // Video catalog data loader
 import { VideoCategory, SubscriptionTier, Video } from './vimeo-browser';
+import { getThumbnailPath } from './thumbnail-mapping';
 import videoCatalogData from '../data/video-catalog.json';
 
 // Map tier strings to SubscriptionTier enum
@@ -39,17 +40,26 @@ export function loadVideosFromCatalog(category: VideoCategory): Video[] {
   console.log(`Loading videos for category: ${category}, found ${categoryVideos.length} videos`);
   
   // Convert to Video objects
-  return categoryVideos.map((video: any, index: number) => ({
+  const videos = categoryVideos.map((video: any, index: number) => ({
     id: parseInt(video.id.replace(/\D/g, '') || index.toString()),
     title: video.title,
     description: video.description,
     duration: video.length || '0:00',
     level: 'Beginner', // Default level if not specified
-    thumbnail: '', // No thumbnails in catalog data
+    thumbnail: `/thumbnails/${categoryKey}/${encodeURIComponent(video.title)}.jpg`, // Set thumbnail based on category and title
     vimeoId: video.id,
     tier: tierMap[video.tier] || SubscriptionTier.BRONZE,
     category: category
   }));
+  
+  // Make sure all videos have proper thumbnail paths
+  return videos.map(video => {
+    // Apply thumbnail mapping
+    return {
+      ...video,
+      thumbnail: getThumbnailPath(video.title, categoryKey)
+    };
+  });
 }
 
 // Get videos by category with pagination

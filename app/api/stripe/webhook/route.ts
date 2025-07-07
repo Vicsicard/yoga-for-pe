@@ -1,3 +1,5 @@
+export const runtime = 'nodejs';
+
 // Stripe webhook handler
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
@@ -6,7 +8,7 @@ import { SubscriptionTier } from '../../../../lib/vimeo-browser';
 
 // Initialize Stripe
 const stripe = process.env.STRIPE_SECRET_KEY 
-  ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' })
+  ? new Stripe(process.env.STRIPE_SECRET_KEY)
   : null;
 
 // Map Stripe subscription status to our subscription tier

@@ -11,6 +11,17 @@ const nextConfig = {
     ],
     domains: ['vimeo.com', 'player.vimeo.com', 'i.vimeocdn.com'],
   },
+  // Configure webpack to prevent Mongoose from being included in client bundles
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Don't bundle mongoose on the client
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        mongoose: false,
+      };
+    }
+    return config;
+  },
 }
 
 module.exports = nextConfig

@@ -48,6 +48,17 @@ export interface Video {
   category: VideoCategory;
 }
 
+// Helper function to get the Vimeo access token
+function getVimeoToken(): string | null {
+  // Check for browser environment
+  if (typeof window !== 'undefined') {
+    return process.env.NEXT_PUBLIC_VIMEO_ACCESS_TOKEN || null;
+  } else {
+    // Server-side
+    return process.env.VIMEO_ACCESS_TOKEN || null;
+  }
+}
+
 // Helper function to make requests to our Vimeo API proxy
 const makeVimeoRequest = async (endpoint: string, params: Record<string, string> = {}): Promise<any> => {
   // Use our API route as a proxy to avoid CORS issues
@@ -231,174 +242,172 @@ export async function hasAccessToVideo(video: Video, userId?: string | null, use
 
 // Function to get featured free videos for the homepage - one from each category
 export async function getFeaturedFreeVideos(): Promise<Video[]> {
-  // Define the specific videos we want to feature (IDs from tag-featured-videos.js)
+  // Define the specific videos we want to feature
   const featuredVideoIds = [
-    '457053392', // Meditation - I Am Meditation 1
+    '457053392', // Meditation - I Am Meditation
     '1095788590', // Yoga for PE - Ab Circle 1
-    '452426275'  // Relaxation - Zenevate Body Scan
+    '452426275'  // Relaxation - Body Scan with Flowers
   ];
   
   console.log('Fetching featured videos by IDs:', featuredVideoIds);
   
-  const featuredVideos: Video[] = [];
-  
   // Custom descriptions for each video
-  const customDescriptions = {
+  const customDescriptions: Record<string, string> = {
     '457053392': 'A guided meditation to help you connect with your inner self and find peace.',
     '1095788590': 'A fun, full-circle core workout that targets every major ab muscle in one dynamic loop.',
     '452426275': 'A relaxing body scan meditation to help you unwind and connect with your body.'
   };
   
   // Map each ID to its category
-  const idToCategoryMap = {
+  const idToCategoryMap: Record<string, VideoCategory> = {
     '457053392': VideoCategory.MEDITATION,
     '1095788590': VideoCategory.YOGA_FOR_PE,
     '452426275': VideoCategory.RELAXATION
   };
-    
-    // Fallback videos in case the API calls fail
-    const fallbackVideos = [
-      {
-        id: 457053392, // Using the video ID as a number for the id field
-        title: 'I Am Meditation',
-        description: 'A guided meditation to help you connect with your inner self and find peace.',
-        duration: '1:08',
-        level: 'Beginner',
-        thumbnail: 'https://i.vimeocdn.com/video/1016790651-4c20aab2a41f4d5a4e5e9c9ec5e9b3b9a1b7c4f4d5e5c4f4d5e5c4f4d5e5c4f4_640',
-        vimeoId: '457053392',
-        tier: SubscriptionTier.BRONZE,
-        category: VideoCategory.MEDITATION
-      },
-      {
-        id: 1095788590, // Using the video ID as a number for the id field
-        title: 'Ab Circle',
-        description: 'A fun, full-circle core workout that targets every major ab muscle in one dynamic loop.',
-        duration: '1:30',
-        level: 'Beginner',
-        thumbnail: 'https://i.vimeocdn.com/video/1016790651-4c20aab2a41f4d5a4e5e9c9ec5e9b3b9a1b7c4f4d5e5c4f4d5e5c4f4d5e5c4f4_640',
-        vimeoId: '1095788590',
-        tier: SubscriptionTier.BRONZE,
-        category: VideoCategory.YOGA_FOR_PE
-      },
-      {
-        id: 452426275, // Using the video ID as a number for the id field
-        title: 'Zenevate Body Scan',
-        description: 'A relaxing body scan meditation to help you unwind and connect with your body.',
-        duration: '1:00',
-        level: 'Beginner',
-        thumbnail: 'https://i.vimeocdn.com/video/1016790651-4c20aab2a41f4d5a4e5e9c9ec5e9b3b9a1b7c4f4d5e5c4f4d5e5c4f4d5e5c4f4_640',
-        vimeoId: '452426275',
-        tier: SubscriptionTier.BRONZE,
-        category: VideoCategory.RELAXATION
-      }
-    ];
-    
-    // Check if environment variables are set before attempting API calls
-    const accessToken = typeof window !== 'undefined' ? null : process.env.VIMEO_ACCESS_TOKEN;
-    
-    // If we're missing environment variables, immediately use fallbacks
-    if (!accessToken) {
-      console.log('Vimeo API credentials not found, using fallback videos');
-      return fallbackVideos;
+
+  // Thumbnail paths for each video
+  const thumbnailMap: Record<string, string> = {
+    '457053392': '/thumbnails/meditation/I Am.jpg',
+    '1095788590': '/thumbnails/yoga-for-pe/Ab Circle 1.jpg',
+    '452426275': '/thumbnails/relaxation/Body Scan with Flowers.jpg'
+  };
+  
+  // Fallback videos in case the API calls fail
+  const fallbackVideos: Video[] = [
+    {
+      id: 457053392,
+      title: 'I Am',
+      description: 'A guided meditation to help you connect with your inner self and find peace.',
+      duration: '1:08',
+      level: 'Beginner',
+      thumbnail: '/thumbnails/meditation/I Am.jpg',
+      vimeoId: '457053392',
+      tier: SubscriptionTier.BRONZE,
+      category: VideoCategory.MEDITATION
+    },
+    {
+      id: 1095788590,
+      title: 'Ab Circle 1',
+      description: 'A fun, full-circle core workout that targets every major ab muscle in one dynamic loop.',
+      duration: '1:30',
+      level: 'Beginner',
+      thumbnail: '/thumbnails/yoga-for-pe/Ab Circle 1.jpg',
+      vimeoId: '1095788590',
+      tier: SubscriptionTier.BRONZE,
+      category: VideoCategory.YOGA_FOR_PE
+    },
+    {
+      id: 452426275,
+      title: 'Body Scan with Flowers',
+      description: 'A relaxing body scan meditation to help you unwind and connect with your body.',
+      duration: '1:00',
+      level: 'Beginner',
+      thumbnail: '/thumbnails/relaxation/Body Scan with Flowers.jpg',
+      vimeoId: '452426275',
+      tier: SubscriptionTier.BRONZE,
+      category: VideoCategory.RELAXATION
     }
-    
-    try {
-      // Fetch each video directly by ID
-      for (const videoId of featuredVideoIds) {
-        try {
-          console.log(`Fetching video with ID: ${videoId}`);
-          
-          // Direct fetch by ID
-          const response = await makeVimeoRequest(`videos/${videoId}`, {});
-          
-          if (response) {
-            const video = response;
-            const category = idToCategoryMap[videoId as keyof typeof idToCategoryMap];
-            const description = customDescriptions[videoId as keyof typeof customDescriptions];
-            
-            console.log(`Adding video: ${video.name} (${category})`);
-            
-            featuredVideos.push({
-              id: parseInt(videoId), // Ensure ID is a number
-              title: video.name || `Video ${videoId}`,
-              description: description, // Use our custom description
-              duration: video.duration ? formatDuration(video.duration) : '1:00',
-              level: getMetadataField(video, 'level') || 'Beginner',
-              thumbnail: video.pictures?.sizes?.length > 0 ? video.pictures.sizes[3].link : '',
-              vimeoId: videoId,
-              tier: SubscriptionTier.BRONZE,
-              category: category
-            });
-          } else {
-            console.log(`No video found with ID: ${videoId}, using fallback`);
-            // Add fallback video for this category
-            const fallbackVideo = fallbackVideos.find(v => v.vimeoId === videoId);
-            if (fallbackVideo) {
-              featuredVideos.push(fallbackVideo);
+  ];
+
+  // Check if token is available for API access
+  const token = getVimeoToken();
+  if (!token) {
+    console.error('Vimeo API token not found');
+    return fallbackVideos; // Use our fallbacks with reliable thumbnails
+  }
+
+  try {
+    const featuredVideos: Video[] = [];
+
+    // Try to fetch each video from Vimeo API
+    for (const videoId of featuredVideoIds) {
+      try {
+        const response = await fetch(
+          `https://api.vimeo.com/videos/${videoId}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+              'Accept': 'application/vnd.vimeo.*+json;version=3.4'
             }
           }
-        } catch (videoError) {
-          console.error(`Error fetching video ${videoId}:`, videoError);
-          // Add fallback video for this category
-          const fallbackVideo = fallbackVideos.find(v => v.vimeoId === videoId);
-          if (fallbackVideo) {
-            console.log(`Using fallback video for ${videoId}`);
-            featuredVideos.push(fallbackVideo);
-          }
+        );
+
+        if (!response.ok) {
+          console.error(`Error fetching featured video ${videoId}:`, response.statusText);
+          continue;
         }
+
+        const data = await response.json();
+        
+        featuredVideos.push({
+          id: parseInt(videoId),
+          title: data.name,
+          description: customDescriptions[videoId] || data.description,
+          duration: formatDuration(data.duration),
+          level: 'All Levels',
+          // Use our pre-defined thumbnail path for reliability
+          thumbnail: thumbnailMap[videoId],
+          vimeoId: videoId,
+          tier: SubscriptionTier.BRONZE,
+          category: idToCategoryMap[videoId]
+        });
+      } catch (error) {
+        console.error(`Error processing featured video ${videoId}:`, error);
       }
+    }
+
+    // If we couldn't fetch all videos, fill with fallbacks
+    if (featuredVideos.length < 3) {
+      console.log(`Only fetched ${featuredVideos.length} videos, adding fallbacks`);
       
-      // If we couldn't fetch any videos, use all fallbacks
-      if (featuredVideos.length === 0) {
-        console.log('No videos fetched, using all fallbacks');
-        return fallbackVideos;
-      }
+      // Find which videos we're missing
+      const fetchedIds = featuredVideos.map(v => v.vimeoId);
+      const missingFallbacks = fallbackVideos.filter(v => !fetchedIds.includes(v.vimeoId));
       
-      console.log('Final featured videos:', featuredVideos.map(v => `${v.title} (${v.category})`));
-      return featuredVideos;
-    } catch (error) {
-      console.error('Error fetching featured videos:', error);
-      // Return fallback videos instead of empty array
-    return [
-      {
-        id: 457053392, // Using the video ID as a number for the id field
-        title: 'I Am Meditation',
-        description: 'A guided meditation to help you connect with your inner self and find peace.',
-        duration: '1:08',
-        level: 'Beginner',
-        thumbnail: 'https://i.vimeocdn.com/video/1016790651-4c20aab2a41f4d5a4e5e9c9ec5e9b3b9a1b7c4f4d5e5c4f4d5e5c4f4d5e5c4f4_640',
-        vimeoId: '457053392',
-        tier: SubscriptionTier.BRONZE,
-        category: VideoCategory.MEDITATION
-      },
-      {
-        id: 1095788590, // Using the video ID as a number for the id field
-        title: 'Ab Circle',
-        description: 'A fun, full-circle core workout that targets every major ab muscle in one dynamic loop.',
-        duration: '1:30',
-        level: 'Beginner',
-        thumbnail: 'https://i.vimeocdn.com/video/1016790651-4c20aab2a41f4d5a4e5e9c9ec5e9b3b9a1b7c4f4d5e5c4f4d5e5c4f4d5e5c4f4_640',
-        vimeoId: '1095788590',
-        tier: SubscriptionTier.BRONZE,
-        category: VideoCategory.YOGA_FOR_PE
-      },
-      {
-        id: 452426275, // Using the video ID as a number for the id field
-        title: 'Zenevate Body Scan',
-        description: 'A relaxing body scan meditation to help you unwind and connect with your body.',
-        duration: '1:00',
-        level: 'Beginner',
-        thumbnail: 'https://i.vimeocdn.com/video/1016790651-4c20aab2a41f4d5a4e5e9c9ec5e9b3b9a1b7c4f4d5e5c4f4d5e5c4f4d5e5c4f4_640',
-        vimeoId: '452426275',
-        tier: SubscriptionTier.BRONZE,
-        category: VideoCategory.RELAXATION
-      }
-    ];
+      // Add them to our result
+      return [...featuredVideos, ...missingFallbacks];
+    }
+
+    console.log('Successfully fetched all featured videos');
+    return featuredVideos;
+  } catch (error) {
+    console.error('Error fetching featured videos:', error);
+    // Return fallbacks on any error
+    return fallbackVideos;
   }
 }
 
+// Simple function to map video categories to thumbnail folders
+function getThumbnailFolder(category: VideoCategory): string {
+  switch(category) {
+    case VideoCategory.MEDITATION: return 'meditation';
+    case VideoCategory.YOGA_FOR_PE: return 'yoga-for-pe';
+    case VideoCategory.RELAXATION: return 'relaxation';
+    case VideoCategory.MINDFUL_MOVEMENTS: return 'mindful-movements';
+    default: return 'yoga-for-pe';
+  }
+}
+
+// Helper function to add thumbnail paths to videos based on their title and category
+export function ensureThumbnailPath(video: Video): Video {
+  // Keep existing thumbnail if it's already a local path
+  if (video.thumbnail && video.thumbnail.startsWith('/thumbnails/')) {
+    return video;
+  }
+  
+  // Get the appropriate folder based on category
+  const folder = getThumbnailFolder(video.category);
+  
+  // Simple direct thumbnail path
+  return {
+    ...video,
+    thumbnail: `/thumbnails/${folder}/${encodeURIComponent(video.title)}.jpg`
+  };
+}
+
 // Helper function to determine video category from tags or metadata
-function determineVideoCategory(video: any): VideoCategory {
+export function determineVideoCategory(video: any): VideoCategory {
   // First check metadata
   const categoryFromMetadata = getMetadataField(video, 'category');
   if (categoryFromMetadata) {

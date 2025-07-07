@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { VideoCategory, SubscriptionTier, Video, hasAccessToVideo } from '../../lib/vimeo-browser'
 import { getVideosFromCatalog, getAllVideosFromCatalog } from '../../lib/video-catalog'
+import { useAuth } from '../../lib/hooks/useAuth'
 
 // Import our modular components
 import VideoPlayer from '../../components/VideoPlayer'
@@ -37,6 +38,9 @@ const videoSections = [
 ];
 
 export default function VideosPage() {
+  // Get user authentication and subscription status
+  const { user, isAuthenticated } = useAuth();
+  
   // Search and filter state
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
@@ -85,9 +89,26 @@ export default function VideosPage() {
   const [relaxationPage, setRelaxationPage] = useState(1)
   const [mindfulMovementsPage, setMindfulMovementsPage] = useState(1)
   
-  // For demo purposes, we'll use Bronze tier (free) as the default user tier
-  // In a real app, this would come from authentication
+  // Get subscription tier from user authentication
+  // Default to Bronze (free) tier if not authenticated or no subscription
   const [userSubscriptionTier, setUserSubscriptionTier] = useState<SubscriptionTier>(SubscriptionTier.BRONZE)
+  
+  // Update subscription tier when user auth changes
+  useEffect(() => {
+    if (user?.subscription?.plan) {
+      // Convert string plan name to SubscriptionTier enum
+      switch(user.subscription.plan.toLowerCase()) {
+        case 'silver':
+          setUserSubscriptionTier(SubscriptionTier.SILVER);
+          break;
+        case 'gold':
+          setUserSubscriptionTier(SubscriptionTier.GOLD);
+          break;
+        default:
+          setUserSubscriptionTier(SubscriptionTier.BRONZE);
+      }
+    }
+  }, [user])
   
   // Load initial videos for each category
   useEffect(() => {
@@ -374,7 +395,7 @@ export default function VideosPage() {
   
   // Handle video click - check access and show premium modal if needed
   const handleVideoClick = (video: Video) => {
-    if (hasAccessToVideo(video, userSubscriptionTier)) {
+    if (hasAccessToVideo(video, null, userSubscriptionTier)) {
       // User has access - play video
       setSelectedVideo(video);
       setShowVideoPlayer(true);

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@clerk/nextjs';
+import { useAuth } from '../../lib/hooks/useAuth';
 
 export default function TestSubscriptionPage() {
   const [loaded, setLoaded] = useState(false);

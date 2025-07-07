@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { FiLock, FiPlay, FiInfo } from 'react-icons/fi'
 import { Video, SubscriptionTier, hasAccessToVideo } from '../lib/vimeo-browser'
+import { getThumbnailPath } from '../lib/thumbnail-mapping'
 
 interface VideoCardProps {
   video: Video;
@@ -68,14 +69,12 @@ export default function VideoCard({ video, userSubscriptionTier, onClick, sectio
     >
       {/* Video thumbnail with play button overlay */}
       <div className="relative aspect-video bg-gray-200">
-        {/* Try to load thumbnail from section-specific subfolder by title, fallback to placeholder */}
         <img 
-          src={`/thumbnails/${getCategoryFolder(video, section)}/${encodeURIComponent(video.title)}.jpg`} 
+          src={video.thumbnail || getThumbnailPath(video.title, getCategoryFolder(video, section))} 
           alt={video.title}
           className="w-full h-full object-cover"
           onError={(e) => {
-            // If thumbnail fails to load, hide the broken image
-            (e.target as HTMLImageElement).style.display = 'none';
+            console.log(`Failed to load thumbnail: ${video.title}`);
           }}
         />
         <div className="absolute inset-0 flex items-center justify-center">

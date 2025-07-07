@@ -1,20 +1,24 @@
+export const runtime = 'nodejs';
+
 // Stripe checkout session creation API route
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs';
+import { auth } from '../../../../auth';
 import { getSubscriptionServiceInstance } from '../../../../lib/subscription/subscription-service-factory';
 import { SubscriptionTier } from '../../../../lib/vimeo-browser';
 
 export async function POST(request: NextRequest) {
   try {
-    // Get authenticated user
-    const { userId } = auth();
+    // Get authenticated user session
+    const session = await auth();
     
-    if (!userId) {
+    if (!session || !session.user?.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
+    
+    const userId = session.user.id;
     
     // Parse request body
     const body = await request.json();

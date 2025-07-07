@@ -1,20 +1,22 @@
 // API route to check if a user has access to a specific subscription tier
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs';
+import { auth } from '../../../../auth';
 import { getSubscriptionServiceInstance } from '../../../../lib/subscription/subscription-service-factory';
 import { SubscriptionTier } from '../../../../lib/vimeo-browser';
 
 export async function GET(request: NextRequest) {
   try {
-    // Get authenticated user
-    const { userId } = auth();
+    // Get authenticated user session
+    const session = await auth();
     
-    if (!userId) {
+    if (!session || !session.user?.id) {
       return NextResponse.json(
         { hasAccess: false, error: 'Unauthorized' },
         { status: 401 }
       );
     }
+    
+    const userId = session.user.id;
     
     // Get video tier from query params
     const searchParams = request.nextUrl.searchParams;

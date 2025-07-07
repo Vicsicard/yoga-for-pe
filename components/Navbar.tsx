@@ -10,7 +10,20 @@ import { useAuth } from '../lib/hooks/useAuth'
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
-  const { user, isAuthenticated, logout } = useAuth()
+  
+  // Use try/catch to handle potential auth provider issues
+  let user = null;
+  let isAuthenticated = false;
+  let logout = async () => {};
+  
+  try {
+    const auth = useAuth();
+    user = auth.user;
+    isAuthenticated = auth.isAuthenticated;
+    logout = auth.logout;
+  } catch (error) {
+    console.error('Auth context not available:', error);
+  }
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)

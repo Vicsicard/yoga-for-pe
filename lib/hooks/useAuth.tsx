@@ -3,15 +3,59 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { useSession, signIn as nextAuthSignIn, signOut as nextAuthSignOut } from 'next-auth/react';
 
+// Define types
+interface User {
+  id: string;
+  name?: string;
+  email?: string;
+  subscription?: {
+    status?: string;
+    plan?: string;
+    stripeCustomerId?: string;
+    stripeSubscriptionId?: string;
+    currentPeriodEnd?: Date;
+  };
+}
+
+interface AuthContextType {
+  user: User | null;
+  loading: boolean;
+  error: string | null;
+  register: (userData: RegisterData) => Promise<{ success: boolean; error?: string }>;
+  login: (credentials: LoginCredentials) => Promise<{ success: boolean; error?: string }>;
+  logout: () => Promise<{ success: boolean; error?: string }>;
+  checkAccess: (contentId: string) => Promise<{ hasAccess: boolean; error?: string }>;
+  refreshUser: () => Promise<{ success: boolean; error?: string }>;
+  hasActiveSubscription: () => boolean;
+  createSubscription: (tier: string) => Promise<{ success: boolean; sessionId?: string; url?: string; error?: string }>;
+  isAuthenticated: boolean;
+}
+
+interface RegisterData {
+  name: string;
+  email: string;
+  password: string;
+}
+
+interface LoginCredentials {
+  email: string;
+  password: string;
+  redirect?: boolean;
+}
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
 // Create auth context
-const AuthContext = createContext();
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Auth provider component
-export function AuthProvider({ children }) {
+export function AuthProvider({ children }: AuthProviderProps) {
   const { data: session, status, update: updateSession } = useSession();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Update user state when session changes
   useEffect(() => {
@@ -20,17 +64,25 @@ export function AuthProvider({ children }) {
       return;
     }
 
-    if (session?.user) {
-      setUser(session.user);
-    } else {
+    try {
+      // Handle potential session parsing errors
+      if (session?.user) {
+        setUser(session.user as User);
+      } else {
+        // Set user to null when no session
+        setUser(null);
+      }
+    } catch (err) {
+      console.error('Error processing session:', err);
+      // Fallback to no user on session errors
       setUser(null);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }, [session, status]);
 
   // Register a new user
-  const register = async (userData) => {
+  const register = async (userData: RegisterData) => {
     setLoading(true);
     setError(null);
 
@@ -60,7 +112,7 @@ export function AuthProvider({ children }) {
       }
 
       return { success: true };
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message);
       return { success: false, error: err.message };
     } finally {
@@ -69,7 +121,7 @@ export function AuthProvider({ children }) {
   };
 
   // Sign in a user
-  const login = async (credentials) => {
+  const login = async (credentials: LoginCredentials) => {
     setLoading(true);
     setError(null);
 
@@ -84,7 +136,7 @@ export function AuthProvider({ children }) {
       }
 
       return { success: true };
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message);
       return { success: false, error: err.message };
     } finally {
@@ -101,7 +153,7 @@ export function AuthProvider({ children }) {
       await nextAuthSignOut({ redirect: false });
       setUser(null);
       return { success: true };
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message);
       return { success: false, error: err.message };
     } finally {
@@ -110,7 +162,7 @@ export function AuthProvider({ children }) {
   };
 
   // Check if user has access to content
-  const checkAccess = async (contentId) => {
+  const checkAccess = async (contentId: string) => {
     if (!user) return { hasAccess: false };
 
     try {
@@ -126,7 +178,7 @@ export function AuthProvider({ children }) {
       }
 
       return { hasAccess: data.hasAccess };
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error checking access:', err);
       return { hasAccess: false, error: err.message };
     }
@@ -140,7 +192,7 @@ export function AuthProvider({ children }) {
       // Update the session data
       await updateSession();
       return { success: true };
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error refreshing user data:', err);
       return { success: false, error: err.message };
     }
@@ -153,12 +205,12 @@ export function AuthProvider({ children }) {
     // Check if user has a paid plan (silver or gold) with active status
     return (
       user.subscription.status === 'active' && 
-      ['silver', 'gold'].includes(user.subscription.plan)
+      ['silver', 'gold'].includes(user.subscription.plan || '')
     );
   };
 
   // Create a checkout session for subscription
-  const createSubscription = async (tier) => {
+  const createSubscription = async (tier: string) => {
     if (!user) return { success: false, error: 'User not authenticated' };
     
     try {
@@ -179,14 +231,14 @@ export function AuthProvider({ children }) {
         sessionId: data.sessionId,
         url: data.url 
       };
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error creating subscription:', err);
       return { success: false, error: err.message };
     }
   };
 
   // Auth context value
-  const value = {
+  const value: AuthContextType = {
     user,
     loading,
     error,
