@@ -4,6 +4,11 @@ const nextConfig = {
   // Completely disable Edge Runtime
   experimental: {
     serverComponentsExternalPackages: ['mongoose', 'bcryptjs'],
+    disableOptimizedLoading: true,
+    esmExternals: 'loose',
+    serverActions: {
+      bodySizeLimit: '2mb',
+    },
   },
   // Disable error checking during builds to bypass issues
   eslint: {
@@ -13,8 +18,6 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   poweredByHeader: false,
-  // Force server-side rendering (no Edge)
-  runtime: 'nodejs',
   images: {
     remotePatterns: [
       {
