@@ -1,11 +1,24 @@
 // Set runtime to Node.js for auth file
 export const runtime = 'nodejs';
 
+// Prevent this file from being imported on the client side
+if (typeof window !== 'undefined') {
+  throw new Error('This module should not be imported on the client side');
+}
+
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
-import connectDB from "./lib/db/db";
-import User from "./lib/models/User";
+
+// Use dynamic imports to avoid Edge Runtime issues
+let connectDB;
+let User;
+
+// Only import these on the server side
+if (typeof window === 'undefined') {
+  connectDB = require("./lib/db/db").default;
+  User = require("./lib/models/User").default;
+}
 
 // Define user type for TypeScript
 interface UserDocument {
