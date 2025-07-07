@@ -36,11 +36,11 @@ const nextConfig = {
       // Don't bundle mongoose on the client
       config.resolve.fallback = {
         ...config.resolve.fallback,
-        mongoose: false,
-        mongodb: false,
-        'mongodb-client-encryption': false,
-        aws4: false,
-        'mongoose-legacy-pluralize': false,
+        "mongoose": false,
+        "mongodb": false,
+        "mongodb-client-encryption": false,
+        "aws4": false,
+        "mongoose-legacy-pluralize": false
       };
     }
     return config;
