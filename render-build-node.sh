@@ -286,6 +286,10 @@ if [ ! -f app/globals.css ]; then
 EOL
 fi
 
+# Install TypeScript dependencies explicitly
+echo "Installing TypeScript dependencies..."
+npm install --no-package-lock typescript @types/react @types/node @types/react-dom
+
 # Clean install dependencies
 echo "Installing dependencies without package lock..."
 npm install --no-package-lock
