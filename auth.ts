@@ -1,3 +1,6 @@
+// Set runtime to Node.js for auth file
+export const runtime = 'nodejs';
+
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
