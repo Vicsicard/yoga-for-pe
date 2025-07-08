@@ -28,8 +28,8 @@ export default function PremiumModal({ selectedTier, onClose }) {
   let isSignedIn = false;
   let userId = null;
   
-  try: {
-    const: { user, isAuthenticated } = useAuth();
+  try {
+    const { user, isAuthenticated } = useAuth();
     isSignedIn = isAuthenticated;
     userId = user?.id || null;
   } catch (error) {
@@ -66,8 +66,8 @@ export default function PremiumModal({ selectedTier, onClose }) {
     setIsLoading(true);
     setError(null);
     
-    try: {
-      logDebug('Creating checkout session', { tier=== SubscriptionTier.SILVER ? 'SILVER' : 'GOLD' });
+    try {
+      logDebug('Creating checkout session', { tier: tier === SubscriptionTier.SILVER ? 'SILVER' : 'GOLD' });
       
       // Call API to create checkout session
       const response = await fetch('/api/stripe/create-checkout-session', {
@@ -76,7 +76,7 @@ export default function PremiumModal({ selectedTier, onClose }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          tier=== SubscriptionTier.SILVER ? 'SILVER' : 'GOLD',
+          tier: tier === SubscriptionTier.SILVER ? 'SILVER' : 'GOLD',
         }),
       });
       
@@ -92,7 +92,7 @@ export default function PremiumModal({ selectedTier, onClose }) {
       if (data.url) {
         logDebug('Redirecting to checkout URL:', data.url);
         window.location.href = data.url;
-      } else: {
+      } else {
         throw new Error('No checkout URL returned');
       }
     } catch (err) {
