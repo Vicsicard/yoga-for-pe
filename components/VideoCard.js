@@ -84,9 +84,9 @@ export default function VideoCard({ video, userSubscriptionTier, onClick, sectio
         {/* Subscription tier badge */}
         <div className="absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium" 
           style={{
-            backgroundColor=== SubscriptionTier.GOLD 
+            backgroundColor: video.tier === SubscriptionTier.GOLD 
               ? 'rgba(234, 179, 8, 0.9)' 
-              === SubscriptionTier.SILVER 
+              : video.tier === SubscriptionTier.SILVER 
                 ? 'rgba(148, 163, 184, 0.9)' 
                 : 'rgba(59, 130, 246, 0.9)',
             color: 'white'
@@ -94,7 +94,7 @@ export default function VideoCard({ video, userSubscriptionTier, onClick, sectio
         >
           {video.tier === SubscriptionTier.GOLD 
             ? 'Gold' 
-            === SubscriptionTier.SILVER 
+            : video.tier === SubscriptionTier.SILVER 
               ? 'Silver' 
               : 'Bronze'}
         </div>
@@ -115,14 +115,14 @@ export default function VideoCard({ video, userSubscriptionTier, onClick, sectio
           aria-label="Show full description"
         >
           <FiInfo size={14} />
-          <span>Read full description
+          <span>Read full description</span>
         </button>
         <div className="flex justify-between items-center">
           <span className="text-xs px-2 py-1 bg-gray-100 rounded-full">{video.level}</span>
           <span className="text-xs text-gray-500">
             {video.tier === SubscriptionTier.BRONZE 
               ? 'Bronze (Free)' 
-              === SubscriptionTier.SILVER 
+              : video.tier === SubscriptionTier.SILVER 
                 ? 'Silver ($7.99)' 
                 : 'Gold ($9.99)'}
           </span>

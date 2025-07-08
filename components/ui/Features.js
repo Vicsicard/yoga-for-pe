@@ -72,11 +72,13 @@ export function FeatureGrid({
   )
 }
 
->
-  imageSrc: string, imageAlt: string
-  imagePosition?: 'left' | 'right'
-  className?: string
-}
+/**
+ * @typedef {Object} FeatureProps
+ * @property {string} imageSrc - The source URL for the feature image
+ * @property {string} imageAlt - Alt text for the feature image
+ * @property {'left' | 'right'} [imagePosition] - Position of the image
+ * @property {string} [className] - Additional CSS classes
+ */
 
 export function FeatureWithImage({
   title,

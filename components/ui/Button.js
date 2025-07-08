@@ -34,7 +34,7 @@ const buttonVariants = cva(
   }
 )
 
-export const Button = React.forwardRef(({ href, variant, size, fullWidth, className, ...props }, ref) => {
+const Button = React.forwardRef(({ href, variant, size, fullWidth, className, ...props }, ref) => {
     if (href) {
       return (
         <Link

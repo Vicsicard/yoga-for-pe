@@ -99,7 +99,7 @@ export default function PremiumModal({ selectedTier, onClose }) {
       const errorMsg = `Error creating checkout session: ${err.message || 'Unknown error'}`;
       console.error('[PREMIUM-MODAL]', errorMsg, err);
       setError(errorMsg);
-    } finally: {
+    } finally {
       setIsLoading(false);
     }
   };

@@ -72,7 +72,8 @@ export function HeroSlider({
   children
 }) {
   // Determine which image set to use based on pageType
-  const sliderImages = pageType === 'contact' ? contactSliderImages = useState(0)
+  const sliderImages = pageType === 'contact' ? contactSliderImages : homeSliderImages;
+  const [currentSlide, setCurrentSlide] = useState(0)
   
   const overlayClasses = {
     light: 'bg-black/30',
@@ -167,14 +168,17 @@ export function HeroSlider({
   )
 }
 
+/**
+ * @param {Object} props
+ * @param {React.ReactNode} props.children
+ * @param {string} [props.className='']
+ * @param {string} [props.maxWidth='max-w-4xl']
+ */
 export function HeroSliderContent({ 
   children, 
   className = '',
   maxWidth = 'max-w-4xl'
-}: { 
-  children: React.ReactNode
-  className?: string
-  maxWidth?) {
+}) {
   return (
     <div className={`text-center ${maxWidth} mx-auto ${className}`}>
       {children}
