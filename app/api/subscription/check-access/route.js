@@ -9,10 +9,11 @@ export const dynamic = 'force-dynamic';
 export async function GET(request) {
   try {
     // Skip auth during build/static generation
-    if (!request.headers) {
+    if (typeof window !== 'undefined' || !request || !request.headers || process.env.NODE_ENV === 'development') {
+      // Return early during static generation or build time
       return NextResponse.json(
         { hasAccess: false, error: 'Static generation mode' },
-        { status: 500 }
+        { status: 200 }
       );
     }
     
