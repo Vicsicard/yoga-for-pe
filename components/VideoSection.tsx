@@ -34,9 +34,9 @@ export default function VideoSection({
       <p className="text-gray-600 mb-6">{description}</p>
       
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {videos.map(video => (
+        {videos.map((video, idx) => (
           <VideoCard 
-            key={video.id} 
+            key={video.id || video.vimeoId || video.title || idx}
             video={video} 
             userSubscriptionTier={userSubscriptionTier}
             onClick={onVideoClick}
