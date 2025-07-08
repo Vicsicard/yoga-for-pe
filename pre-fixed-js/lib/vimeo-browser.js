@@ -19,24 +19,17 @@ const SubscriptionTier = {
   },
   2: {
     name: 'Gold',
-    price: 19.99,
-    description: 'Full access to all premium content including live sessions'
+    price: 14.99,
+    description: 'Full access to all content including exclusive premium videos'
   }
 };
 
 // Define video categories
 const VideoCategory = {
-  INTRO: 0,
-  WARM_UP: 1,
-  MAIN_PRACTICE: 2,
-  COOL_DOWN: 3,
-  SPECIAL: 4,
-  // Add descriptions for UI display
-  0: { name: 'Introduction', description: 'Introductory videos' },
-  1: { name: 'Warm Up', description: 'Warm up exercises' },
-  2: { name: 'Main Practice', description: 'Core yoga practices' },
-  3: { name: 'Cool Down', description: 'Cool down and relaxation' },
-  4: { name: 'Special', description: 'Special content and features' }
+  MEDITATION: 'meditation',
+  YOGA_FOR_PE: 'yogaForPE',
+  RELAXATION: 'relaxation',
+  OTHER: 'other'
 };
 
 // Helper function to get Vimeo API token
@@ -58,157 +51,191 @@ const makeVimeoRequest = async (endpoint, params = {}) => {
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
-    const response = await fetch(apiUrl.toString(), {
-      signal: controller.signal,
-      headers: { 'Cache-Control': 'no-cache' }
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      signal: controller.signal
     });
+
     clearTimeout(timeoutId);
+
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Vimeo API request failed: ${response.status} ${response.statusText}\nDetails: ${errorText}`);
+      throw new Error(`Vimeo API error: ${response.status}`);
     }
+
     return await response.json();
   } catch (error) {
-    throw error;
+    console.error('Error fetching from Vimeo API:', error);
+    return null;
   }
 };
 
 // Get all videos from the Vimeo account
 const getAllVideos = async (page = 1) => {
   try {
-    return await makeVimeoRequest('/me/videos', { 
-      page,
+    const data = await makeVimeoRequest('/users/me/videos', {
+      page: page,
       per_page: 100,
-      sort: 'date',
-      direction: 'desc',
-      fields: 'uri,name,description,pictures,duration,tags,metadata'
+      fields: 'uri,name,description,pictures,metadata,tags,duration,created_time'
     });
+
+    if (!data || !data.data) {
+      return [];
+    }
+
+    return data.data.map(processVideoData);
   } catch (error) {
-    console.error('Error fetching videos:', error);
-    return { data: [] };
+    console.error('Error fetching all videos:', error);
+    return [];
   }
 };
 
 // Process video data
 const processVideoData = (video) => {
-  if (!video) return null;
-
-  const thumbnailUrl = video.pictures?.sizes?.[3]?.link || '';
-  
-  // Extract category from video metadata or tags
+  const id = video.uri.split('/').pop();
   const category = determineVideoCategory(video);
-  
-  // Extract required subscription tier from metadata or tags
   const requiredTier = determineRequiredTier(video);
+  const thumbnail = video.pictures.sizes.find(size => size.width === 640)?.link || 
+                    video.pictures.sizes[video.pictures.sizes.length - 1]?.link;
 
   return {
-    id: video.uri.split('/').pop(),
+    id,
     title: video.name,
-    description: video.description || '',
-    thumbnail: thumbnailUrl,
-    duration: video.duration,
+    description: video.description,
+    thumbnail,
     category,
-    requiredTier
+    duration: video.duration,
+    created: video.created_time,
+    requiredTier,
+    vimeoId: id
   };
 };
 
 // Determine the video category based on metadata or tags
 const determineVideoCategory = (video) => {
-  // Check if video has category in metadata
-  if (video.metadata?.custom_fields?.category) {
-    const categoryStr = video.metadata.custom_fields.category.toLowerCase();
-    if (categoryStr.includes('intro')) return VideoCategory.INTRO;
-    if (categoryStr.includes('warm')) return VideoCategory.WARM_UP;
-    if (categoryStr.includes('main')) return VideoCategory.MAIN_PRACTICE;
-    if (categoryStr.includes('cool')) return VideoCategory.COOL_DOWN;
-    if (categoryStr.includes('special')) return VideoCategory.SPECIAL;
+  // First check metadata fields
+  if (video.metadata && video.metadata.connections && 
+      video.metadata.connections.categories && 
+      video.metadata.connections.categories.options) {
+    
+    const categoryNames = video.metadata.connections.categories.options
+      .map(cat => cat.name.toLowerCase());
+    
+    if (categoryNames.includes('meditation')) return VideoCategory.MEDITATION;
+    if (categoryNames.includes('yoga for pe') || categoryNames.includes('yoga')) return VideoCategory.YOGA_FOR_PE;
+    if (categoryNames.includes('relaxation')) return VideoCategory.RELAXATION;
   }
   
-  // Check tags as fallback
+  // Then check tags
   if (video.tags) {
-    for (const tag of video.tags) {
-      const tagName = tag.name.toLowerCase();
-      if (tagName.includes('intro')) return VideoCategory.INTRO;
-      if (tagName.includes('warm')) return VideoCategory.WARM_UP;
-      if (tagName.includes('main')) return VideoCategory.MAIN_PRACTICE;
-      if (tagName.includes('cool')) return VideoCategory.COOL_DOWN;
-      if (tagName.includes('special')) return VideoCategory.SPECIAL;
-    }
+    const tagNames = video.tags.map(tag => tag.name.toLowerCase());
+    
+    if (tagNames.includes('meditation')) return VideoCategory.MEDITATION;
+    if (tagNames.includes('yoga for pe') || tagNames.includes('yoga')) return VideoCategory.YOGA_FOR_PE;
+    if (tagNames.includes('relaxation')) return VideoCategory.RELAXATION;
   }
   
-  // Default to main practice if no category found
-  return VideoCategory.MAIN_PRACTICE;
+  // If nothing specific found, return OTHER
+  return VideoCategory.OTHER;
 };
 
 // Determine required subscription tier from video metadata or tags
 const determineRequiredTier = (video) => {
-  // Check if video has tier information in metadata
-  if (video.metadata?.custom_fields?.tier) {
-    const tierStr = video.metadata.custom_fields.tier.toLowerCase();
-    if (tierStr.includes('gold')) return SubscriptionTier.GOLD;
-    if (tierStr.includes('silver')) return SubscriptionTier.SILVER;
-    if (tierStr.includes('bronze')) return SubscriptionTier.BRONZE;
-  }
-  
-  // Check tags as fallback
-  if (video.tags) {
-    for (const tag of video.tags) {
-      const tagName = tag.name.toLowerCase();
-      if (tagName.includes('gold')) return SubscriptionTier.GOLD;
-      if (tagName.includes('silver')) return SubscriptionTier.SILVER;
-      if (tagName.includes('bronze') || tagName.includes('free')) return SubscriptionTier.BRONZE;
+  // First check metadata for subscription info
+  if (video.metadata && video.metadata.connections && 
+      video.metadata.connections.custom_fields && 
+      video.metadata.connections.custom_fields.options) {
+    
+    const fields = video.metadata.connections.custom_fields.options;
+    const subscriptionField = fields.find(field => 
+      field.name.toLowerCase() === 'subscription' || 
+      field.name.toLowerCase() === 'tier'
+    );
+    
+    if (subscriptionField) {
+      const value = subscriptionField.value.toLowerCase();
+      if (value.includes('gold')) return SubscriptionTier.GOLD;
+      if (value.includes('silver')) return SubscriptionTier.SILVER;
+      if (value.includes('bronze') || value.includes('free')) return SubscriptionTier.BRONZE;
     }
   }
   
-  // Default to gold tier if no tier information found
-  return SubscriptionTier.GOLD;
+  // Then check tags
+  if (video.tags) {
+    const tagNames = video.tags.map(tag => tag.name.toLowerCase());
+    
+    if (tagNames.includes('gold') || tagNames.includes('premium')) return SubscriptionTier.GOLD;
+    if (tagNames.includes('silver')) return SubscriptionTier.SILVER;
+    if (tagNames.includes('bronze') || tagNames.includes('free')) return SubscriptionTier.BRONZE;
+  }
+  
+  // Default to bronze tier if no information found
+  return SubscriptionTier.BRONZE;
 };
 
 // Check if user has access to video based on their subscription tier
 const hasAccessToVideo = (video, userTier) => {
-  // If no video or invalid user tier, deny access
-  if (!video || userTier === undefined || userTier === null) return false;
+  // If user tier is undefined or null, default to BRONZE (free tier)
+  const userSubscriptionLevel = userTier !== undefined ? userTier : SubscriptionTier.BRONZE;
   
-  // Convert tiers to numeric values for comparison
-  const videoTier = typeof video.requiredTier === 'number' ? video.requiredTier : SubscriptionTier.GOLD;
-  const userTierValue = typeof userTier === 'number' ? userTier : SubscriptionTier.BRONZE;
+  // Get video required tier
+  const videoTier = typeof video === 'object' ? 
+    video.requiredTier : 
+    SubscriptionTier.BRONZE; // Default to free if not specified
   
-  // User has access if their tier is equal or higher than video's required tier
-  return userTierValue >= videoTier;
+  // User can access if their tier is equal or higher than video's required tier
+  return userSubscriptionLevel >= videoTier;
 };
 
 // Get featured videos for homepage
 const getFeaturedVideos = async (count = 4) => {
   try {
-    const response = await getAllVideos();
-    if (!response || !response.data || response.data.length === 0) {
-      console.warn('No videos found, using fallback data');
+    // Try to get videos from the API
+    const allVideos = await getAllVideos();
+    
+    if (!allVideos || allVideos.length === 0) {
+      console.log('No videos found from API, using fallback data');
       return getFallbackFeaturedVideos();
     }
     
-    // Filter videos with 'featured' tag or metadata
-    let featuredVideos = response.data.filter(video => {
-      // Check metadata for featured flag
-      if (video.metadata?.custom_fields?.featured === 'true') return true;
-      
-      // Check tags for 'featured' tag
-      return video.tags && video.tags.some(tag => 
-        tag.name.toLowerCase().includes('featured')
-      );
+    // Group videos by category
+    const videosByCategory = {
+      [VideoCategory.MEDITATION]: [],
+      [VideoCategory.YOGA_FOR_PE]: [],
+      [VideoCategory.RELAXATION]: []
+    };
+    
+    allVideos.forEach(video => {
+      const category = video.category;
+      if (videosByCategory[category]) {
+        videosByCategory[category].push(video);
+      }
     });
     
-    // If no featured videos found, just take the latest videos
-    if (featuredVideos.length === 0) {
-      console.log('No videos with featured tag found, using latest videos');
-      featuredVideos = response.data.slice(0, count);
+    // Get featured videos from each category
+    const featured = [];
+    
+    // Try to get one from each category first
+    Object.keys(videosByCategory).forEach(category => {
+      if (videosByCategory[category].length > 0) {
+        featured.push(videosByCategory[category][0]);
+      }
+    });
+    
+    // Fill remaining slots with random videos if needed
+    while (featured.length < count && allVideos.length > featured.length) {
+      const remainingVideos = allVideos.filter(v => !featured.find(f => f.id === v.id));
+      if (remainingVideos.length === 0) break;
+      
+      const randomIndex = Math.floor(Math.random() * remainingVideos.length);
+      featured.push(remainingVideos[randomIndex]);
     }
     
-    // Process and limit the number of featured videos
-    return featuredVideos
-      .slice(0, count)
-      .map(processVideoData)
-      .filter(Boolean); // Remove any null values
+    return featured.slice(0, count);
   } catch (error) {
     console.error('Error getting featured videos:', error);
     return getFallbackFeaturedVideos();
@@ -219,69 +246,82 @@ const getFeaturedVideos = async (count = 4) => {
 const getFallbackFeaturedVideos = () => {
   return [
     {
-      id: '12345',
-      title: 'Introduction to Yoga for PE',
-      description: 'Learn the basics of incorporating yoga into physical education curriculum.',
-      thumbnail: '/images/fallback-featured-1.jpg',
-      duration: 300, // 5 minutes
-      category: VideoCategory.INTRO,
-      requiredTier: SubscriptionTier.BRONZE
-    },
-    {
-      id: '23456',
-      title: 'Warm-Up Routine for Classes',
-      description: 'A complete warm-up routine designed specifically for classroom settings.',
-      thumbnail: '/images/fallback-featured-2.jpg',
+      id: '123456789',
+      title: 'Meditation for Beginners',
+      description: 'A gentle introduction to meditation practices suitable for all ages.',
+      thumbnail: '/thumbnails/meditation-1.jpg',
+      category: VideoCategory.MEDITATION,
       duration: 600, // 10 minutes
-      category: VideoCategory.WARM_UP,
-      requiredTier: SubscriptionTier.BRONZE
+      requiredTier: SubscriptionTier.BRONZE,
+      vimeoId: '123456789'
     },
     {
-      id: '34567',
-      title: 'Balance Poses for Strength',
-      description: 'Intermediate balance poses to build strength and focus in students.',
-      thumbnail: '/images/fallback-featured-3.jpg',
+      id: '234567890',
+      title: 'Yoga for PE: Morning Routine',
+      description: 'Start your physical education class with this energizing morning yoga routine.',
+      thumbnail: '/thumbnails/yoga-morning.jpg',
+      category: VideoCategory.YOGA_FOR_PE,
+      duration: 1200, // 20 minutes
+      requiredTier: SubscriptionTier.BRONZE,
+      vimeoId: '234567890'
+    },
+    {
+      id: '345678901',
+      title: 'Deep Relaxation Techniques',
+      description: 'Advanced relaxation techniques for stress relief and improved focus.',
+      thumbnail: '/thumbnails/relaxation-deep.jpg',
+      category: VideoCategory.RELAXATION,
       duration: 900, // 15 minutes
-      category: VideoCategory.MAIN_PRACTICE,
-      requiredTier: SubscriptionTier.SILVER
+      requiredTier: SubscriptionTier.SILVER,
+      vimeoId: '345678901'
     },
     {
-      id: '45678',
-      title: 'Mindfulness and Cool Down',
-      description: 'End-of-session mindfulness practices and cool down stretches.',
-      thumbnail: '/images/fallback-featured-4.jpg',
-      duration: 480, // 8 minutes
-      category: VideoCategory.COOL_DOWN,
-      requiredTier: SubscriptionTier.BRONZE
+      id: '456789012',
+      title: 'Premium Meditation Series: Part 1',
+      description: 'First in our premium series of guided meditations for advanced practitioners.',
+      thumbnail: '/thumbnails/premium-meditation.jpg',
+      category: VideoCategory.MEDITATION,
+      duration: 1800, // 30 minutes
+      requiredTier: SubscriptionTier.GOLD,
+      vimeoId: '456789012'
     }
   ];
 };
 
 // Get the URL for a video thumbnail or use a fallback
 const getVideoThumbnailPath = (videoId) => {
-  if (!videoId) return '/images/fallback-thumbnail.jpg';
-  return `/api/video-thumbnail/${videoId}`;
+  return `/thumbnails/${videoId}.jpg`;
 };
 
 // Determine if a video is accessible based on subscription
 const isVideoAccessible = (video, userSubscription) => {
-  if (!video) return false;
+  // If video requires Gold tier but user has Silver or lower
+  if (video.requiredTier === SubscriptionTier.GOLD && 
+      (!userSubscription || userSubscription < SubscriptionTier.GOLD)) {
+    return false;
+  }
   
-  // Convert subscription level to numeric value
-  const userTier = userSubscription?.tier || SubscriptionTier.BRONZE;
+  // If video requires Silver tier but user has Bronze or lower
+  if (video.requiredTier === SubscriptionTier.SILVER && 
+      (!userSubscription || userSubscription < SubscriptionTier.SILVER)) {
+    return false;
+  }
   
-  return hasAccessToVideo(video, userTier);
+  return true;
 };
 
 // Get video details by ID
 const getVideoById = async (videoId) => {
-  if (!videoId) return null;
-  
   try {
-    const video = await makeVimeoRequest(`/videos/${videoId}`);
-    return processVideoData(video);
+    const data = await makeVimeoRequest(`/videos/${videoId}`, {
+      fields: 'uri,name,description,pictures,metadata,tags,duration,created_time'
+    });
+    
+    if (!data) return null;
+    
+    return processVideoData(data);
   } catch (error) {
-    console.error(`Error fetching video ${videoId}:`, error);
+    console.error(`Error fetching video with ID ${videoId}:`, error);
     return null;
   }
 };
@@ -289,13 +329,15 @@ const getVideoById = async (videoId) => {
 // Get videos by category
 const getVideosByCategory = async (categoryId) => {
   try {
-    const response = await getAllVideos();
-    if (!response || !response.data) return [];
+    const allVideos = await getAllVideos();
     
-    return response.data
-      .filter(video => determineVideoCategory(video) === categoryId)
-      .map(processVideoData)
-      .filter(Boolean);
+    if (!allVideos || allVideos.length === 0) {
+      return [];
+    }
+    
+    return allVideos.filter(video => {
+      return video.category === categoryId;
+    });
   } catch (error) {
     console.error(`Error fetching videos for category ${categoryId}:`, error);
     return [];
@@ -306,11 +348,12 @@ const getVideosByCategory = async (categoryId) => {
 module.exports = {
   SubscriptionTier,
   VideoCategory,
+  getVimeoToken,
+  makeVimeoRequest,
   getAllVideos,
   getFeaturedVideos,
   getVideoById,
   getVideosByCategory,
-  processVideoData,
   hasAccessToVideo,
   isVideoAccessible,
   getVideoThumbnailPath
