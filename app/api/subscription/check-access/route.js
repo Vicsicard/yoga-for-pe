@@ -4,15 +4,18 @@ import { auth } from '../../../../auth';
 import { getSubscriptionServiceInstance } from '../../../../lib/subscription/subscription-service-factory';
 import { SubscriptionTier } from '../../../../lib/vimeo-browser';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
-  try: {
+  try {
     // Get authenticated user session
     const session = await auth();
     
     if (!session || !session.user?.id) {
       return NextResponse.json(
-        { hasAccess, error: 'Unauthorized' },
-        { status);
+        { hasAccess: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
     }
     
     const userId = session.user.id;
@@ -23,14 +26,15 @@ export async function GET(request) {
     
     if (!videoTierParam) {
       return NextResponse.json(
-        { hasAccess, error: 'Missing videoTier parameter' },
-        { status);
+        { hasAccess: false, error: 'Missing videoTier parameter' },
+        { status: 400 }
+      );
     }
     
     // Parse tier from string to enum
     let videoTier;
-    try: {
-      videoTier = parseInt(videoTierParam, 10) as SubscriptionTier;
+    try {
+      videoTier = parseInt(videoTierParam, 10);
       
       // Validate the tier is a valid enum value
       if (![SubscriptionTier.BRONZE, SubscriptionTier.SILVER, SubscriptionTier.GOLD].includes(videoTier)) {
@@ -38,8 +42,9 @@ export async function GET(request) {
       }
     } catch (error) {
       return NextResponse.json(
-        { hasAccess, error: 'Invalid videoTier parameter' },
-        { status);
+        { hasAccess: false, error: 'Invalid videoTier parameter' },
+        { status: 400 }
+      );
     }
     
     // Get subscription service
@@ -53,9 +58,11 @@ export async function GET(request) {
     console.error('Error checking subscription access:', error);
     return NextResponse.json(
       { 
-        hasAccess, 
+        hasAccess: false, 
         error: 'Failed to check subscription access',
-        message,
-      { status);
+        message: error.message
+      },
+      { status: 500 }
+    );
   }
 }

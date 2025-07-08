@@ -5,6 +5,8 @@ import { auth } from '../../../../auth';
 import connectDB from '../../../../lib/db/db';
 import User from '../../../../lib/models/User';
 
+export const dynamic = 'force-dynamic';
+
 // Initialize Stripe
 const stripe = process.env.STRIPE_SECRET_KEY 
   ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' })

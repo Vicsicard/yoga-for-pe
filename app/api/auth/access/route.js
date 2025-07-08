@@ -1,5 +1,7 @@
 import { verifyContentAccess } from '../../../../lib/controllers/auth.controller';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req) {
   try {
     // Get the plan from query parameters
