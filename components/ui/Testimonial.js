@@ -105,10 +105,11 @@ export function TestimonialCard({
   )
 }
 
->
-  columns?: 1 | 2 | 3 | 4
-  className?: string
-}
+/**
+ * @typedef {Object} TestimonialGridProps
+ * @property {number} [columns=3] - Number of columns (1-4)
+ * @property {string} [className] - Additional CSS classes
+ */
 
 export function TestimonialGrid({
   testimonials,

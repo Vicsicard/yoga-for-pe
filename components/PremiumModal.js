@@ -116,7 +116,7 @@ export default function PremiumModal({ selectedTier, onClose }) {
     return (
       <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-          <h3 className="text-2xl font-bold mb-4 text-red-600">Error
+          <h3 className="text-2xl font-bold mb-4 text-red-600">Error</h3>
           <p className="mb-6 text-red-600">{error}</p>
           
           <div className="flex justify-end space-x-3">
