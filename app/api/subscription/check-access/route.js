@@ -9,7 +9,13 @@ export const dynamic = 'force-dynamic';
 export async function GET(request) {
   try {
     // Skip auth during build/static generation
-    if (typeof window !== 'undefined' || !request || !request.headers || process.env.NODE_ENV === 'development') {
+    if (
+      typeof window !== 'undefined' ||
+      !request ||
+      !request.headers ||
+      process.env.NODE_ENV === 'development' ||
+      process.env.NEXT_PHASE // Vercel static export/build
+    ) {
       // Return early during static generation or build time
       return NextResponse.json(
         { hasAccess: false, error: 'Static generation mode' },
