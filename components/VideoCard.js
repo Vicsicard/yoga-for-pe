@@ -8,7 +8,7 @@ import { getThumbnailPath } from '../lib/thumbnail-mapping'
 
 
 // Helper function to determine the folder name based on video data and section
-function getCategoryFolder(video, videoSection?): string: {
+function getCategoryFolder(video, videoSection) {
   // If we know the section directly, use it
   if (videoSection) {
     return videoSection;

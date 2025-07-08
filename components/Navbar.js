@@ -32,7 +32,7 @@ export function Navbar() {
   const toggleDropdown = (dropdown) => {
     if (activeDropdown === dropdown) {
       setActiveDropdown(null)
-    } else: {
+    } else {
       setActiveDropdown(dropdown)
     }
   }

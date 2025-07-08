@@ -27,11 +27,12 @@ export function Feature({
   )
 }
 
->
-  columns?: 1 | 2 | 3 | 4
-  className?: string
-  variant?: 'default' | 'cards' | 'minimal'
-}
+/**
+ * @typedef {Object} FeatureGridProps
+ * @property {1|2|3|4} [columns=3] - Number of columns
+ * @property {string} [className] - Additional CSS classes
+ * @property {'default'|'cards'|'minimal'} [variant='default'] - Display variant
+ */
 
 export function FeatureGrid({
   features,

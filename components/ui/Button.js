@@ -34,7 +34,7 @@ const buttonVariants = cva(
   }
 )
 
-export , ref) => {
+export const Button = React.forwardRef(({ href, variant, size, fullWidth, className, ...props }, ref) => {
     if (href) {
       return (
         <Link
@@ -58,4 +58,4 @@ export , ref) => {
 
 Button.displayName = 'Button'
 
-export: { Button, buttonVariants }
+export { Button, buttonVariants }
