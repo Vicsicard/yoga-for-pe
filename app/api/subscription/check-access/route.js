@@ -8,6 +8,14 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request) {
   try {
+    // Skip auth during build/static generation
+    if (!request.headers) {
+      return NextResponse.json(
+        { hasAccess: false, error: 'Static generation mode' },
+        { status: 500 }
+      );
+    }
+    
     // Get authenticated user session
     const session = await auth();
     

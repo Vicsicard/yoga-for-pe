@@ -1,5 +1,7 @@
 import { register } from '../../../../lib/controllers/auth.controller';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req) {
   try {
     const body = await req.json();

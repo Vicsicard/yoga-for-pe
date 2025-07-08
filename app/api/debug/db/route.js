@@ -2,8 +2,18 @@ import { NextResponse } from 'next/server';
 import connectDB from '../../../../lib/db/db';
 import mongoose from 'mongoose';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
+    // Skip database connection during build/static generation
+    if (process.env.NODE_ENV === 'production' && !process.env.MONGODB_URI) {
+      return NextResponse.json({
+        connected: false,
+        error: 'MongoDB URI not available during build'
+      });
+    }
+    
     // Try to connect to the database
     await connectDB();
     
