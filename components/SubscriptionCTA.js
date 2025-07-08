@@ -9,7 +9,7 @@ export default function SubscriptionCTA({ onSubscribeClick }) {
     <section className="bg-primary-50 py-16">
       <div className="container">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-4">Unlock Premium Content
+          <h2 className="text-3xl font-bold mb-4">Unlock Premium Content</h2>
           <p className="text-lg text-gray-700 mb-8">
             Subscribe to access our complete library of premium videos, curriculum materials, and exclusive resources for yoga in physical education.
           </p>
