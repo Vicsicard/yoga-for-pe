@@ -46,36 +46,49 @@ export function Footer() {
                   Videos
                 </Link>
               </li>
-            </ul>
-          </div>
-          
-          {/* Footer Spacer */}
-          <div></div>
-          
-          {/* Contact */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
-            <ul className="space-y-2 text-gray-400">
-              <li>Email: info@yogaforpe.com</li>
-              <li>Phone: (555) 123-4567</li>
               <li>
-                <Link href="/contact" className="text-primary-400 hover:text-primary-300 transition-colors">
-                  Send us a message
+                <Link href="/login" className="text-gray-400 hover:text-white transition-colors">
+                  Login
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="text-gray-400 hover:text-white transition-colors">
+                  Contact
                 </Link>
               </li>
             </ul>
           </div>
+          
+          {/* Contact Info */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Contact</h3>
+            <p className="text-gray-400 mb-2">Email: info@yogaforpe.com</p>
+            <p className="text-gray-400 mb-2">Phone: (123) 456-7890</p>
+          </div>
+          
+          {/* Newsletter */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Stay Updated</h3>
+            <p className="text-gray-400 mb-2">Subscribe to our newsletter for the latest updates.</p>
+            <div className="flex mt-2">
+              <input type="email" placeholder="Your email" className="px-3 py-2 bg-gray-800 text-white rounded-l" />
+              <button className="bg-blue-500 px-4 py-2 rounded-r hover:bg-blue-600 transition-colors">
+                Subscribe
+              </button>
+            </div>
+          </div>
         </div>
         
-        <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-400 text-sm">
+        {/* Bottom Section */}
+        <div className="border-t border-gray-800 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
+          <p className="text-gray-500 text-sm mb-4 md:mb-0">
             &copy; {new Date().getFullYear()} Yoga for PE. All rights reserved.
           </p>
-          <div className="flex space-x-6 mt-4 md:mt-0">
-            <Link href="/privacy" className="text-sm text-gray-400 hover:text-white transition-colors">
+          <div className="flex space-x-4">
+            <Link href="/privacy" className="text-gray-500 text-sm hover:text-white transition-colors">
               Privacy Policy
             </Link>
-            <Link href="/terms" className="text-sm text-gray-400 hover:text-white transition-colors">
+            <Link href="/terms" className="text-gray-500 text-sm hover:text-white transition-colors">
               Terms of Service
             </Link>
           </div>

@@ -51,17 +51,21 @@ const getUserFromCredentials = async (email, password) => {
     
     // Find user
     const user = await User.findOne({ email }).select('+password');
-    if (!user) return null;
+    if (!user) {
+      console.log('User not found');
+      return null;
+    }
     
     // Check password
     const isValid = await compare(password, user.password);
-    if (!isValid) return null;
+    if (!isValid) {
+      console.log('Invalid password');
+      return null;
+    }
     
-    // Return user without password
-    const { password: _, ...userWithoutPassword } = user.toObject();
-    return userWithoutPassword;
+    return user;
   } catch (error) {
-    console.error('Auth error:', error);
+    console.error('Error in getUserFromCredentials:', error);
     return null;
   }
 };
@@ -75,17 +79,19 @@ export const { handlers, auth } = NextAuth({
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
-        
         try {
+          if (!credentials?.email || !credentials?.password) {
+            return null;
+          }
+          
           const user = await getUserFromCredentials(
-            credentials.email,
+            credentials.email, 
             credentials.password
           );
           
           return user;
         } catch (error) {
-          console.error('Error in authorize:', error);
+          console.error('Auth error:', error);
           return null;
         }
       }
