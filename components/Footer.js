@@ -10,31 +10,31 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Logo and Description */}
           <div>
-            <h2 className="text-2xl font-bold mb-4">Yoga for PE
+            <h2 className="text-2xl font-bold mb-4">Yoga for PE</h2>
             <p className="text-gray-400 mb-4">Transforming physical education through yoga practice to enhance flexibility, focus, and well-being in schools.</p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
                 <FaFacebook size={20} />
-                <span className="sr-only">Facebook
+                <span className="sr-only">Facebook</span>
               </a>
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
                 <FaInstagram size={20} />
-                <span className="sr-only">Instagram
+                <span className="sr-only">Instagram</span>
               </a>
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
                 <FaTwitter size={20} />
-                <span className="sr-only">Twitter
+                <span className="sr-only">Twitter</span>
               </a>
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
                 <FaYoutube size={20} />
-                <span className="sr-only">YouTube
+                <span className="sr-only">YouTube</span>
               </a>
             </div>
           </div>
           
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links
+            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/" className="text-gray-400 hover:text-white transition-colors">
@@ -54,10 +54,10 @@ export function Footer() {
           
           {/* Contact */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Contact Us
+            <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
             <ul className="space-y-2 text-gray-400">
-              <li>Email: info@yogaforpe.com
-              <li>Phone: (555) 123-4567
+              <li>Email: info@yogaforpe.com</li>
+              <li>Phone: (555) 123-4567</li>
               <li>
                 <Link href="/contact" className="text-primary-400 hover:text-primary-300 transition-colors">
                   Send us a message

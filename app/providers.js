@@ -6,7 +6,7 @@ import { AuthProvider } from '../lib/hooks/useAuth';
 
 // Add explicit options to SessionProvider for better stability
 
-export function Providers({ children }: { children) {
+export function Providers({ children }) {
   return (
     <SessionProvider
       // Add explicit configuration to improve stability
