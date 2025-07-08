@@ -4,9 +4,21 @@ import { auth } from '../../../../auth';
 import { getSubscriptionServiceInstance } from '../../../../lib/subscription/subscription-service-factory';
 import { SubscriptionTier } from '../../../../lib/vimeo-browser';
 
+// Module-level static generation guard
+const isStaticExport =
+  typeof process !== 'undefined' &&
+  (process.env.NEXT_PHASE || process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' || process.env.NEXT_PUBLIC_VERCEL_ENV === 'production');
+
 export const dynamic = 'force-dynamic';
 
-export async function GET(request) {
+export const GET = isStaticExport
+  ? async function () {
+      return NextResponse.json(
+        { hasAccess: false, error: 'Static generation mode (module-level guard)' },
+        { status: 200 }
+      );
+    }
+  : async function (request) {
   try {
     // Skip auth during build/static generation
     if (
@@ -81,3 +93,12 @@ export async function GET(request) {
     );
   }
 }
+
+const staticHandler = async function () {
+  return NextResponse.json(
+    { hasAccess: false, error: 'Static generation mode (module-level guard)' },
+    { status: 200 }
+  );
+}
+
+export { dynamic, getHandler: isStaticExport ? staticHandler : getHandler };

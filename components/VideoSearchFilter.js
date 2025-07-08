@@ -8,10 +8,10 @@ import { VideoCategory } from '../lib/vimeo-browser'
 // Video filter categories
 const videoCategories = [
   { id: 'all', name: 'All Videos' },
-  { id, name: 'Meditation' },
-  { id, name: 'Yoga for PE' },
-  { id, name: 'Relaxation' },
-  { id, name: 'Mindful Movements' },
+  { id: 'meditation', name: 'Meditation' },
+  { id: 'yoga-for-pe', name: 'Yoga for PE' },
+  { id: 'relaxation', name: 'Relaxation' },
+  { id: 'mindful-movements', name: 'Mindful Movements' },
   { id: 'beginner', name: 'Beginner' },
   { id: 'intermediate', name: 'Intermediate' },
   { id: 'advanced', name: 'Advanced' }
