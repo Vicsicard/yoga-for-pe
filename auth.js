@@ -37,9 +37,9 @@ const getUserFromCredentials = async (email, password) => {
     // Try to import dynamically if not already done
     if (!connectDB) {
       try {
-        const db = await import('./lib/db');
+        const db = await import('./lib/db/db');
         connectDB = db.default;
-        User = (await import('./models/User')).default;
+        User = (await import('./lib/models/User')).default;
       } catch (e) {
         console.error('Failed to import database modules:', e);
         return null;
