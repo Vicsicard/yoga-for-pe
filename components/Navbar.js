@@ -16,7 +16,7 @@ export function Navbar() {
   let isAuthenticated = false;
   let logout = async () => {};
   
-  try: {
+  try {
     const auth = useAuth();
     user = auth.user;
     isAuthenticated = auth.isAuthenticated;

@@ -32,7 +32,7 @@ export default function VideoSection({
             onClick={onVideoClick}
             section={sectionName || (title.toLowerCase().includes('meditation') ? 'meditation' : 
                     title.toLowerCase().includes('yoga') ? 'yoga-for-pe' : 
-                    title.toLowerCase().includes('relaxation') ? 'relaxation' )}
+                    title.toLowerCase().includes('relaxation') ? 'relaxation' : 'other')}
           />
         ))}
       </div>

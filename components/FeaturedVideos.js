@@ -69,7 +69,7 @@ export default function FeaturedVideos({ videos, isLoading }) {
                 <CardFooter>
                   <div className="flex justify-between items-center w-full">
                     <span className="text-xs bg-gray-100 px-2 py-1 rounded">{video.level}</span>
-                    <span className="text-xs text-primary-600">Free
+                    <span className="text-xs text-primary-600">Free</span>
                   </div>
                 </CardFooter>
               </Card>

@@ -45,7 +45,7 @@ export default function FilteredVideoResults({
                 <span>Loading...</span>
               ) : (
                 <>
-                  <span>Show Next Videos
+                  <span>Show Next Videos</span>
                   <FiRefreshCw className="ml-2" />
                 </>
               )}

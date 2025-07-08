@@ -8,7 +8,7 @@ import { SubscriptionTier, subscriptionTierDetails } from '../lib/vimeo-browser'
 import { SubscriptionPlan } from '../lib/subscription/types';
 
 // Debug helper function
-function logDebug(message, data?) {
+function logDebug(message, data) {
   console.log(`[PREMIUM-MODAL] ${message}`, data || '');
 }
 
