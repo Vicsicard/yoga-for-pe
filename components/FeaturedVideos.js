@@ -53,7 +53,7 @@ export default function FeaturedVideos({ videos, isLoading }) {
                   
                   {/* Category and Free badge */}
                   <div className="absolute top-3 right-3 bg-primary-600 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center">
-                    {(video.category === 'meditation' ? 'Meditation' === 'yoga-for-pe' ? 'Yoga for PE' : 'Relaxation')} • Free
+                    {video.category === 'meditation' ? 'Meditation' : (video.category === 'yogaForPE' ? 'Yoga for PE' : 'Relaxation')} • Free
                   </div>
                   
                   {/* Duration */}
