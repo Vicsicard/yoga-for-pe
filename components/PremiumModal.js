@@ -192,7 +192,7 @@ export default function PremiumModal({ selectedTier, onClose }) {
     return (
       <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-          <h3 className="text-2xl font-bold mb-4">Choose Your Subscription
+          <h3 className="text-2xl font-bold mb-4">Choose Your Subscription</h3>
           <p className="mb-6">
             Select a subscription plan to access premium content.
           </p>
@@ -205,7 +205,7 @@ export default function PremiumModal({ selectedTier, onClose }) {
               >
                 <div className="flex justify-between items-center mb-2">
                   <span className="font-medium text-lg">{subscriptionTierDetails[SubscriptionTier.SILVER].name}</span>
-                  <span className="font-bold">${subscriptionTierDetails[SubscriptionTier.SILVER].price.toFixed(2)}/mo
+                  <span className="font-bold">${subscriptionTierDetails[SubscriptionTier.SILVER].price.toFixed(2)}/mo</span>
                 </div>
                 <p className="text-sm text-gray-600 mb-3">{subscriptionTierDetails[SubscriptionTier.SILVER].description}</p>
                 <ul className="text-sm space-y-1">
@@ -231,9 +231,9 @@ export default function PremiumModal({ selectedTier, onClose }) {
                 <div className="flex justify-between items-center mb-2">
                   <div className="flex items-center">
                     <span className="font-medium text-lg">{subscriptionTierDetails[SubscriptionTier.GOLD].name}</span>
-                    <span className="ml-2 px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-medium rounded">BEST VALUE
+                    <span className="ml-2 px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-medium rounded">BEST VALUE</span>
                   </div>
-                  <span className="font-bold">${subscriptionTierDetails[SubscriptionTier.GOLD].price.toFixed(2)}/mo
+                  <span className="font-bold">${subscriptionTierDetails[SubscriptionTier.GOLD].price.toFixed(2)}/mo</span>
                 </div>
                 <p className="text-sm text-gray-600 mb-3">{subscriptionTierDetails[SubscriptionTier.GOLD].description}</p>
                 <ul className="text-sm space-y-1">
