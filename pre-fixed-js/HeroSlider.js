@@ -4,21 +4,22 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-export default function HeroSlider({
-  title = "Yoga for Physical Education",
-  subtitle = "Enhance your PE curriculum with mindfulness and movement",
-  description,
-  buttonText = "Get Started",
-  buttonUrl = "/videos",
-  secondaryButtonText,
-  secondaryButtonUrl,
-  overlayOpacity = "medium", // light, medium, dark
-  imagePosition = "center", // top, center, bottom
-  height = "lg", // sm, md, lg, xl, full
-  roundedCorners = true,
-  sliderInterval = 5000,
-  pageType = "home",
-}) {
+export default function HeroSlider(props) {
+  // Extract props with default values
+  const title = props.title || "Yoga for Physical Education";
+  const subtitle = props.subtitle || "Enhance your PE curriculum with mindfulness and movement";
+  const description = props.description;
+  const buttonText = props.buttonText || "Get Started";
+  const buttonUrl = props.buttonUrl || "/videos";
+  const secondaryButtonText = props.secondaryButtonText;
+  const secondaryButtonUrl = props.secondaryButtonUrl;
+  const overlayOpacity = props.overlayOpacity || "medium"; // light, medium, dark
+  const imagePosition = props.imagePosition || "center"; // top, center, bottom
+  const height = props.height || "lg"; // sm, md, lg, xl, full
+  const roundedCorners = props.roundedCorners !== false; // default to true
+  const sliderInterval = props.sliderInterval || 5000;
+  const pageType = props.pageType || "home";
+
   // Height classes
   const heightClasses = {
     sm: "h-[300px]",
@@ -72,9 +73,14 @@ export default function HeroSlider({
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // Determine which image set to use based on pageType
-  const sliderImages = pageType === 'contact' ? contactSliderImages : 
-                       pageType === 'about' ? aboutSliderImages :
-                       homeSliderImages;
+  let sliderImages;
+  if (pageType === 'contact') {
+    sliderImages = contactSliderImages;
+  } else if (pageType === 'about') {
+    sliderImages = aboutSliderImages;
+  } else {
+    sliderImages = homeSliderImages;
+  }
 
   const overlayClasses = {
     light: 'bg-black/30',
@@ -94,31 +100,25 @@ export default function HeroSlider({
   }, [sliderImages.length, sliderInterval]);
 
   return (
-    <div 
-      className={`relative w-full ${heightClasses[height]} overflow-hidden ${
-        roundedCorners ? "rounded-2xl" : ""
-      }`}
-    >
+    <div className={"relative w-full " + heightClasses[height] + " overflow-hidden " + (roundedCorners ? "rounded-2xl" : "")}>
       {/* Slider images */}
       {sliderImages.map((image, index) => (
         <div
           key={index}
-          className={`absolute inset-0 transition-opacity duration-1000 ${
-            index === currentIndex ? "opacity-100" : "opacity-0"
-          }`}
+          className={"absolute inset-0 transition-opacity duration-1000 " + (index === currentIndex ? "opacity-100" : "opacity-0")}
         >
           <Image
             src={image.src || "/images/hero/default-hero.jpg"}
             alt={image.alt || "Yoga for PE"}
             fill
             priority={index === 0}
-            className={`object-cover object-${imagePosition}`}
+            className={"object-cover object-" + imagePosition}
           />
         </div>
       ))}
 
       {/* Dark overlay */}
-      <div className={`absolute inset-0 ${overlayClasses[overlayOpacity] || overlayClasses.medium}`}></div>
+      <div className={"absolute inset-0 " + (overlayClasses[overlayOpacity] || overlayClasses.medium)}></div>
 
       {/* Content */}
       <div className="absolute inset-0 flex items-center justify-center p-6">
@@ -166,10 +166,8 @@ export default function HeroSlider({
             <button
               key={index}
               onClick={() => setCurrentIndex(index)}
-              className={`h-2 rounded-full transition-all ${
-                index === currentIndex ? "w-6 bg-white" : "w-2 bg-white/50"
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
+              className={"h-2 rounded-full transition-all " + (index === currentIndex ? "w-6 bg-white" : "w-2 bg-white/50")}
+              aria-label={"Go to slide " + (index + 1)}
             ></button>
           ))}
         </div>

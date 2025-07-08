@@ -53,8 +53,9 @@ export default function VideoCard({ video, isPremium = false, videoSection }) {
   };
   
   // Get difficulty config or default
-  const { label: difficultyLabel, colorClass: difficultyColor } = 
-    difficultyConfig[difficulty] || difficultyConfig.beginner;
+  const difficultyConfig2 = difficultyConfig[difficulty] || difficultyConfig.beginner;
+  const difficultyLabel = difficultyConfig2.label;
+  const difficultyColor = difficultyConfig2.colorClass;
 
   return (
     <div className="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">

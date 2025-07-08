@@ -32,15 +32,17 @@ export default function Button({
   };
 
   // Compose classes
-  const buttonClasses = `
-    ${variants[variant]} 
-    ${sizes[size]} 
-    ${fullWidth ? 'w-full' : ''}
-    rounded-lg font-medium transition-colors duration-200
-    ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-    ${className}
-    flex items-center justify-center
-  `;
+  const fullWidthClass = fullWidth ? 'w-full' : '';
+  const disabledClass = disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer';
+  const buttonClasses = [
+    variants[variant], 
+    sizes[size],
+    fullWidthClass,
+    'rounded-lg font-medium transition-colors duration-200',
+    disabledClass,
+    className,
+    'flex items-center justify-center'
+  ].join(' ').trim();
 
   // Loading spinner component
   const LoadingSpinner = () => (

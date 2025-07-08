@@ -3,6 +3,21 @@
 import React from 'react';
 import VideoCard from './VideoCard';
 
+// Helper function to determine video section from title
+function getVideoSectionFromTitle(title) {
+  const lowerTitle = title.toLowerCase();
+  
+  if (lowerTitle.includes('meditation')) {
+    return 'meditation';
+  } else if (lowerTitle.includes('yoga')) {
+    return 'yoga-for-pe';
+  } else if (lowerTitle.includes('relaxation')) {
+    return 'relaxation';
+  } else {
+    return '';
+  }
+}
+
 export default function VideoSection({ 
   title, 
   videos = [], 
@@ -25,11 +40,7 @@ export default function VideoSection({
             video={video}
             isPremium={isPremium}
             onClick={onVideoClick}
-            videoSection={sectionName || (
-              title.toLowerCase().includes('meditation') ? 'meditation' : 
-              title.toLowerCase().includes('yoga') ? 'yoga-for-pe' : 
-              title.toLowerCase().includes('relaxation') ? 'relaxation' : ''
-            )}
+            videoSection={sectionName || getVideoSectionFromTitle(title)}
           />
         ))}
       </div>

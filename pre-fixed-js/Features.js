@@ -3,6 +3,17 @@
 import React from 'react';
 import { FiCheck } from 'react-icons/fi';
 
+// Helper function to get class based on variant
+function getVariantClass(variant) {
+  if (variant === 'cards') {
+    return 'bg-white p-6 rounded-lg shadow-md';
+  } else if (variant === 'minimal') {
+    return '';
+  } else {
+    return 'flex gap-x-3';
+  }
+}
+
 export default function Features({
   title,
   subtitle,
@@ -32,16 +43,11 @@ export default function Features({
         </p>
       )}
       
-      <div className={`grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-${columns} lg:grid-cols-${columns}`}>
+      <div className={"grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-" + columns + " lg:grid-cols-" + columns}>
         {items.map((item, i) => (
           <div 
             key={i} 
-            className={variant === 'cards' 
-              ? 'bg-white p-6 rounded-lg shadow-md' 
-              : variant === 'minimal' 
-                ? '' 
-                : 'flex gap-x-3'
-            }
+            className={getVariantClass(variant)}
           >
             {variant !== 'minimal' && (
               <div className="flex-shrink-0">

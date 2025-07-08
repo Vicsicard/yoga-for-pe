@@ -314,50 +314,55 @@ echo "Copying pre-fixed JS files over problematic ones..."
 if [ -d "pre-fixed-js" ]; then
   echo "Found pre-fixed JS files directory"
   
-  # Copy each pre-fixed file to its corresponding location
-  if [ -f "pre-fixed-js/Footer.js" ]; then
-    echo "Copying pre-fixed Footer.js"
-    cp pre-fixed-js/Footer.js components/Footer.js
-  fi
+  # Define a function to copy files with proper structure creation
+  copy_prefixed_file() {
+    local src="$1"
+    local dest="$2"
+    
+    # Create destination directory if it doesn't exist
+    mkdir -p "$(dirname "$dest")"
+    
+    # Copy the file and report
+    if [ -f "$src" ]; then
+      echo "Copying pre-fixed $(basename "$src")"
+      cp "$src" "$dest"
+      echo "✓ Successfully copied $(basename "$src") to $dest"
+    fi
+  }
   
-  if [ -f "pre-fixed-js/Navbar.js" ]; then
-    echo "Copying pre-fixed Navbar.js"
-    cp pre-fixed-js/Navbar.js components/Navbar.js
-  fi
+  # Root component files
+  copy_prefixed_file "pre-fixed-js/Footer.js" "components/Footer.js"
+  copy_prefixed_file "pre-fixed-js/Navbar.js" "components/Navbar.js"
+  copy_prefixed_file "pre-fixed-js/PremiumModal.js" "components/PremiumModal.js"
+  copy_prefixed_file "pre-fixed-js/SubscriptionCTA.js" "components/SubscriptionCTA.js"
+  copy_prefixed_file "pre-fixed-js/VideoCard.js" "components/VideoCard.js"
+  copy_prefixed_file "pre-fixed-js/VideoSection.js" "components/VideoSection.js"
   
-  if [ -f "pre-fixed-js/PremiumModal.js" ]; then
-    echo "Copying pre-fixed PremiumModal.js"
-    cp pre-fixed-js/PremiumModal.js components/PremiumModal.js
-  fi
+  # UI component files
+  copy_prefixed_file "pre-fixed-js/components/ui/Button.js" "components/ui/Button.js"
+  copy_prefixed_file "pre-fixed-js/components/ui/Features.js" "components/ui/Features.js"
+  copy_prefixed_file "pre-fixed-js/components/ui/HeroSlider.js" "components/ui/HeroSlider.js"
+  copy_prefixed_file "pre-fixed-js/components/ui/Testimonial.js" "components/ui/Testimonial.js"
   
-  if [ -f "pre-fixed-js/SubscriptionCTA.js" ]; then
-    echo "Copying pre-fixed SubscriptionCTA.js"
-    cp pre-fixed-js/SubscriptionCTA.js components/SubscriptionCTA.js
-  fi
+  # Library files
+  copy_prefixed_file "pre-fixed-js/lib/hooks/useAuth.js" "lib/hooks/useAuth.js"
+  copy_prefixed_file "pre-fixed-js/lib/thumbnail-mapping.js" "lib/thumbnail-mapping.js"
+  copy_prefixed_file "pre-fixed-js/lib/video-catalog.js" "lib/video-catalog.js"
   
-  if [ -f "pre-fixed-js/VideoCard.js" ]; then
-    echo "Copying pre-fixed VideoCard.js"
-    cp pre-fixed-js/VideoCard.js components/VideoCard.js
-  fi
-  
+  # Check for the old way too (for backward compatibility)
   if [ -f "pre-fixed-js/Button.js" ]; then
-    echo "Copying pre-fixed Button.js"
+    echo "Found Button.js in root pre-fixed directory, copying to components/ui/Button.js"
     cp pre-fixed-js/Button.js components/ui/Button.js
   fi
   
   if [ -f "pre-fixed-js/Features.js" ]; then
-    echo "Copying pre-fixed Features.js"
+    echo "Found Features.js in root pre-fixed directory, copying to components/ui/Features.js"
     cp pre-fixed-js/Features.js components/ui/Features.js
   fi
   
   if [ -f "pre-fixed-js/HeroSlider.js" ]; then
-    echo "Copying pre-fixed HeroSlider.js"
+    echo "Found HeroSlider.js in root pre-fixed directory, copying to components/ui/HeroSlider.js"
     cp pre-fixed-js/HeroSlider.js components/ui/HeroSlider.js
-  fi
-  
-  if [ -f "pre-fixed-js/VideoSection.js" ]; then
-    echo "Copying pre-fixed VideoSection.js"
-    cp pre-fixed-js/VideoSection.js components/VideoSection.js
   fi
 else
   echo "WARNING: pre-fixed-js directory not found!"
