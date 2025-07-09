@@ -53,8 +53,12 @@ export function Footer() {
             </ul>
           </div>
           
-          {/* Footer Spacer */}
-          <div></div>
+          {/* Newsletter */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Stay Updated</h3>
+            <p className="text-gray-400 mb-4">Subscribe to our newsletter for the latest updates.</p>
+            <p className="text-primary-400 text-sm font-medium">Coming Soon</p>
+          </div>
           
           {/* Contact */}
           <div>
