@@ -3,10 +3,25 @@ import Stripe from 'stripe';
 import User from '../../../../lib/models/User';
 import { connectDB } from '../../../../lib/db/connect';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+// Add dynamic export to prevent static generation
+export const dynamic = 'force-dynamic';
+
+// Initialize Stripe only when needed to avoid build-time errors
+let stripe;
+if (process.env.STRIPE_SECRET_KEY) {
+  stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+}
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export async function POST(request) {
+  // Check if Stripe is configured
+  if (!stripe || !process.env.STRIPE_SECRET_KEY) {
+    return NextResponse.json(
+      { error: 'Stripe not configured. Please add STRIPE_SECRET_KEY to environment variables.' },
+      { status: 500 }
+    );
+  }
+
   const body = await request.text();
   const sig = request.headers.get('stripe-signature');
 

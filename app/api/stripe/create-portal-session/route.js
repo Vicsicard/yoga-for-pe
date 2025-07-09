@@ -4,10 +4,25 @@ import jwt from 'jsonwebtoken';
 import User from '../../../../lib/models/User';
 import { connectDB } from '../../../../lib/db/connect';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+// Add dynamic export to prevent static generation
+export const dynamic = 'force-dynamic';
+
+// Initialize Stripe only when needed to avoid build-time errors
+let stripe;
+if (process.env.STRIPE_SECRET_KEY) {
+  stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+}
 
 export async function POST(request) {
   try {
+    // Check if Stripe is configured
+    if (!stripe || !process.env.STRIPE_SECRET_KEY) {
+      return NextResponse.json(
+        { error: 'Stripe not configured. Please add STRIPE_SECRET_KEY to environment variables.' },
+        { status: 500 }
+      );
+    }
+
     // Verify authentication
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
