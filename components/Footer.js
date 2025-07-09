@@ -1,10 +1,13 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { FaFacebook, FaTwitter, FaInstagram, FaYoutube } from 'react-icons/fa';
+import { LiabilityWaiverModal } from './LiabilityWaiverModal';
 
 export function Footer() {
+  const [isWaiverModalOpen, setIsWaiverModalOpen] = useState(false);
+
   return (
     <footer className="bg-gray-900 text-white">
       <div className="container py-12">
@@ -64,7 +67,7 @@ export function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-4">Contact</h3>
             <p className="text-gray-400 mb-2">Email: info@yogaforpe.com</p>
-            <p className="text-gray-400 mb-2">Phone: (123) 456-7890</p>
+            <p className="text-gray-400 mb-2">Phone: 720.514.9820</p>
           </div>
           
           {/* Newsletter */}
@@ -92,9 +95,20 @@ export function Footer() {
             <Link href="/terms" className="text-gray-500 text-sm hover:text-white transition-colors">
               Terms of Service
             </Link>
+            <button 
+              onClick={() => setIsWaiverModalOpen(true)}
+              className="text-gray-500 text-sm hover:text-white transition-colors"
+            >
+              Liability Waiver
+            </button>
           </div>
         </div>
       </div>
+      
+      <LiabilityWaiverModal 
+        isOpen={isWaiverModalOpen} 
+        onClose={() => setIsWaiverModalOpen(false)} 
+      />
     </footer>
   )
 }

@@ -11,6 +11,8 @@
     "render-build": "chmod +x ./render-build-node.sh && ./render-build-node.sh"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.4",
+    "@heroicons/react": "^2.2.0",
     "@stripe/react-stripe-js": "^3.7.0",
     "@stripe/stripe-js": "^7.4.0",
     "autoprefixer": "10.4.17",

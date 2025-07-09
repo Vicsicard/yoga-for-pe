@@ -2,8 +2,12 @@
 
 import Link from 'next/link'
 import { FaFacebook, FaInstagram, FaTwitter, FaYoutube } from 'react-icons/fa'
+import { useState } from 'react'
+import { LiabilityWaiverModal } from './LiabilityWaiverModal'
 
 export function Footer() {
+  const [isWaiverModalOpen, setIsWaiverModalOpen] = useState(false)
+
   return (
     <footer className="bg-gray-900 text-white">
       <div className="container py-12">
@@ -57,7 +61,7 @@ export function Footer() {
             <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
             <ul className="space-y-2 text-gray-400">
               <li>Email: info@yogaforpe.com</li>
-              <li>Phone: (555) 123-4567</li>
+              <li>Phone: 720.514.9820</li>
               <li>
                 <Link href="/contact" className="text-primary-400 hover:text-primary-300 transition-colors">
                   Send us a message
@@ -78,9 +82,20 @@ export function Footer() {
             <Link href="/terms" className="text-sm text-gray-400 hover:text-white transition-colors">
               Terms of Service
             </Link>
+            <button 
+              onClick={() => setIsWaiverModalOpen(true)}
+              className="text-sm text-gray-400 hover:text-white transition-colors"
+            >
+              Liability Waiver
+            </button>
           </div>
         </div>
       </div>
+      
+      <LiabilityWaiverModal 
+        isOpen={isWaiverModalOpen} 
+        onClose={() => setIsWaiverModalOpen(false)} 
+      />
     </footer>
   )
 }
