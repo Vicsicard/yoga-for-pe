@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../lib/hooks/useAuth';
+import { useAuth } from '../../lib/contexts/AuthContext';
 
 export default function TestSubscriptionPage() {
   const [loaded, setLoaded] = useState(false);

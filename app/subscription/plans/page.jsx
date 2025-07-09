@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../../../lib/hooks/useAuth';
+import { useAuth } from '../../../lib/contexts/AuthContext';
 
 const PricingCard = ({ title, price, features, tier, isPopular, onSelect, isLoading }) => {
   return (
