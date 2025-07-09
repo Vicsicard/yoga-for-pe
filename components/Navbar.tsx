@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { FiMenu, FiX, FiChevronDown, FiUser, FiLogOut } from 'react-icons/fi'
 import { Button } from './ui/Button'
@@ -10,20 +10,28 @@ import { useAuth } from '../lib/hooks/useAuth'
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
+  const [isClient, setIsClient] = useState(false)
   
-  // Use try/catch to handle potential auth provider issues
-  let user = null;
-  let isAuthenticated = false;
-  let logout = async () => {};
+  // Initialize with default values to prevent hydration mismatch
+  const [user, setUser] = useState(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [logout, setLogout] = useState<() => Promise<void>>(() => async () => {})
   
-  try {
-    const auth = useAuth();
-    user = auth.user;
-    isAuthenticated = auth.isAuthenticated;
-    logout = auth.logout;
-  } catch (error) {
-    console.error('Auth context not available:', error);
-  }
+  useEffect(() => {
+    setIsClient(true)
+    
+    // Only access auth context after client hydration
+    try {
+      const auth = useAuth()
+      setUser(auth.user)
+      setIsAuthenticated(auth.isAuthenticated)
+      setLogout(() => async () => {
+        await auth.logout()
+      })
+    } catch (error) {
+      console.error('Auth context not available:', error)
+    }
+  }, [])
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)

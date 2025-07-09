@@ -45,13 +45,14 @@ interface LoginCredentials {
 
 interface AuthProviderProps {
   children: ReactNode;
+  isClient?: boolean;
 }
 
 // Create auth context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Auth provider component
-export function AuthProvider({ children }: AuthProviderProps) {
+export function AuthProvider({ children, isClient = false }: AuthProviderProps) {
   const { data: session, status, update: updateSession } = useSession();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);

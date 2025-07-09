@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { FiLock, FiPlay, FiInfo } from 'react-icons/fi'
 import { Video, SubscriptionTier, hasAccessToVideo } from '../lib/vimeo-browser'
 import { getThumbnailPath } from '../lib/thumbnail-mapping'
@@ -51,9 +51,19 @@ function getCategoryFolder(video: Video, videoSection?: string): string {
 }
 
 export default function VideoCard({ video, userSubscriptionTier, onClick, section }: VideoCardProps) {
-  // Use the proper type for hasAccessToVideo
-  const hasAccess = hasAccessToVideo(video, null, userSubscriptionTier);
+  // Async access check
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
   const [showFullDescription, setShowFullDescription] = useState(false);
+
+  // Check access when video or tier changes
+  React.useEffect(() => {
+    let isMounted = true;
+    setHasAccess(null); // reset before checking
+    hasAccessToVideo(video, null, userSubscriptionTier)
+      .then(result => { if (isMounted) setHasAccess(result); })
+      .catch(() => { if (isMounted) setHasAccess(false); });
+    return () => { isMounted = false; };
+  }, [video, userSubscriptionTier]);
   
   // Handle mouse events
   const handleInfoClick = (e: React.MouseEvent) => {

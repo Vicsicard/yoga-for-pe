@@ -4,10 +4,12 @@ import { useState, useEffect } from 'react';
 
 export default function TestPage() {
   const [loaded, setLoaded] = useState(false);
+  const [currentTime, setCurrentTime] = useState('');
 
   useEffect(() => {
     console.log('Test page loaded successfully');
     setLoaded(true);
+    setCurrentTime(new Date().toISOString());
     
     // Log to server console as well
     try {
@@ -28,7 +30,8 @@ export default function TestPage() {
       <p className="text-xl mb-4">Check your browser console for a log message.</p>
       <div className="p-4 bg-green-200 rounded-lg">
         <p className="font-bold">Page loaded state: {loaded ? 'YES' : 'NO'}</p>
-        <p>Current time: {new Date().toISOString()}</p>
+        {/* Only show time when it's been set client-side */}
+        <p>Current time: {currentTime}</p>
       </div>
     </div>
   );

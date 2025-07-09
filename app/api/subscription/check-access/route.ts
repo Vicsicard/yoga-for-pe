@@ -1,13 +1,16 @@
 // API route to check if a user has access to a specific subscription tier
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '../../../../auth';
-import { getSubscriptionServiceInstance } from '../../../../lib/subscription/subscription-service-factory';
+import { getServerSession } from 'next-auth/next';
+import { authConfig } from '../../../../auth';
 import { SubscriptionTier } from '../../../../lib/vimeo-browser';
+
+// Force Node.js runtime
+export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
   try {
     // Get authenticated user session
-    const session = await auth();
+    const session = await getServerSession(authConfig);
     
     if (!session || !session.user?.id) {
       return NextResponse.json(
@@ -45,11 +48,29 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    // Get subscription service
-    const subscriptionService = getSubscriptionServiceInstance();
+    // For now, provide basic access logic
+    // TODO: Implement proper subscription service integration
+    let hasAccess = false;
     
-    // Check if user has access to the requested tier
-    const hasAccess = await subscriptionService.hasAccessToTier(userId, videoTier);
+    // Basic access logic - you can expand this based on your subscription tiers
+    if (session.user?.subscription?.status === 'active') {
+      const userPlan = session.user.subscription.plan;
+      
+      // Grant access based on subscription tier
+      switch (videoTier) {
+        case SubscriptionTier.BRONZE:
+          hasAccess = ['bronze', 'silver', 'gold'].includes(userPlan);
+          break;
+        case SubscriptionTier.SILVER:
+          hasAccess = ['silver', 'gold'].includes(userPlan);
+          break;
+        case SubscriptionTier.GOLD:
+          hasAccess = userPlan === 'gold';
+          break;
+        default:
+          hasAccess = false;
+      }
+    }
     
     return NextResponse.json({ hasAccess });
   } catch (error: any) {
