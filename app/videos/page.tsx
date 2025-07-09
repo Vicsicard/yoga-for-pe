@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { VideoCategory, SubscriptionTier, Video, hasAccessToVideo } from '../../lib/vimeo-browser'
 import { getVideosFromCatalog, getAllVideosFromCatalog } from '../../lib/video-catalog'
-import { useAuth } from '../../lib/hooks/useAuth'
+import { useAuth } from '../../lib/contexts/AuthContext'
 
 // Import our modular components
 import VideoPlayer from '../../components/VideoPlayer'
