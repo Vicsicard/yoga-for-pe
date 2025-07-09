@@ -21,11 +21,11 @@ export function Footer() {
                 <FaFacebook size={20} />
                 <span className="sr-only">Facebook</span>
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="https://instagram.com/yogaforpe" className="text-gray-400 hover:text-white transition-colors" target="_blank" rel="noopener noreferrer">
                 <FaInstagram size={20} />
                 <span className="sr-only">Instagram</span>
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="https://twitter.com/yogaforpe" className="text-gray-400 hover:text-white transition-colors" target="_blank" rel="noopener noreferrer">
                 <FaTwitter size={20} />
                 <span className="sr-only">Twitter</span>
               </a>

@@ -13,8 +13,7 @@ const subscriptionTiers = {
     features: [
       "Access to all Bronze (free) videos",
       "Basic yoga sequences for PE",
-      "Foundational breathing exercises",
-      "Community support"
+      "Foundational breathing exercises"
     ]
   },
   silver: {
@@ -27,8 +26,7 @@ const subscriptionTiers = {
       "Access to Silver premium videos",
       "Intermediate yoga sequences",
       "Specialized PE integration techniques",
-      "Monthly new content",
-      "Email support"
+      "Monthly new content"
     ]
   },
   gold: {
@@ -39,11 +37,7 @@ const subscriptionTiers = {
     features: [
       "Everything in Bronze & Silver",
       "Access to Gold exclusive videos", 
-      "Advanced yoga sequences",
-      "Teacher training content",
-      "Priority support",
-      "Early access to new features",
-      "Downloadable resources"
+      "Advanced yoga sequences"
     ]
   }
 };
