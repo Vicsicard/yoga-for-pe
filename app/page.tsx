@@ -322,7 +322,7 @@ export default function Home() {
             </div>
             <div className="p-4 bg-white rounded shadow-sm hover:shadow-md transition-shadow">
               <h4 className="font-medium mb-2">One-on-One Consulting</h4>
-              <p className="text-sm text-gray-600">Personalized coaching for educators</p>
+              <p className="text-sm text-gray-600">Personal training and Group fitness for everyone.</p>
             </div>
           </div>
           <div className="text-center mt-6">

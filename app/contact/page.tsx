@@ -195,24 +195,24 @@ export default function ContactPage() {
             align="center"
           />
 
-          <div className="max-w-3xl mx-auto mt-10 space-y-6">
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">How do I integrate yoga into my existing PE curriculum?</h3>
-              <p className="text-gray-600">
+          <div className="max-w-4xl mx-auto mt-10 space-y-8">
+            <div className="p-8 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 hover:shadow-2xl" style={{ background: 'linear-gradient(135deg, #1B90A4, #167A8C)' }}>
+              <h3 className="text-xl font-bold text-white mb-4 drop-shadow-sm">How do I integrate yoga into my existing PE curriculum?</h3>
+              <p className="text-white/90 leading-relaxed text-base">
                 Our resources are designed to complement your existing PE program. You can use our videos as standalone lessons, warm-ups, cool-downs, or integrate yoga poses into your regular activities.
               </p>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Do I need previous yoga experience to teach these materials?</h3>
-              <p className="text-gray-600">
+            <div className="p-8 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 hover:shadow-2xl" style={{ background: 'linear-gradient(135deg, #167A8C, #1B90A4)' }}>
+              <h3 className="text-xl font-bold text-white mb-4 drop-shadow-sm">Do I need previous yoga experience to teach these materials?</h3>
+              <p className="text-white/90 leading-relaxed text-base">
                 Not at all! Our content is designed for educators of all experience levels. The videos provide clear instruction that you can follow along with your students.
               </p>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">How do your resources align with PE standards?</h3>
-              <p className="text-gray-600">
+            <div className="p-8 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 hover:shadow-2xl" style={{ background: 'linear-gradient(135deg, #1B90A4, #167A8C)' }}>
+              <h3 className="text-xl font-bold text-white mb-4 drop-shadow-sm">How do your resources align with PE standards?</h3>
+              <p className="text-white/90 leading-relaxed text-base">
                 Our yoga program aligns with the 2024 SHAPE America National Physical Education Standards, supporting physical literacy, movement competency, and lifelong wellness habits.
               </p>
             </div>
