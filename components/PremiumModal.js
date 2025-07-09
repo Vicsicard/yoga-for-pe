@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../lib/hooks/useAuth';
+import { useAuth } from '../lib/contexts/AuthContext';
 import Link from 'next/link';
 import { SubscriptionTier, subscriptionTierDetails } from '../lib/vimeo-browser';
 import { SubscriptionPlan } from '../lib/subscription/types';

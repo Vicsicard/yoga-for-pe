@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { FiMenu, FiX, FiChevronDown, FiUser, FiLogOut } from 'react-icons/fi'
 import { Button } from './ui/Button'
 import Logo from './Logo'
-import { useAuth } from '../lib/hooks/useAuth'
+import { useAuth } from '../lib/contexts/AuthContext'
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)

@@ -1,8 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { Fragment } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
+import { XMarkIcon } from '@heroicons/react/24/outline';
+import { StarIcon, PlayIcon } from '@heroicons/react/20/solid';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../lib/hooks/useAuth';
+import { useAuth } from '../lib/contexts/AuthContext';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { SubscriptionTier, subscriptionTierDetails } from '../lib/vimeo-browser';
 import { SubscriptionPlan } from '../lib/subscription/types';

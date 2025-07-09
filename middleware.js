@@ -1,26 +1,46 @@
 import { NextResponse } from 'next/server';
-import { auth } from './auth';
-import { NextRequest } from 'next/server';
+import jwt from 'jsonwebtoken';
 
-// Define user 
+export async function middleware(request) {
+  const { pathname } = request.nextUrl;
   
-  // Check if the user is authenticated
-  if (!session && isProtectedRoute(request.nextUrl.pathname)) {
-    // Redirect to sign-in page with a return URL
-    const signInUrl = new URL('/sign-in', request.url);
-    signInUrl.searchParams.set('redirect', request.nextUrl.pathname);
-    return NextResponse.redirect(signInUrl);
+  // Skip middleware for API routes, static files, and public pages
+  if (
+    pathname.startsWith('/api/') ||
+    pathname.startsWith('/_next/') ||
+    pathname.startsWith('/favicon.ico') ||
+    pathname === '/' ||
+    pathname === '/sign-in' ||
+    pathname === '/sign-up' ||
+    pathname === '/signup' ||
+    pathname.startsWith('/test-')
+  ) {
+    return NextResponse.next();
+  }
+
+  // Check JWT token for protected routes
+  const token = request.cookies.get('auth_token')?.value || 
+                request.headers.get('authorization')?.replace('Bearer ', '');
+  
+  let isAuthenticated = false;
+  let user = null;
+  
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_super_secret_jwt_key_for_yoga_pe_app_development_2024');
+      isAuthenticated = true;
+      user = decoded;
+    } catch (error) {
+      console.log('JWT verification failed:', error.message);
+    }
   }
   
-  // Check if user has an active subscription for premium content
-  if (session && isPremiumRoute(request.nextUrl.pathname)) {
-    const user = session.user as UserWithSubscription;
-    const subscription = user?.subscription;
-    
-    // If not on bronze plan and subscription is not active, redirect to subscription page
-    if (subscription?.plan !== 'bronze' && subscription?.status !== 'active') {
-      return NextResponse.redirect(new URL('/subscription/plans', request.url));
-    }
+  // Check if the user is authenticated for protected routes
+  if (!isAuthenticated && isProtectedRoute(pathname)) {
+    // Redirect to sign-in page with a return URL
+    const signInUrl = new URL('/sign-in', request.url);
+    signInUrl.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(signInUrl);
   }
   
   return NextResponse.next();
@@ -30,10 +50,16 @@ import { NextRequest } from 'next/server';
 function isProtectedRoute(pathname) {
   const protectedPaths = [
     '/premium',
-    '/subscription',
     '/account',
-    '/videos/premium'
+    '/videos/premium',
+    '/dashboard'
   ];
+  
+  // Allow access to subscription selection page for authenticated users
+  // This page should be accessible after signup
+  if (pathname === '/subscription/select') {
+    return false; // Don't require additional auth - handled by client-side auth context
+  }
   
   return protectedPaths.some(path => pathname.startsWith(path));
 }

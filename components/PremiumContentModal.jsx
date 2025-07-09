@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../lib/hooks/useAuth';
+import { useAuth } from '../lib/contexts/AuthContext';
 
 export default function PremiumContentModal({ isOpen, onClose, contentTitle }) {
   const { user, isAuthenticated, createSubscription } = useAuth();

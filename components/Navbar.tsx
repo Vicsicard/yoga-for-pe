@@ -5,32 +5,17 @@ import Link from 'next/link'
 import { FiMenu, FiX, FiChevronDown, FiUser, FiLogOut } from 'react-icons/fi'
 import { Button } from './ui/Button'
 import Logo from './Logo'
-import { useAuth } from '../lib/hooks/useAuth'
+import { useAuth } from '../lib/contexts/AuthContext'
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const [isClient, setIsClient] = useState(false)
   
-  // Initialize with default values to prevent hydration mismatch
-  const [user, setUser] = useState(null)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [logout, setLogout] = useState<() => Promise<void>>(() => async () => {})
+  const { user, isAuthenticated, logout } = useAuth()
   
   useEffect(() => {
     setIsClient(true)
-    
-    // Only access auth context after client hydration
-    try {
-      const auth = useAuth()
-      setUser(auth.user)
-      setIsAuthenticated(auth.isAuthenticated)
-      setLogout(() => async () => {
-        await auth.logout()
-      })
-    } catch (error) {
-      console.error('Auth context not available:', error)
-    }
   }, [])
 
   const toggleMenu = () => {

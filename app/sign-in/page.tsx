@@ -3,7 +3,7 @@
 import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { useAuth } from '../../lib/hooks/useAuth';
+import { useAuth } from '../../lib/contexts/AuthContext';
 
 function SignInForm() {
   const [email, setEmail] = useState('');
@@ -13,7 +13,7 @@ function SignInForm() {
   
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { login } = useAuth();
+  const { signin } = useAuth();
   
   const redirectTo = searchParams.get('redirect') || '/';
   
@@ -23,7 +23,7 @@ function SignInForm() {
     setError('');
     
     try {
-      const result = await login({ email, password, redirect: false });
+      const result = await signin({ email, password });
       
       if (result.success) {
         router.push(redirectTo);
