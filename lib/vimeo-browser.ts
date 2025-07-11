@@ -196,7 +196,7 @@ function getVideoTier(video: any): SubscriptionTier {
 }
 
 // Function to check if a user has access to a video based on their subscription tier
-export async function hasAccessToVideo(video: Video, userId?: string | null, userTier?: SubscriptionTier): Promise<boolean> {
+export async function hasAccessToVideo(video: Video, userId?: string | null, userTier?: SubscriptionTier | null): Promise<boolean> {
   try {
     // For Bronze videos, allow access to everyone
     if (video.tier === SubscriptionTier.BRONZE) {
@@ -206,8 +206,8 @@ export async function hasAccessToVideo(video: Video, userId?: string | null, use
     // For Silver and Gold videos, require authentication and appropriate subscription
     // If no userId is provided, use the passed userTier
     if (!userId) {
-      // If no userTier provided, deny access to premium content
-      if (!userTier) {
+      // If no userTier provided or null (unauthenticated), deny access to premium content
+      if (userTier === null || userTier === undefined) {
         return false;
       }
       

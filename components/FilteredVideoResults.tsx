@@ -8,7 +8,7 @@ interface FilteredVideoResultsProps {
   title: string;
   videos: Video[];
   isLoading: boolean;
-  userSubscriptionTier: SubscriptionTier;
+  userSubscriptionTier: SubscriptionTier | null;
   onVideoClick: (video: Video) => void;
   onLoadMore: () => void;
 }

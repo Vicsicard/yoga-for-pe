@@ -90,12 +90,13 @@ export default function VideosPage() {
   const [mindfulMovementsPage, setMindfulMovementsPage] = useState(1)
   
   // Get subscription tier from user authentication
-  // Default to Bronze (free) tier if not authenticated or no subscription
-  const [userSubscriptionTier, setUserSubscriptionTier] = useState<SubscriptionTier>(SubscriptionTier.BRONZE)
+  // Default to null if not authenticated (will block premium content)
+  const [userSubscriptionTier, setUserSubscriptionTier] = useState<SubscriptionTier | null>(null)
   
   // Update subscription tier when user auth changes
   useEffect(() => {
-    if (user?.subscription?.plan) {
+    // If user is authenticated and has a subscription plan
+    if (isAuthenticated && user?.subscription?.plan) {
       // Convert string plan name to SubscriptionTier enum
       switch(user.subscription.plan.toLowerCase()) {
         case 'silver':
@@ -107,8 +108,14 @@ export default function VideosPage() {
         default:
           setUserSubscriptionTier(SubscriptionTier.BRONZE);
       }
+    } else if (isAuthenticated) {
+      // Authenticated but no subscription = Bronze tier
+      setUserSubscriptionTier(SubscriptionTier.BRONZE);
+    } else {
+      // Not authenticated = null (will block premium content)
+      setUserSubscriptionTier(null);
     }
-  }, [user])
+  }, [user, isAuthenticated])
   
   // Load initial videos for each category
   useEffect(() => {
@@ -357,13 +364,21 @@ export default function VideosPage() {
   };
   
   // Handle video click - check access and show premium modal if needed
-  const handleVideoClick = (video: Video) => {
-    if (hasAccessToVideo(video, null, userSubscriptionTier)) {
-      // User has access - play video
-      setSelectedVideo(video);
-      setShowVideoPlayer(true);
-    } else {
-      // User doesn't have access - show premium modal
+  const handleVideoClick = async (video: Video) => {
+    try {
+      // Properly await the async access check
+      const hasAccess = await hasAccessToVideo(video, null, userSubscriptionTier);
+      
+      if (hasAccess) {
+        setSelectedVideo(video);
+        setShowVideoPlayer(true);
+      } else {
+        setSelectedTier(video.tier);
+        setShowPremiumModal(true);
+      }
+    } catch (error) {
+      console.error('Error checking video access:', error);
+      // Default to showing premium modal on error for security
       setSelectedTier(video.tier);
       setShowPremiumModal(true);
     }

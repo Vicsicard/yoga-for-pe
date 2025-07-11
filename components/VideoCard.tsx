@@ -7,7 +7,7 @@ import { getThumbnailPath } from '../lib/thumbnail-mapping'
 
 interface VideoCardProps {
   video: Video;
-  userSubscriptionTier: SubscriptionTier;
+  userSubscriptionTier: SubscriptionTier | null;
   onClick: (video: Video) => void;
   section?: string; // Optional section parameter
 }

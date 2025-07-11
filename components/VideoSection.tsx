@@ -10,7 +10,7 @@ interface VideoSectionProps {
   description: string;
   videos: Video[];
   isLoading: boolean;
-  userSubscriptionTier: SubscriptionTier;
+  userSubscriptionTier: SubscriptionTier | null;
   onVideoClick: (video: Video) => void;
   onLoadMore: () => void;
   isExpanded?: boolean; // New prop to track if this section is showing 6 videos
