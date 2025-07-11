@@ -50,13 +50,21 @@ export async function POST(request) {
       }
     }
     
-    // If no valid JWT, use customer email from Stripe session
-    if (!userId && session.customer && session.customer.email) {
-      userEmail = session.customer.email;
-      console.log('Using customer email from Stripe session:', userEmail);
+    // If no valid JWT, try to get userId from session metadata or use customer email
+    if (!userId) {
+      // First try to get userId from session metadata
+      if (session.metadata && session.metadata.userId) {
+        userId = session.metadata.userId;
+        console.log('Using userId from session metadata:', userId);
+      }
+      // If still no userId, use customer email
+      else if (session.customer && session.customer.email) {
+        userEmail = session.customer.email;
+        console.log('Using customer email from Stripe session:', userEmail);
+      }
     }
     
-    if (!userEmail) {
+    if (!userId && !userEmail) {
       console.log('No user identification available');
       return NextResponse.json({ message: 'Unable to identify user' }, { status: 400 });
     }
@@ -69,19 +77,87 @@ export async function POST(request) {
     }
 
     // Connect to database
+    console.log('Step 1: Connecting to database...');
     await connectDB();
+    console.log('Step 1: Database connected successfully');
 
     // Find the user in our database
+    console.log('Step 2: Finding user in database...');
     let user;
     if (userId) {
+      console.log('Step 2a: Finding user by ID:', userId);
       user = await User.findById(userId);
     } else {
+      console.log('Step 2b: Finding user by email:', userEmail);
       user = await User.findOne({ email: userEmail });
     }
+    console.log('Step 2: User lookup completed');
     
     if (!user) {
       console.log('User not found in database for:', userId || userEmail);
-      return NextResponse.json({ message: 'User not found' }, { status: 404 });
+      
+      // If we searched by userId but didn't find user, try by email from Stripe session
+      if (userId && session.customer && session.customer.email) {
+        console.log('Step 3a: Trying to find user by Stripe customer email:', session.customer.email);
+        user = await User.findOne({ email: session.customer.email });
+        if (user) {
+          console.log('Step 3a: Found existing user by email:', user.email);
+        }
+      }
+      
+      // If still no user found, create a new one
+      if (!user) {
+        console.log('Step 3b: Creating new user account from Stripe session...');
+        
+        // Create user from Stripe session data
+        if (!session.customer || !session.customer.email) {
+          console.log('Cannot create user: no customer email in Stripe session');
+          return NextResponse.json({ message: 'Unable to identify or create user' }, { status: 400 });
+        }
+        
+        const customerEmail = session.customer.email;
+        const customerName = session.customer.name || customerEmail.split('@')[0];
+        
+        // Generate a temporary password (user will need to reset it)
+        const tempPassword = Math.random().toString(36).slice(-12);
+        
+        try {
+          user = new User({
+            name: customerName,
+            email: customerEmail,
+            password: tempPassword, // Will be hashed by pre-save hook
+            subscription: {
+              plan: 'bronze', // Will be updated below
+              status: 'active',
+              stripeCustomerId: session.customer.id
+            }
+          });
+          
+          await user.save();
+          console.log('Step 3b: New user created successfully:', user.email);
+        } catch (createError) {
+          console.error('Error creating user:', createError);
+          
+          // If it's a duplicate key error, try to find the existing user
+          if (createError.code === 11000) {
+            console.log('Step 3c: User already exists, finding existing user...');
+            user = await User.findOne({ email: customerEmail });
+            if (user) {
+              console.log('Step 3c: Found existing user after duplicate error:', user.email);
+            } else {
+              return NextResponse.json({ 
+                message: 'User exists but could not be retrieved', 
+                error: createError.message 
+              }, { status: 500 });
+            }
+          } else {
+            return NextResponse.json({ 
+              message: 'Failed to create user account', 
+              error: createError.message 
+            }, { status: 500 });
+          }
+        }
+      }
     }
 
     console.log('User found:', user.email);
@@ -131,7 +207,7 @@ export async function POST(request) {
     const subscriptionUpdate = {
       status: stripeSubscription ? stripeSubscription.status : 'active',
       plan: tier,
-      stripeCustomerId: session.customer,
+      stripeCustomerId: session.customer ? session.customer.id : null,
       stripeSubscriptionId: stripeSubscription ? stripeSubscription.id : null,
       currentPeriodStart: stripeSubscription ? new Date(stripeSubscription.current_period_start * 1000) : new Date(),
       currentPeriodEnd: stripeSubscription ? new Date(stripeSubscription.current_period_end * 1000) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now as fallback
@@ -168,9 +244,24 @@ export async function POST(request) {
     });
 
   } catch (error) {
-    console.error('Error verifying payment:', error);
+    console.error('=== PAYMENT VERIFICATION ERROR ===');
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    console.error('Environment variables check:');
+    console.error('- JWT_SECRET exists:', !!process.env.JWT_SECRET);
+    console.error('- STRIPE_SECRET_KEY exists:', !!process.env.STRIPE_SECRET_KEY);
+    console.error('- MONGODB_URI exists:', !!process.env.MONGODB_URI);
+    console.error('- STRIPE_SILVER_PRICE_ID exists:', !!process.env.STRIPE_SILVER_PRICE_ID);
+    console.error('- STRIPE_GOLD_PRICE_ID exists:', !!process.env.STRIPE_GOLD_PRICE_ID);
+    console.error('=====================================');
+    
     return NextResponse.json(
-      { message: 'Internal server error', error: error.message },
+      { 
+        message: 'Internal server error', 
+        error: error.message,
+        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      },
       { status: 500 }
     );
   }
