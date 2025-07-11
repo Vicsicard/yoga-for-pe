@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { connectDB } from '../../../lib/db/connect';
+import { connectDB } from '../../../../lib/db/connect';
+import User from '../../../../lib/models/User';
 import jwt from 'jsonwebtoken';
 import Stripe from 'stripe';
 
@@ -77,16 +78,12 @@ export async function GET(request) {
       debugInfo.mongodb.uriMissing = true;
     } else {
       await connectDB();
-      // Get MongoDB client from global cache
-      const { db } = global.mongo;
-      const collections = await db.listCollections().toArray();
       debugInfo.mongodb.connected = true;
-      debugInfo.mongodb.collections = collections.map(c => c.name);
       
-      // Check if users collection exists and try to find user
+      // Try to find user if token is valid
       if (debugInfo.auth.tokenValid && debugInfo.auth.tokenDecoded) {
         const userId = debugInfo.auth.tokenDecoded.userId;
-        const user = await db.collection('users').findOne({ _id: userId });
+        const user = await User.findById(userId);
         debugInfo.mongodb.userFound = !!user;
         if (user) {
           debugInfo.mongodb.userDetails = {
