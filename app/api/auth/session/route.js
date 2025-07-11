@@ -47,10 +47,12 @@ export async function GET(request) {
     
   } catch (error) {
     console.error('Session error:', error);
+    console.error('JWT_SECRET exists:', !!process.env.JWT_SECRET);
+    console.error('MONGODB_URI exists:', !!process.env.MONGODB_URI);
     
     if (error.name === 'JsonWebTokenError') {
       return NextResponse.json(
-        { error: 'Invalid token' },
+        { error: 'Invalid token', details: error.message },
         { status: 401 }
       );
     }
@@ -63,7 +65,7 @@ export async function GET(request) {
     }
     
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error.message },
       { status: 500 }
     );
   }

@@ -111,16 +111,23 @@ export async function POST(request) {
 
   } catch (error) {
     console.error('Stripe checkout error:', error);
+    console.error('Environment variables check:');
+    console.error('JWT_SECRET exists:', !!process.env.JWT_SECRET);
+    console.error('MONGODB_URI exists:', !!process.env.MONGODB_URI);
+    console.error('STRIPE_SECRET_KEY exists:', !!process.env.STRIPE_SECRET_KEY);
+    console.error('STRIPE_SILVER_PRICE_ID exists:', !!process.env.STRIPE_SILVER_PRICE_ID);
+    console.error('STRIPE_GOLD_PRICE_ID exists:', !!process.env.STRIPE_GOLD_PRICE_ID);
+    console.error('NEXT_PUBLIC_BASE_URL exists:', !!process.env.NEXT_PUBLIC_BASE_URL);
     
     if (error.name === 'JsonWebTokenError') {
       return NextResponse.json(
-        { error: 'Invalid authentication token' },
+        { error: 'Invalid authentication token', details: error.message },
         { status: 401 }
       );
     }
     
     return NextResponse.json(
-      { error: 'Failed to create checkout session' },
+      { error: 'Failed to create checkout session', details: error.message },
       { status: 500 }
     );
   }
