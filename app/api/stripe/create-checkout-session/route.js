@@ -54,21 +54,20 @@ export async function POST(request) {
       );
     }
 
-    // Define pricing
-    const prices = {
-      silver: {
-        amount: 799, // $7.99 in cents
-        name: 'Silver Plan',
-        description: 'Access to Bronze and Silver videos'
-      },
-      gold: {
-        amount: 999, // $9.99 in cents
-        name: 'Gold Plan', 
-        description: 'Access to all Bronze, Silver, and Gold videos'
-      }
+    // Use existing Stripe price IDs from environment variables
+    const priceIds = {
+      silver: process.env.STRIPE_SILVER_PRICE_ID,
+      gold: process.env.STRIPE_GOLD_PRICE_ID
     };
 
-    const selectedPrice = prices[tier];
+    const selectedPriceId = priceIds[tier];
+    
+    if (!selectedPriceId) {
+      return NextResponse.json(
+        { error: `Price ID not found for tier: ${tier}` },
+        { status: 400 }
+      );
+    }
 
     // Create or retrieve Stripe customer
     let stripeCustomerId = user.subscription.stripeCustomerId;
@@ -95,17 +94,7 @@ export async function POST(request) {
       payment_method_types: ['card'],
       line_items: [
         {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: selectedPrice.name,
-              description: selectedPrice.description,
-            },
-            unit_amount: selectedPrice.amount,
-            recurring: {
-              interval: 'month',
-            },
-          },
+          price: selectedPriceId,
           quantity: 1,
         },
       ],

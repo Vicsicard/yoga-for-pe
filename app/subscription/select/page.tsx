@@ -123,11 +123,16 @@ export default function SubscriptionSelectPage() {
         router.push('/videos?welcome=true');
       } else {
         // For Silver/Gold, redirect to Stripe checkout
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+          throw new Error('Please sign in to subscribe to a plan');
+        }
+
         const response = await fetch('/api/stripe/create-checkout-session', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+            'Authorization': `Bearer ${token}`,
           },
           body: JSON.stringify({
             tier: tier,

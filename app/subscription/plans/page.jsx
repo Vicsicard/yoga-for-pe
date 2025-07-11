@@ -64,10 +64,17 @@ export default function SubscriptionPlansPage() {
     setError('');
 
     try {
+      // Get the auth token from localStorage
+      const token = localStorage.getItem('auth_token');
+      if (!token) {
+        throw new Error('Please sign in to subscribe to a plan');
+      }
+
       const response = await fetch('/api/stripe/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ tier }),
       });
