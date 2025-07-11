@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     // Check if Stripe is configured
@@ -22,8 +24,8 @@ export async function GET() {
       const account = await stripe.account.retrieve();
       
       // Check for price IDs
-      const silverPriceId = process.env.STRIPE_PRICE_SILVER;
-      const goldPriceId = process.env.STRIPE_PRICE_GOLD;
+      const silverPriceId = process.env.STRIPE_SILVER_PRICE_ID;
+      const goldPriceId = process.env.STRIPE_GOLD_PRICE_ID;
       
       let silverPrice = null;
       let goldPrice = null;
@@ -48,9 +50,13 @@ export async function GET() {
         configured: true,
         accountId: account.id,
         accountName: account.business_profile?.name || 'Not set',
+        silverPriceId: silverPriceId,
         silverPriceConfigured: !!silverPrice,
+        goldPriceId: goldPriceId,
         goldPriceConfigured: !!goldPrice,
-        webhookSecretConfigured: !!process.env.STRIPE_WEBHOOK_SECRET
+        webhookSecretConfigured: !!process.env.STRIPE_WEBHOOK_SECRET,
+        baseUrlConfigured: !!process.env.NEXT_PUBLIC_BASE_URL,
+        baseUrl: process.env.NEXT_PUBLIC_BASE_URL
       });
     } catch (err) {
       console.error('Error verifying Stripe configuration:', err);
