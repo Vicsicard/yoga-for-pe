@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/contexts/AuthContext';
 
@@ -109,6 +109,12 @@ const PricingCard = ({ tier, tierData, onSelect, isLoading }) => {
 
 export default function SubscriptionSelectPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  
+  // Set isClient to true when component mounts (client-side only)
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
   const [selectedTier, setSelectedTier] = useState(null);
   const router = useRouter();
   const { user } = useAuth();
@@ -122,6 +128,12 @@ export default function SubscriptionSelectPage() {
         // Bronze is free - redirect to videos immediately
         router.push('/videos?welcome=true');
       } else {
+        // Only run this code on the client side
+        if (!isClient) {
+          throw new Error('Client-side functionality not available during server rendering');
+          return;
+        }
+        
         // For Silver/Gold, redirect to Stripe checkout
         const token = localStorage.getItem('auth_token');
         if (!token) {

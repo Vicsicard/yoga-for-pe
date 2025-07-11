@@ -25,9 +25,15 @@ export async function POST(request) {
 
     // Verify authentication
     const authHeader = request.headers.get('authorization');
+    console.log('Auth header present:', !!authHeader);
+    if (authHeader) {
+      console.log('Auth header starts with Bearer:', authHeader.startsWith('Bearer '));
+    }
+    
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.error('Authentication missing or invalid');
       return NextResponse.json(
-        { error: 'Authentication required' },
+        { error: 'Authentication required', message: 'Please sign in to continue' },
         { status: 401 }
       );
     }
@@ -111,6 +117,9 @@ export async function POST(request) {
 
   } catch (error) {
     console.error('Stripe checkout error:', error);
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
     console.error('Environment variables check:');
     console.error('JWT_SECRET exists:', !!process.env.JWT_SECRET);
     console.error('MONGODB_URI exists:', !!process.env.MONGODB_URI);
@@ -118,6 +127,13 @@ export async function POST(request) {
     console.error('STRIPE_SILVER_PRICE_ID exists:', !!process.env.STRIPE_SILVER_PRICE_ID);
     console.error('STRIPE_GOLD_PRICE_ID exists:', !!process.env.STRIPE_GOLD_PRICE_ID);
     console.error('NEXT_PUBLIC_BASE_URL exists:', !!process.env.NEXT_PUBLIC_BASE_URL);
+    
+    // Log request information
+    try {
+      console.error('Request headers:', JSON.stringify(Object.fromEntries(request.headers.entries())));
+    } catch (headerError) {
+      console.error('Could not log request headers:', headerError.message);
+    }
     
     if (error.name === 'JsonWebTokenError') {
       return NextResponse.json(

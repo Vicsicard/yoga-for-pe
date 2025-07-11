@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../lib/contexts/AuthContext';
 
@@ -58,12 +58,23 @@ export default function SubscriptionPlansPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isClient, setIsClient] = useState(false);
+  
+  // Set isClient to true when component mounts (client-side only)
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleSelectPlan = async (tier) => {
     setIsLoading(true);
     setError('');
 
     try {
+      // Only run this code on the client side
+      if (!isClient) {
+        throw new Error('Client-side functionality not available during server rendering');
+      }
+      
       // Get the auth token from localStorage
       const token = localStorage.getItem('auth_token');
       if (!token) {
