@@ -140,25 +140,36 @@ export default function SubscriptionSelectPage() {
           throw new Error('Please sign in to subscribe to a plan');
         }
 
-        const response = await fetch('/api/stripe/create-checkout-session', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            tier: tier,
-            userId: user?.id,
-          }),
-        });
+        try {
+          const response = await fetch('/api/stripe/create-checkout-session', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              tier: tier,
+              userId: user?.id,
+            }),
+          });
 
-        const data = await response.json();
+          // Handle server errors
+          if (response.status === 500) {
+            console.error('Server error when creating checkout session');
+            throw new Error('Server error. Please try again later or contact support.');
+          }
 
-        if (response.ok && data.url) {
-          // Redirect to Stripe checkout
-          window.location.href = data.url;
-        } else {
-          throw new Error(data.error || 'Failed to create checkout session');
+          const data = await response.json();
+
+          if (response.ok && data.url) {
+            // Redirect to Stripe checkout
+            window.location.href = data.url;
+          } else {
+            throw new Error(data.error || 'Failed to create checkout session');
+          }
+        } catch (fetchError) {
+          console.error('Fetch error:', fetchError);
+          throw new Error('Network error. Please check your connection and try again.');
         }
       }
     } catch (error) {
