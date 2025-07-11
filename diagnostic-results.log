@@ -1,0 +1,55 @@
+[2025-07-11T17:32:42.701Z] === YOGA FOR PE DIAGNOSTIC TEST ===
+[2025-07-11T17:32:42.705Z] Running diagnostics at 2025-07-11T17:32:42.705Z
+[2025-07-11T17:32:42.706Z] 
+=== ENVIRONMENT VARIABLES ===
+[2025-07-11T17:32:42.706Z] NODE_ENV: Not set
+[2025-07-11T17:32:42.707Z] MONGODB_URI exists: true
+[2025-07-11T17:32:42.708Z] JWT_SECRET exists: true
+[2025-07-11T17:32:42.708Z] STRIPE_SECRET_KEY exists: true
+[2025-07-11T17:32:42.709Z] STRIPE_PUBLISHABLE_KEY exists: true
+[2025-07-11T17:32:42.709Z] STRIPE_SILVER_PRICE_ID exists: true
+[2025-07-11T17:32:42.710Z] STRIPE_GOLD_PRICE_ID exists: true
+[2025-07-11T17:32:42.711Z] STRIPE_WEBHOOK_SECRET exists: true
+[2025-07-11T17:32:42.712Z] 
+=== MONGODB CONNECTION TEST ===
+[2025-07-11T17:32:42.713Z] Detected database name: yoga-for-pe
+[2025-07-11T17:32:42.729Z] Connecting to MongoDB...
+[2025-07-11T17:32:43.589Z] ✅ MongoDB connection successful
+[2025-07-11T17:32:43.591Z] Testing database operations...
+[2025-07-11T17:32:43.650Z] Found 1 collections:
+[2025-07-11T17:32:43.651Z] - users
+[2025-07-11T17:32:43.710Z] Found 1 users in the database
+[2025-07-11T17:32:43.805Z] Sample user structure:
+[2025-07-11T17:32:43.806Z] {
+  "_id": "exists",
+  "name": "exists",
+  "subscription": "exists",
+  "stripeCustomerId": "missing"
+}
+[2025-07-11T17:32:43.810Z] MongoDB connection closed
+[2025-07-11T17:32:43.810Z] 
+=== STRIPE CONNECTION TEST ===
+[2025-07-11T17:32:43.811Z] Initializing Stripe...
+[2025-07-11T17:32:43.816Z] Testing account access...
+[2025-07-11T17:32:44.279Z] ✅ Connected to Stripe account: acct_1QsXDUFJNbys2kBX
+[2025-07-11T17:32:44.280Z] 
+Testing price IDs...
+[2025-07-11T17:32:44.437Z] ✅ Silver price ID valid: price_1RjTJgFJNbys2kBXQYYBks8S
+[2025-07-11T17:32:44.438Z]    Product: prod_SemtucxciB4GPs
+[2025-07-11T17:32:44.439Z]    Amount: 7.99 usd
+[2025-07-11T17:32:44.440Z]    Recurring: Yes
+[2025-07-11T17:32:44.597Z] ✅ Gold price ID valid: price_1RjTJhFJNbys2kBXbUuiR7a9
+[2025-07-11T17:32:44.597Z]    Product: prod_SemtB5mZQ87g7r
+[2025-07-11T17:32:44.598Z]    Amount: 9.99 usd
+[2025-07-11T17:32:44.599Z]    Recurring: Yes
+[2025-07-11T17:32:44.599Z] 
+Testing checkout session creation...
+[2025-07-11T17:32:44.996Z] ✅ Checkout session created successfully: cs_live_a1yq4pEAGdGZEno0XGRi6lB7wpnLlXX6Mm23mRxgPUQqaa4PRkU7F4cp2t
+[2025-07-11T17:32:44.997Z]    URL: https://checkout.stripe.com/c/pay/cs_live_a1yq4pEAGdGZEno0XGRi6lB7wpnLlXX6Mm23mRxgPUQqaa4PRkU7F4cp2t#fidkdWxOYHwnPyd1blppbHNgWjA0VHZdQVBDT0tnfHY3bkddf0kyR0JvNn9IbDdkT3NvN1AxUEljVjJfQDZdT300f29TV31TaU1pS2JQYmx9Rj1KMDBnNjRxd25QbW1Xd11AN3I3TENJT3dpNTU0QkZAfWIxaicpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl
+[2025-07-11T17:32:44.998Z] 
+=== DIAGNOSTIC SUMMARY ===
+[2025-07-11T17:32:44.998Z] MongoDB: ✅ PASSED
+[2025-07-11T17:32:44.999Z] Stripe: ✅ PASSED
+[2025-07-11T17:32:45.000Z] 
+Diagnostic test completed at 2025-07-11T17:32:45.000Z
+[2025-07-11T17:32:45.000Z] Full results saved to diagnostic-results.log
