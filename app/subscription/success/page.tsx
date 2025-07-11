@@ -27,21 +27,23 @@ function SuccessContent() {
         // Get the current token from localStorage
         const token = localStorage.getItem('token');
         
-        if (!token) {
-          setStatus('error');
-          setError('Authentication token not found. Please log in again.');
-          return;
-        }
-
         console.log('Verifying payment with session ID:', sessionId);
+        console.log('Token available:', !!token);
 
         // Call our API to verify the subscription and refresh the token
+        // The API can now handle cases where token is missing
+        const headers = {
+          'Content-Type': 'application/json'
+        };
+        
+        // Add authorization header only if token exists
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        
         const response = await fetch('/api/subscription/verify-payment', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
+          headers,
           body: JSON.stringify({ sessionId })
         });
 
@@ -167,14 +169,21 @@ function SuccessContent() {
                 </Link>
               </div>
             ) : status === 'error' ? (
-              <div className="space-y-2">
-                <Link
-                  href="/videos"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  View Videos
-                </Link>
-                <br />
+              <div className="space-y-3">
+                <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                  <Link
+                    href="/videos"
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
+                    View Videos
+                  </Link>
+                  <Link
+                    href="/auth/login"
+                    className="inline-flex items-center px-4 py-2 border border-indigo-300 text-sm font-medium rounded-md text-indigo-700 bg-indigo-50 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
+                    Login
+                  </Link>
+                </div>
                 <button
                   onClick={() => window.location.reload()}
                   className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"

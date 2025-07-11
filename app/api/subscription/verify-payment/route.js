@@ -10,26 +10,7 @@ export async function POST(request) {
   try {
     console.log('Payment verification request received');
     
-    // Get the authorization header
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.log('Missing or invalid authorization header');
-      return NextResponse.json({ message: 'Authorization token required' }, { status: 401 });
-    }
-
-    const token = authHeader.split(' ')[1];
-    
-    // Verify the JWT token
-    let decoded;
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log('JWT verified for user:', decoded.userId);
-    } catch (jwtError) {
-      console.log('JWT verification failed:', jwtError.message);
-      return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
-    }
-
-    // Get the session ID from the request body
+    // Get the session ID from the request body first
     const { sessionId } = await request.json();
     if (!sessionId) {
       console.log('Missing session ID');
@@ -38,8 +19,10 @@ export async function POST(request) {
 
     console.log('Verifying Stripe session:', sessionId);
 
-    // Retrieve the Stripe checkout session
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    // Retrieve the Stripe checkout session first to get customer info
+    const session = await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ['customer']
+    });
     
     if (!session) {
       console.log('Stripe session not found');
@@ -48,6 +31,35 @@ export async function POST(request) {
 
     console.log('Stripe session status:', session.payment_status);
     console.log('Session customer:', session.customer);
+
+    // Get user identification - either from JWT token or from Stripe session
+    let userId = null;
+    let userEmail = null;
+    
+    // Try to get user from JWT token first
+    const authHeader = request.headers.get('authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        userId = decoded.userId;
+        userEmail = decoded.email;
+        console.log('JWT verified for user:', userId);
+      } catch (jwtError) {
+        console.log('JWT verification failed, will use session customer info:', jwtError.message);
+      }
+    }
+    
+    // If no valid JWT, use customer email from Stripe session
+    if (!userId && session.customer && session.customer.email) {
+      userEmail = session.customer.email;
+      console.log('Using customer email from Stripe session:', userEmail);
+    }
+    
+    if (!userEmail) {
+      console.log('No user identification available');
+      return NextResponse.json({ message: 'Unable to identify user' }, { status: 400 });
+    }
     console.log('Session metadata:', session.metadata);
 
     // Verify the payment was successful
@@ -59,10 +71,16 @@ export async function POST(request) {
     // Connect to database
     await connectDB();
 
-    // Find the user
-    const user = await User.findById(decoded.userId);
+    // Find the user in our database
+    let user;
+    if (userId) {
+      user = await User.findById(userId);
+    } else {
+      user = await User.findOne({ email: userEmail });
+    }
+    
     if (!user) {
-      console.log('User not found in database');
+      console.log('User not found in database for:', userId || userEmail);
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
