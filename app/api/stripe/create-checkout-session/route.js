@@ -111,6 +111,8 @@ export async function POST(request) {
         userId: user._id.toString(),
         tier: tier,
       },
+      // Enable coupon code entry field
+      allow_promotion_codes: true,
     });
 
     return NextResponse.json({ url: session.url });
