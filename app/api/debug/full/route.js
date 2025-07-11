@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { connectToDatabase } from '../../../lib/db/mongodb';
+import { connectDB } from '../../../lib/db/connect';
 import jwt from 'jsonwebtoken';
 import Stripe from 'stripe';
 
@@ -76,7 +76,9 @@ export async function GET(request) {
     if (!process.env.MONGODB_URI) {
       debugInfo.mongodb.uriMissing = true;
     } else {
-      const { db } = await connectToDatabase();
+      await connectDB();
+      // Get MongoDB client from global cache
+      const { db } = global.mongo;
       const collections = await db.listCollections().toArray();
       debugInfo.mongodb.connected = true;
       debugInfo.mongodb.collections = collections.map(c => c.name);
