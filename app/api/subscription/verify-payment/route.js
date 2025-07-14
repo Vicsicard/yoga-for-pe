@@ -31,6 +31,9 @@ export async function POST(request) {
 
     console.log('Stripe session status:', session.payment_status);
     console.log('Session customer:', session.customer);
+    console.log('Session metadata:', session.metadata);
+    console.log('Session mode:', session.mode);
+    console.log('Session subscription:', session.subscription);
 
     // Get user identification - either from JWT token or from Stripe session
     let userId = null;
@@ -185,9 +188,17 @@ export async function POST(request) {
       }
     }
 
-    // Determine the subscription tier based on the price ID
+    // Determine the subscription tier based on session metadata first (most reliable)
+    // Then fall back to price ID if metadata is not available
     let tier = 'bronze';
-    if (session.line_items) {
+    
+    // First check session metadata for tier information (set during checkout creation)
+    if (session.metadata && session.metadata.tier) {
+      console.log('Using tier from session metadata:', session.metadata.tier);
+      tier = session.metadata.tier.toLowerCase();
+    }
+    // If no tier in metadata, try to determine from line items
+    else if (session.line_items) {
       const lineItems = await stripe.checkout.sessions.listLineItems(sessionId);
       if (lineItems.data.length > 0) {
         const priceId = lineItems.data[0].price.id;
@@ -199,6 +210,12 @@ export async function POST(request) {
           tier = 'gold';
         }
       }
+    }
+    
+    // Final check - if we have a subscription object from Stripe, check its metadata too
+    if (stripeSubscription && stripeSubscription.metadata && stripeSubscription.metadata.tier) {
+      console.log('Using tier from subscription metadata:', stripeSubscription.metadata.tier);
+      tier = stripeSubscription.metadata.tier.toLowerCase();
     }
 
     console.log('Determined subscription tier:', tier);
