@@ -58,26 +58,38 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    // For now, provide basic access logic
-    // TODO: Implement proper subscription service integration with user database
+    // Get user's subscription tier from JWT token
+    const userSubscription = decoded.subscription;
+    console.log('User subscription from JWT:', userSubscription);
+    
+    // Default to Bronze if no subscription info in token
+    const userTier = userSubscription?.plan?.toLowerCase() || 'bronze';
+    console.log('User tier:', userTier);
+    
     let hasAccess = false;
     
-    // Basic access logic - authenticated users get Bronze access by default
-    // TODO: Fetch user subscription status from database using userId
+    // Check access based on video tier and user's subscription tier
     switch (videoTier) {
       case SubscriptionTier.BRONZE:
-        // All authenticated users can access Bronze (free) content
+        // Bronze videos are accessible to everyone
         hasAccess = true;
         break;
+      
       case SubscriptionTier.SILVER:
-      case SubscriptionTier.GOLD:
-        // Premium tiers require subscription - placeholder logic
-        // TODO: Check user's actual subscription status from database
-        hasAccess = false;
+        // Silver videos are accessible to Silver and Gold subscribers
+        hasAccess = userTier === 'silver' || userTier === 'gold';
         break;
+      
+      case SubscriptionTier.GOLD:
+        // Gold videos are only accessible to Gold subscribers
+        hasAccess = userTier === 'gold';
+        break;
+      
       default:
         hasAccess = false;
     }
+    
+    console.log(`Access check for ${videoTier} video with user tier ${userTier}: ${hasAccess ? 'GRANTED' : 'DENIED'}`)
     
     return NextResponse.json({ hasAccess });
   } catch (error: any) {

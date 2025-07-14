@@ -235,23 +235,41 @@ export async function hasAccessToVideo(video: Video, userId?: string | null, use
     } else {
       // For client-side, we'll need to make an API call
       try {
+        console.log(`Checking access for video tier: ${video.tier}, user tier: ${userTier || 'not authenticated'}`);
+        
+        // Get the JWT token from localStorage
+        let token = null;
+        if (typeof window !== 'undefined') {
+          token = localStorage.getItem('token');
+          console.log('JWT token available:', !!token);
+        }
+        
+        // Set up headers with authorization if token exists
+        const headers: HeadersInit = {
+          'Content-Type': 'application/json',
+        };
+        
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        
         const response = await fetch(`/api/subscription/check-access?videoTier=${video.tier}`, {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers,
         });
         
         if (!response.ok) {
-          throw new Error('Failed to check subscription access');
+          const errorData = await response.json();
+          console.error('Access check failed:', errorData);
+          throw new Error(`Failed to check subscription access: ${errorData.error || response.statusText}`);
         }
         
         const data = await response.json();
+        console.log(`Access check result for tier ${video.tier}: ${data.hasAccess ? 'GRANTED' : 'DENIED'}`);
         return data.hasAccess;
-      } catch (apiError) {
-        console.error('Error checking subscription access via API:', apiError);
-        // Fall back to the provided tier or BRONZE if API call fails
-        return (userTier || SubscriptionTier.BRONZE) >= video.tier;
+      } catch (error) {
+        console.error('Error checking video access:', error);
+        return false; // Default to no access on error
       }
     }
   } catch (error) {
