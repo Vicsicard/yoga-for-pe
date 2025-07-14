@@ -130,7 +130,7 @@ export default function SubscriptionPlansPage() {
         'Email support',
       ],
       tier: 'silver',
-      isPopular: true,
+      isPopular: false,
     },
     {
       title: 'Gold',
@@ -143,7 +143,7 @@ export default function SubscriptionPlansPage() {
         'Early access to new content',
       ],
       tier: 'gold',
-      isPopular: false,
+      isPopular: true,
     },
   ];
 

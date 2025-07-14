@@ -20,7 +20,7 @@ const subscriptionTiers = {
     name: "Silver", 
     price: 7.99,
     description: "Perfect for regular practice",
-    popular: true,
+    popular: false,
     features: [
       "Everything in Bronze",
       "Access to Silver premium videos",
@@ -33,7 +33,7 @@ const subscriptionTiers = {
     name: "Gold",
     price: 9.99, 
     description: "Complete access",
-    popular: false,
+    popular: true,
     features: [
       "Everything in Bronze & Silver",
       "Access to Gold exclusive videos", 
