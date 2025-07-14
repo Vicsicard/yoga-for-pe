@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { FiLock, FiPlay, FiInfo } from 'react-icons/fi'
 import { Video, SubscriptionTier, hasAccessToVideo } from '../lib/vimeo-browser'
 import { getThumbnailPath } from '../lib/thumbnail-mapping'
+import { useAuth } from '../lib/contexts/AuthContext'
 
 interface VideoCardProps {
   video: Video;
@@ -54,16 +55,35 @@ export default function VideoCard({ video, userSubscriptionTier, onClick, sectio
   // Async access check
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
   const [showFullDescription, setShowFullDescription] = useState(false);
+  
+  // Get user ID from auth context
+  let userId = null;
+  try {
+    const { user } = useAuth();
+    userId = user?.id || null;
+    console.log('VideoCard - User ID:', userId);
+    console.log('VideoCard - User subscription tier:', userSubscriptionTier);
+  } catch (error) {
+    console.error('Auth error in VideoCard:', error);
+  }
 
   // Check access when video or tier changes
   React.useEffect(() => {
     let isMounted = true;
     setHasAccess(null); // reset before checking
-    hasAccessToVideo(video, null, userSubscriptionTier)
-      .then(result => { if (isMounted) setHasAccess(result); })
-      .catch(() => { if (isMounted) setHasAccess(false); });
+    hasAccessToVideo(video, userId, userSubscriptionTier)
+      .then(result => { 
+        if (isMounted) {
+          console.log(`Access check for video ${video.title}: ${result ? 'GRANTED' : 'DENIED'}`);
+          setHasAccess(result); 
+        }
+      })
+      .catch((error) => { 
+        console.error(`Access check error for video ${video.title}:`, error);
+        if (isMounted) setHasAccess(false); 
+      });
     return () => { isMounted = false; };
-  }, [video, userSubscriptionTier]);
+  }, [video, userSubscriptionTier, userId]);
   
   // Handle mouse events
   const handleInfoClick = (e: React.MouseEvent) => {

@@ -366,8 +366,14 @@ export default function VideosPage() {
   // Handle video click - check access and show premium modal if needed
   const handleVideoClick = async (video: Video) => {
     try {
-      // Properly await the async access check
-      const hasAccess = await hasAccessToVideo(video, null, userSubscriptionTier);
+      console.log('Video click - checking access for:', video.title);
+      console.log('Video click - user ID:', user?.id);
+      console.log('Video click - user subscription tier:', userSubscriptionTier);
+      
+      // Properly await the async access check with user ID
+      const hasAccess = await hasAccessToVideo(video, user?.id || null, userSubscriptionTier);
+      
+      console.log(`Access check result for ${video.title}: ${hasAccess ? 'GRANTED' : 'DENIED'}`);
       
       if (hasAccess) {
         setSelectedVideo(video);

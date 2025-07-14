@@ -76,11 +76,20 @@ export default function PremiumModal({ selectedTier, onClose }: PremiumModalProp
     try {
       logDebug('Creating checkout session', { tier: tier === SubscriptionTier.SILVER ? 'SILVER' : 'GOLD' });
       
-      // Call API to create checkout session
+      // Get the auth token from localStorage
+      const token = localStorage.getItem('auth_token');
+      logDebug('Auth token available:', !!token);
+      
+      if (!token) {
+        throw new Error('Authentication token not found. Please sign in again.');
+      }
+      
+      // Call API to create checkout session with auth token
       const response = await fetch('/api/stripe/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           tier: tier === SubscriptionTier.SILVER ? 'SILVER' : 'GOLD',
