@@ -240,7 +240,7 @@ export async function hasAccessToVideo(video: Video, userId?: string | null, use
         // Get the JWT token from localStorage
         let token = null;
         if (typeof window !== 'undefined') {
-          token = localStorage.getItem('token');
+          token = localStorage.getItem('auth_token');
           console.log('JWT token available:', !!token);
         }
         

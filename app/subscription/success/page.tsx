@@ -25,7 +25,7 @@ function SuccessContent() {
         setStatus('verifying');
         
         // Get the current token from localStorage
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('auth_token');
         
         console.log('Verifying payment with session ID:', sessionId);
         console.log('Token available:', !!token);
@@ -57,7 +57,7 @@ function SuccessContent() {
         
         // Save the new token with updated subscription info
         if (data.token) {
-          localStorage.setItem('token', data.token);
+          localStorage.setItem('auth_token', data.token);
           console.log('JWT token updated with new subscription info');
         }
         
