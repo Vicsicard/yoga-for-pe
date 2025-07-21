@@ -13,7 +13,7 @@ import { FiUsers, FiAward, FiHeart, FiBook, FiCheckCircle, FiArrowRight, FiPlay 
 import { useState, useEffect } from 'react'
 import { getFeaturedFreeVideos, Video, SubscriptionTier, VideoCategory } from '../lib/vimeo-browser'
 import Link from 'next/link'
-import FeaturedVideos from '../components/FeaturedVideos'
+import FeaturedVideos from '../components/FeaturedVideosNew'
 
 // Content bubbles for Bend, Brighten, Bloom section
 const contentBubbles = [
