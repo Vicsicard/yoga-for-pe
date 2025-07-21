@@ -11,6 +11,8 @@ export const thumbnailMapping: Record<string, string> = {
   'Box Breath Flowing into Calming Heart': 'Box Breath flowing into Calming Heart.jpg',
   'High-5 Meditation': 'High-5 Meditation.jpg',
   'I AM Flow Mediation': 'I Am.jpg',
+  'I AM Flow Meditation': 'I Am.jpg',
+  'Long Deep Breath: Breath in Peace; Breath out Stress': 'Breath in Peace & Out Stress.jpg',
   'I AM Instructions & Flow Meditation': 'I Am.jpg',
   'Breath in Peace & Out Stress': 'Breath in Peace & Out Stress.jpg',
   'Kirtan Kriya': 'Kirtan Kriya.jpg',
