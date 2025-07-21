@@ -27,7 +27,7 @@ export const thumbnailMapping: Record<string, string> = {
   'Sun Salutation Foundation': 'Sun Salutation Foundations.jpg',
   'Sunrise Sun Salutation Extra': 'Sunrise Sun Salutation Extra .jpg',
   'Sunrise Salutation: Flowing with Lake Michigan\'s First Light': 'Sunrise Sun Salutation Extra .jpg',
-  'Rise & Shine: Sun Salutation with positive Affirmations (Because You\'re a Superhero)': 'Rise & Shine Thumbnail.jpg',
+  'Rise & Shine: Sun Salutation with positive Affirmations (Because You\'re a Superhero)': 'Rise-and-Shine-Thumbnail.jpg',
   'Ab Circle 1': 'Ab Circle 1.jpg',
   'Ab Circle 2': 'Ab Circle 2.jpg',
   'Branch Out': 'Branch Out.jpg',
