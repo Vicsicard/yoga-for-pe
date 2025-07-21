@@ -45,17 +45,17 @@ export default function FeaturedVideos({ videos, isLoading }: FeaturedVideosProp
                       }}
                     />
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary-500/20 to-primary-800/20 group-hover:from-primary-500/30 group-hover:to-primary-800/30 transition-all" />
+
                   
                   {/* Play button */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-16 h-16 rounded-full bg-primary-600/90 text-white flex items-center justify-center transition-transform hover:scale-110">
+                    <div className="w-16 h-16 rounded-full bg-gray-800/90 text-white flex items-center justify-center transition-transform hover:scale-110">
                       <FiPlay size={24} />
                     </div>
                   </div>
                   
                   {/* Category and Free badge */}
-                  <div className="absolute top-3 right-3 bg-primary-600 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center">
+                  <div className="absolute top-3 right-3 bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center">
                     {(video.category === 'meditation' ? 'Meditation' : 
                      video.category === 'yoga-for-pe' ? 'Yoga for PE' : 'Relaxation')} • Free
                   </div>
@@ -73,7 +73,7 @@ export default function FeaturedVideos({ videos, isLoading }: FeaturedVideosProp
                 <CardFooter>
                   <div className="flex justify-between items-center w-full">
                     <span className="text-xs bg-gray-100 px-2 py-1 rounded">{video.level}</span>
-                    <span className="text-xs text-primary-600">Free</span>
+                    <span className="text-xs text-blue-600">Free</span>
                   </div>
                 </CardFooter>
               </Card>

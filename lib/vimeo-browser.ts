@@ -283,9 +283,9 @@ export async function hasAccessToVideo(video: Video, userId?: string | null, use
 export async function getFeaturedFreeVideos(): Promise<Video[]> {
   // Define the specific videos we want to feature
   const featuredVideoIds = [
-    '457053392', // Meditation - I Am Meditation
     '1095788590', // Yoga for PE - Ab Circle 1
-    '452426275'  // Relaxation - Body Scan with Flowers
+    '452426275',  // Relaxation - Body Scan with Flowers
+    '457053392'   // Meditation - I Am Meditation
   ];
   
   console.log('Fetching featured videos by IDs:', featuredVideoIds);

@@ -136,19 +136,8 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  // Fallback videos in case the API calls fail
+  // Fallback videos in case the API calls fail - ordered as requested: Yoga for PE first, Relaxation second, Meditation third
   const fallbackVideos: Video[] = [
-    {
-      id: 457053392,
-      title: 'I Am Meditation',
-      description: 'A guided meditation to help you connect with your inner self and find peace.',
-      duration: '1:08',
-      level: 'Beginner',
-      thumbnail: 'https://i.vimeocdn.com/video/1016790651-4c20aab2a41f4d5a4e5e9c9ec5e9b3b9a1b7c4f4d5e5c4f4d5e5c4f4d5e5c4f4_640',
-      vimeoId: '457053392',
-      tier: SubscriptionTier.BRONZE,
-      category: VideoCategory.MEDITATION
-    },
     {
       id: 1095788590,
       title: 'Ab Circle',
@@ -170,6 +159,17 @@ export default function Home() {
       vimeoId: '452426275',
       tier: SubscriptionTier.BRONZE,
       category: VideoCategory.RELAXATION
+    },
+    {
+      id: 457053392,
+      title: 'I Am Meditation',
+      description: 'A guided meditation to help you connect with your inner self and find peace.',
+      duration: '1:08',
+      level: 'Beginner',
+      thumbnail: 'https://i.vimeocdn.com/video/1016790651-4c20aab2a41f4d5a4e5e9c9ec5e9b3b9a1b7c4f4d5e5c4f4d5e5c4f4d5e5c4f4_640',
+      vimeoId: '457053392',
+      tier: SubscriptionTier.BRONZE,
+      category: VideoCategory.MEDITATION
     }
   ];
 
@@ -337,9 +337,9 @@ export default function Home() {
       <Section bgColor="dark" spacing="lg">
         <Container size="sm">
           <div className="text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Transform Your PE Curriculum?</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Shake Up Your Fitness Routine?</h2>
             <p className="text-lg text-white/80 mb-8">
-              Join thousands of schools already enhancing their physical education programs with yoga.
+              From classrooms to living rooms, join thousands of individuals, educators, and schools on a journey to bend, brighten, and bloom through the power of yoga!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button href="/videos" size="lg">
