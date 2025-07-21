@@ -5,8 +5,8 @@ export const thumbnailMapping: Record<string, string> = {
   // Meditation videos
   'Calming Heart at the Royal Arch': 'Calming Heart at the Royal Arch.jpg',
   'Nostril Navigator: Alt Nostril Breath': 'Nostril Navigator Alt Nostril Breath.jpg',
-  'Alternate Nostril Breathing Flow': 'Nostril Navigator Alt Nostril Breath.jpg',
-  'Alternate Nostril Breathing Instruction & Flow': 'Nostril Navigator Alt Nostril Breath.jpg',
+  'Alternate Nostril Breathing Flow': 'Alternate Nostril Breathing Flow.jpg',
+  'Alternate Nostril Breathing Instruction & Flow': 'Alternate Nostril Breathing Flow.jpg',
   'Sun Salutation : Your Yoga Foundation': 'Sun Salutation Foundations.jpg',
   'Box Breath Flowing into Calming Heart': 'Box Breath flowing into Calming Heart.jpg',
   'High-5 Meditation': 'High-5 Meditation.jpg',
@@ -27,7 +27,7 @@ export const thumbnailMapping: Record<string, string> = {
   'Sun Salutation Foundation': 'Sun Salutation Foundations.jpg',
   'Sunrise Sun Salutation Extra': 'Sunrise Sun Salutation Extra .jpg',
   'Sunrise Salutation: Flowing with Lake Michigan\'s First Light': 'Sunrise Sun Salutation Extra .jpg',
-
+  'Rise & Shine: Sun Salutation with positive Affirmations (Because You\'re a Superhero)': 'Rise & Shine Sun Salutation with positive Affirmations.jpg',
   'Ab Circle 1': 'Ab Circle 1.jpg',
   'Ab Circle 2': 'Ab Circle 2.jpg',
   'Branch Out': 'Branch Out.jpg',

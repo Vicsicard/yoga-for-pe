@@ -54,10 +54,14 @@ export function loadVideosFromCatalog(category: VideoCategory): Video[] {
   
   // Make sure all videos have proper thumbnail paths
   return videos.map(video => {
-    // Apply thumbnail mapping
+    // Try Vimeo thumbnail first, then fall back to local mapping
+    const localThumbnail = getThumbnailPath(video.title, categoryKey);
+    const hasLocalMapping = localThumbnail !== `/thumbnails/${categoryKey}/default.jpg`;
+    
     return {
       ...video,
-      thumbnail: getThumbnailPath(video.title, categoryKey)
+      // Use local mapping if available, otherwise keep Vimeo thumbnail
+      thumbnail: hasLocalMapping ? localThumbnail : video.thumbnail
     };
   });
 }
