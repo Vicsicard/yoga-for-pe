@@ -27,6 +27,7 @@ export const thumbnailMapping: Record<string, string> = {
   'Sun Salutation Foundation': 'Sun Salutation Foundations.jpg',
   'Sunrise Sun Salutation Extra': 'Sunrise Sun Salutation Extra .jpg',
   'Sunrise Salutation: Flowing with Lake Michigan\'s First Light': 'Sunrise Sun Salutation Extra .jpg',
+  'Rise & Shine: Sun Salutation with positive Affirmations (Because You\'re a Superhero)': 'Rise & Shine Sun Salutation with positive Affirmations.jpg',
   'Ab Circle 1': 'Ab Circle 1.jpg',
   'Ab Circle 2': 'Ab Circle 2.jpg',
   'Branch Out': 'Branch Out.jpg',
@@ -41,6 +42,7 @@ export const thumbnailMapping: Record<string, string> = {
 
   // Mindful Movements videos
   'The Flower by Michael Franti & Spearhead, Victoria Canal': 'The Flower.jpg',
+  'The Flower Video': 'The Flower Video.jpg',
   'The Champion': 'The Champion.jpg',
   'Champion by Carrie Underwood, Ludacris': 'The Champion.jpg',
   'Thunder': 'Thunder.jpg',
