@@ -46,7 +46,7 @@ export function loadVideosFromCatalog(category: VideoCategory): Video[] {
     description: video.description,
     duration: video.length || '0:00',
     level: 'Beginner', // Default level if not specified
-    thumbnail: `/thumbnails/${categoryKey}/${encodeURIComponent(video.title)}.jpg`, // Set thumbnail based on category and title
+    thumbnail: video.id ? `https://vumbnail.com/${video.id}.jpg` : `/thumbnails/${categoryKey}/${encodeURIComponent(video.title)}.jpg`, // Use Vimeo thumbnail if available
     vimeoId: video.id,
     tier: tierMap[video.tier] || SubscriptionTier.BRONZE,
     category: category
