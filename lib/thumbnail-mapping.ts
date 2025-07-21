@@ -5,6 +5,9 @@ export const thumbnailMapping: Record<string, string> = {
   // Meditation videos
   'Calming Heart at the Royal Arch': 'Calming Heart at the Royal Arch.jpg',
   'Nostril Navigator: Alt Nostril Breath': 'Nostril Navigator Alt Nostril Breath.jpg',
+  'Alternate Nostril Breathing Flow': 'Nostril Navigator Alt Nostril Breath.jpg',
+  'Alternate Nostril Breathing Instruction & Flow': 'Nostril Navigator Alt Nostril Breath.jpg',
+  'Sun Salutation : Your Yoga Foundation': 'Sun Salutation Foundations.jpg',
   'Box Breath Flowing into Calming Heart': 'Box Breath flowing into Calming Heart.jpg',
   'High-5 Meditation': 'High-5 Meditation.jpg',
   'I AM Flow Mediation': 'I Am.jpg',
