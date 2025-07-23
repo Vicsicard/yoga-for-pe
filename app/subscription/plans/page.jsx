@@ -112,9 +112,9 @@ export default function SubscriptionPlansPage() {
       title: 'Bronze',
       price: '0',
       features: [
-        'All Free Videos',
-        'Free Mindful Movements',
-        'As the website grows so will the free content'
+        '--All Free Videos',
+        '--Free Mindful Movements',
+        '--As the website grows so will the free content'
       ],
       tier: 'bronze',
       isPopular: false,
@@ -123,12 +123,12 @@ export default function SubscriptionPlansPage() {
       title: 'Silver',
       price: '7.99',
       features: [
-        'All Free Videos',
-        'Free Mindful Movements',
-        'All Yoga Flows',
-        'Supporting documents of how Yoga supports the SHAPE American National Standards',
-        'Monthly Blog/Vlog (coming soon)',
-        'As the website grows so will the free & Silver Content'
+        '--All Free Videos',
+        '--Free Mindful Movements',
+        '--All Yoga Flows',
+        '--Supporting documents of how Yoga supports the SHAPE American National Standards',
+        '--Monthly Blog/Vlog (coming soon)',
+        '--As the website grows so will the free & Silver Content'
       ],
       tier: 'silver',
       isPopular: false,
@@ -137,16 +137,16 @@ export default function SubscriptionPlansPage() {
       title: 'Gold',
       price: '9.99',
       features: [
-        'All Free Videos',
-        'Free Mindful Movements',
-        'All Yoga Flows',
-        'Supporting documents of how Yoga supports the SHAPE American National Standards',
-        'Monthly Blog/Vlog (coming soon)',
-        'Instructional Videos',
-        'Travel Videos done on location around the world',
-        'New Video(s) every month',
-        'Exclusive Gold only opportunities',
-        'As the website grows so will the Bronze (free), Silver, & Gold content'
+        '--All Free Videos',
+        '--Free Mindful Movements',
+        '--All Yoga Flows',
+        '--Supporting documents of how Yoga supports the SHAPE American National Standards',
+        '--Monthly Blog/Vlog (coming soon)',
+        '--Instructional Videos',
+        '--Travel Videos done on location around the world',
+        '--New Video(s) every month',
+        '--Exclusive Gold only opportunities',
+        '--As the website grows so will the Bronze (free), Silver, & Gold content'
       ],
       tier: 'gold',
       isPopular: true,
