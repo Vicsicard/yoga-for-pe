@@ -140,7 +140,7 @@ export default function Home() {
   const fallbackVideos: Video[] = [
     {
       id: 1095788590,
-      title: 'Ab Circle',
+      title: 'Ab Circle 1',
       description: 'A fun, full-circle core workout that targets every major ab muscle in one dynamic loop.',
       duration: '1:30',
       level: 'Beginner',
@@ -151,7 +151,7 @@ export default function Home() {
     },
     {
       id: 452426275,
-      title: 'Zenevate Body Scan',
+      title: 'Body Scan with Flowers',
       description: 'A relaxing body scan meditation to help you unwind and connect with your body.',
       duration: '1:00',
       level: 'Beginner',

@@ -315,7 +315,7 @@ export async function getFeaturedFreeVideos(): Promise<Video[]> {
   const fallbackVideos: Video[] = [
     {
       id: 457053392,
-      title: 'I Am',
+      title: 'I Am Meditation',
       description: 'A guided meditation to help you connect with your inner self and find peace.',
       duration: '1:08',
       level: 'Beginner',
