@@ -105,6 +105,25 @@ export default function VideoCard({ video, userSubscriptionTier, onClick, sectio
           className="w-full h-full object-cover"
           onError={(e) => {
             console.log(`Failed to load thumbnail: ${video.title}`);
+            // Fallback to Vimeo thumbnail if available, otherwise use a category default
+            const target = e.target as HTMLImageElement;
+            if (video.vimeoId) {
+              target.src = `https://vumbnail.com/${video.vimeoId}.jpg`;
+            } else {
+              const category = getCategoryFolder(video, section);
+              // Use category-specific defaults
+              if (category === 'meditation') {
+                target.src = '/thumbnails/meditation/I Am.jpg';
+              } else if (category === 'yoga-for-pe') {
+                target.src = '/thumbnails/yoga-for-pe/Sun Salutation Foundations.jpg';
+              } else if (category === 'relaxation') {
+                target.src = '/thumbnails/relaxation/Body Scan with Flowers.jpg';
+              } else if (category === 'mindful-movements') {
+                target.src = '/thumbnails/mindful-movements/The Champion.jpg';
+              } else {
+                target.src = '/thumbnails/yoga-for-pe/Sun Salutation Foundations.jpg';
+              }
+            }
           }}
         />
         <div className="absolute inset-0 flex items-center justify-center">
