@@ -290,6 +290,13 @@ export async function getFeaturedFreeVideos(): Promise<Video[]> {
   
   console.log('Fetching featured videos by IDs:', featuredVideoIds);
   
+  // Custom titles for each video
+  const customTitles: Record<string, string> = {
+    '457053392': 'I Am Meditation',
+    '1095788590': 'Ab Circle 1',
+    '452426275': 'Body Scan with Flowers'
+  };
+  
   // Custom descriptions for each video
   const customDescriptions: Record<string, string> = {
     '457053392': 'A guided meditation to help you connect with your inner self and find peace.',
@@ -381,7 +388,7 @@ export async function getFeaturedFreeVideos(): Promise<Video[]> {
         
         featuredVideos.push({
           id: parseInt(videoId),
-          title: data.name,
+          title: customTitles[videoId] || data.name,
           description: customDescriptions[videoId] || data.description,
           duration: formatDuration(data.duration),
           level: 'All Levels',

@@ -5,8 +5,8 @@ export const thumbnailMapping: Record<string, string> = {
   // Meditation videos
   'Calming Heart at the Royal Arch': 'Calming Heart at the Royal Arch.jpg',
   'Nostril Navigator: Alt Nostril Breath': 'Nostril Navigator Alt Nostril Breath.jpg',
-  'Alternate Nostril Breathing Flow': 'Alternate Nostril Breathing Flow.jpg',
-  'Alternate Nostril Breathing Instruction & Flow': 'Alternate Nostril Breathing Flow.jpg',
+  'Alternate Nostril Breathing Flow': 'Nostril Navigator Alt Nostril Breath.jpg',
+  'Alternate Nostril Breathing Instruction & Flow': 'Nostril Navigator Alt Nostril Breath.jpg',
   'Sun Salutation : Your Yoga Foundation': 'Sun Salutation Foundations.jpg',
   'Box Breath Flowing into Calming Heart': 'Box Breath flowing into Calming Heart.jpg',
   'High-5 Meditation': 'High-5 Meditation.jpg',
@@ -66,7 +66,23 @@ export function getThumbnailPath(title: string, category: string): string {
     }
   }
   
-  // Last resort: use a default placeholder based on category
-  console.log(`No thumbnail found for "${title}" in category "${category}". Using default.`);
-  return `/thumbnails/${category}/default.jpg`;
+  // Try a simple filename approach (just use the title as filename)
+  const simplifiedTitle = `${title}.jpg`;
+  
+  // Last resort: use a category-specific default or the general default
+  console.log(`No thumbnail found for "${title}" in category "${category}". Using fallback.`);
+  
+  // Category-specific defaults
+  if (category === 'meditation') {
+    return '/thumbnails/meditation/I Am.jpg'; // Use a common meditation thumbnail as fallback
+  } else if (category === 'yoga-for-pe') {
+    return '/thumbnails/yoga-for-pe/Sun Salutation Foundations.jpg'; // Common yoga thumbnail
+  } else if (category === 'relaxation') {
+    return '/thumbnails/relaxation/Body Scan with Flowers.jpg'; // Common relaxation thumbnail
+  } else if (category === 'mindful-movements') {
+    return '/thumbnails/mindful-movements/The Champion.jpg'; // Common mindful movements thumbnail
+  }
+  
+  // General default if category doesn't match
+  return '/thumbnails/yoga-for-pe/Sun Salutation Foundations.jpg';
 }
