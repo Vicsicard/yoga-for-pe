@@ -21,8 +21,8 @@ const PricingCard = ({ title, price, features, tier, isPopular, onSelect, isLoad
       </div>
       <ul role="list" className="mb-8 space-y-4 text-left">
         {features.map((feature, index) => (
-          <li key={index} className="flex items-center">
-            <span>{feature}</span>
+          <li key={index} className="flex items-center font-light">
+            <span className="whitespace-pre">{feature}</span>
           </li>
         ))}
       </ul>
