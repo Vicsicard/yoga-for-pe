@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { auth } from '../../../../auth';
-import connectDB from '../../../../lib/db/db';
+import connectDB from '../../../../lib/db/index';
 import User from '../../../../lib/models/User';
 
 export const dynamic = 'force-dynamic';

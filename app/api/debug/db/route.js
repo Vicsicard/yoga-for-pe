@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import connectDB from '../../../../lib/db/db';
+import connectDB from '../../../../lib/db/index';
 import mongoose from 'mongoose';
 
 export const dynamic = 'force-dynamic';
