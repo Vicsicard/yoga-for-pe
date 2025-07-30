@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { connectDB } from '../../../../lib/db/connect';
+import { connectDB } from '../../../../lib/db/index';
 import User from '../../../../lib/models/User';
 import jwt from 'jsonwebtoken';
 import Stripe from 'stripe';

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import User from '../../../../lib/models/User';
-import { connectDB } from '../../../../lib/db/connect';
+import { connectDB } from '../../../../lib/db/index';
 
 export const dynamic = 'force-dynamic';
 

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import User from '../../../../lib/models/User';
-import { connectDB } from '../../../../lib/db/connect';
+import { connectDB } from '../../../../lib/db/index';
 
 // Add dynamic export to prevent static generation
 export const dynamic = 'force-dynamic';

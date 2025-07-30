@@ -16,7 +16,7 @@ let User;
 
 // Only import these on the server side
 if (typeof window === 'undefined') {
-  connectDB = require("./lib/db/db").default;
+  connectDB = require("./lib/db/index").connectDB;
   User = require("./lib/models/User").default;
 }
 
