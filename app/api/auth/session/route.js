@@ -21,10 +21,12 @@ export async function GET(request) {
     
     let decoded;
     try {
-      // Use enhanced verifyToken function from auth.js
       decoded = verifyToken(token);
+      console.log('Token verified successfully, decoded userId:', decoded.userId);
+      console.log('Token contains subscription data:', !!decoded.subscription);
     } catch (tokenError) {
-      // Handle specific token verification errors
+      console.error('Token verification failed:', tokenError.message);
+      console.error('Token value (first 10 chars):', token.substring(0, 10) + '...');
       const errorCode = tokenError.message;
       const statusCode = getStatusCodeFromError(errorCode);
       const errorMessage = getErrorMessage(errorCode);

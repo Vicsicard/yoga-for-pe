@@ -6,9 +6,34 @@ import jwt from 'jsonwebtoken';
 
 export async function POST(request) {
   try {
-    await connectDB();
+    console.log('Signin route called');
+    console.log('JWT_SECRET exists:', !!process.env.JWT_SECRET);
+    console.log('MONGODB_URI exists:', !!process.env.MONGODB_URI);
     
-    const { email, password } = await request.json();
+    try {
+      await connectDB();
+      console.log('Database connected successfully');
+    } catch (dbError) {
+      console.error('Database connection error:', dbError);
+      return NextResponse.json(
+        { error: 'Database connection failed', details: dbError.message },
+        { status: 500 }
+      );
+    }
+    
+    let body;
+    try {
+      body = await request.json();
+      console.log('Request body parsed successfully');
+    } catch (parseError) {
+      console.error('Failed to parse request body:', parseError);
+      return NextResponse.json(
+        { error: 'Invalid request format', details: parseError.message },
+        { status: 400 }
+      );
+    }
+    
+    const { email, password } = body;
     
     console.log('Signin attempt for email:', email);
     
@@ -49,9 +74,14 @@ export async function POST(request) {
     // Generate JWT token
     const token = jwt.sign(
       { 
-        userId: user._id,
+        userId: user._id.toString(),
         email: user.email,
-        name: user.name
+        name: user.name,
+        subscription: {
+          plan: user.subscription?.plan || 'bronze',
+          status: user.subscription?.status || 'inactive',
+          currentPeriodEnd: user.subscription?.currentPeriodEnd || null
+        }
       },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }

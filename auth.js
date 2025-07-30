@@ -118,13 +118,31 @@ export const verifyToken = (token) => {
   try {
     // Verify token with JWT_SECRET
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // Ensure userId is a string for MongoDB compatibility
+    if (decoded.userId) {
+      // Convert to string if it's not already
+      decoded.userId = decoded.userId.toString();
+      
+      // Log the user ID format for debugging
+      console.log('Token verified successfully');
+      console.log('User ID type:', typeof decoded.userId);
+      console.log('User ID value:', decoded.userId);
+      console.log('Subscription data present:', !!decoded.subscription);
+    } else {
+      console.error('Token missing userId field');
+      throw new Error('TOKEN_INVALID_FORMAT');
+    }
+    
     return decoded;
   } catch (error) {
-    console.error('Token verification error:', error.name);
+    console.error('Token verification error:', error.name, error.message);
     if (error.name === 'TokenExpiredError') {
       throw new Error('TOKEN_EXPIRED');
     } else if (error.name === 'JsonWebTokenError') {
       throw new Error('TOKEN_INVALID');
+    } else if (error.message === 'TOKEN_INVALID_FORMAT') {
+      throw new Error('TOKEN_INVALID_FORMAT');
     } else {
       throw new Error('TOKEN_VERIFICATION_FAILED');
     }
