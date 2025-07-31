@@ -1,9 +1,10 @@
 // Stripe session verification API route
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { auth } from '../../../../auth';
+// Remove auth import as it's not available
 import connectDB from '../../../../lib/db/index';
 import User from '../../../../lib/models/User';
+import jwt from 'jsonwebtoken';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,17 +15,29 @@ const stripe = process.env.STRIPE_SECRET_KEY
 
 export async function GET(request) {
   try {
-    // Get authenticated user from NextAuth
-    const session = await auth();
-    
-    if (!session || !session.user) {
+    // Get authentication token from Authorization header
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: 'Missing or invalid authorization header' },
         { status: 401 }
       );
     }
     
-    const userId = session.user.id;
+    const token = authHeader.split(' ')[1];
+    
+    // Verify JWT token
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      return NextResponse.json(
+        { error: 'Invalid or expired token' },
+        { status: 401 }
+      );
+    }
+    
+    const userId = decoded.id;
     
     // Get session_id from query params
     const { searchParams } = new URL(request.url);
