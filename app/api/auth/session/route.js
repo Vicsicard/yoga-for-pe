@@ -1,9 +1,96 @@
 import { NextResponse } from 'next/server';
-import User from '../../../../lib/models/User';
-import { connectDB } from '../../../../lib/db/index';
-import { verifyToken } from '../../../../auth';
+import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
 
+// Force dynamic rendering for this route
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
+// MongoDB connection with error handling
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (!MONGODB_URI) {
+  console.error('MONGODB_URI is not defined in environment variables');
+}
+
+// Cache MongoDB connection
+let cached = global.mongoose;
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
+async function connectDB() {
+  if (cached.conn) {
+    console.log('Using cached MongoDB connection');
+    return cached.conn;
+  }
+
+  if (!cached.promise) {
+    const opts = { bufferCommands: false };
+    console.log('Connecting to MongoDB...');
+    cached.promise = mongoose.connect(MONGODB_URI, opts)
+      .then((mongoose) => {
+        console.log('MongoDB connected successfully');
+        return mongoose;
+      })
+      .catch(error => {
+        console.error('MongoDB connection error:', error);
+        console.error('Error name:', error.name);
+        console.error('Error code:', error.code);
+        console.error('MongoDB URI exists:', !!MONGODB_URI);
+        throw error;
+      });
+  }
+
+  try {
+    cached.conn = await cached.promise;
+  } catch (e) {
+    cached.promise = null;
+    throw e;
+  }
+
+  return cached.conn;
+}
+
+// User model schema
+const userSchema = new mongoose.Schema({
+  name: String,
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  subscription: {
+    status: { type: String, default: 'inactive' },
+    plan: { type: String, default: 'bronze' },
+    stripeCustomerId: String,
+    stripeSubscriptionId: String,
+    currentPeriodEnd: Date,
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+  },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+// Get User model (with handling for model compilation errors)
+const User = mongoose.models.User || mongoose.model('User', userSchema);
+
+// JWT token verification function
+function verifyToken(token) {
+  if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET_MISSING');
+  }
+  
+  try {
+    return jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      throw new Error('TOKEN_EXPIRED');
+    } else if (error.name === 'JsonWebTokenError') {
+      throw new Error('INVALID_TOKEN');
+    } else {
+      throw new Error('TOKEN_VERIFICATION_FAILED');
+    }
+  }
+}
 
 export async function GET(request) {
   try {
@@ -24,6 +111,17 @@ export async function GET(request) {
       decoded = verifyToken(token);
       console.log('Token verified successfully, decoded userId:', decoded.userId);
       console.log('Token contains subscription data:', !!decoded.subscription);
+      console.log('User ID type:', typeof decoded.userId);
+      
+      // Validate that userId is a string and looks like a valid MongoDB ObjectId
+      if (!decoded.userId || typeof decoded.userId !== 'string' || decoded.userId.length !== 24) {
+        console.error('Invalid userId in token:', decoded.userId);
+        return NextResponse.json({
+          success: false,
+          message: 'Invalid user ID in authentication token',
+          errorCode: 'INVALID_USER_ID'
+        }, { status: 401 });
+      }
     } catch (tokenError) {
       console.error('Token verification failed:', tokenError.message);
       console.error('Token value (first 10 chars):', token.substring(0, 10) + '...');

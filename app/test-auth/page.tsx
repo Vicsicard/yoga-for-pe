@@ -13,6 +13,7 @@ export default function TestAuth() {
     setResult('');
     
     try {
+      console.log('Testing signin with:', { email, password });
       const response = await fetch('/api/auth/signin', {
         method: 'POST',
         headers: {
@@ -21,15 +22,23 @@ export default function TestAuth() {
         body: JSON.stringify({ email, password }),
       });
 
+      console.log('Signin response status:', response.status);
       const data = await response.json();
+      console.log('Signin response data:', data);
       
-      if (response.ok) {
-        setResult(`SUCCESS: ${JSON.stringify(data, null, 2)}`);
+      if (response.ok && data.token) {
+        // Store token in localStorage
         localStorage.setItem('auth_token', data.token);
+        
+        // Also store in cookie for middleware
+        document.cookie = `auth_token=${data.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Strict`;
+        
+        setResult(`SUCCESS: Token received and stored\n\nUser: ${JSON.stringify(data.user, null, 2)}\n\nToken (first 20 chars): ${data.token.substring(0, 20)}...`);
       } else {
         setResult(`ERROR: ${response.status} - ${JSON.stringify(data, null, 2)}`);
       }
     } catch (error) {
+      console.error('Signin test error:', error);
       setResult(`NETWORK ERROR: ${error.message}`);
     }
     
@@ -47,6 +56,8 @@ export default function TestAuth() {
         setLoading(false);
         return;
       }
+      
+      console.log('Testing session with token (first 20 chars):', token.substring(0, 20) + '...');
 
       const response = await fetch('/api/auth/session', {
         headers: {
@@ -54,14 +65,21 @@ export default function TestAuth() {
         },
       });
 
+      console.log('Session check response status:', response.status);
       const data = await response.json();
+      console.log('Session check response data:', data);
       
-      if (response.ok) {
-        setResult(`SESSION SUCCESS: ${JSON.stringify(data, null, 2)}`);
+      if (response.ok && data.success) {
+        setResult(`SESSION VALID\n\nUser: ${JSON.stringify(data.user, null, 2)}`);
       } else {
-        setResult(`SESSION ERROR: ${response.status} - ${JSON.stringify(data, null, 2)}`);
+        // If session is invalid, clear tokens
+        localStorage.removeItem('auth_token');
+        document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict';
+        
+        setResult(`SESSION ERROR: ${response.status}\n\nDetails: ${JSON.stringify(data, null, 2)}`);
       }
     } catch (error) {
+      console.error('Session test error:', error);
       setResult(`SESSION NETWORK ERROR: ${error.message}`);
     }
     

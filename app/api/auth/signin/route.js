@@ -1,18 +1,94 @@
 import { NextResponse } from 'next/server';
-import { connectDB } from '../../../../lib/db/index';
-import User from '../../../../lib/models/User';
+import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-// Prevent this route from being statically generated
+// Force dynamic rendering for this route
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
+// MongoDB connection with error handling
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (!MONGODB_URI) {
+  console.error('MONGODB_URI is not defined in environment variables');
+}
+
+// Cache MongoDB connection
+let cached = global.mongoose;
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
+async function connectDB() {
+  if (cached.conn) {
+    console.log('Using cached MongoDB connection');
+    return cached.conn;
+  }
+
+  if (!cached.promise) {
+    const opts = { bufferCommands: false };
+    console.log('Connecting to MongoDB...');
+    cached.promise = mongoose.connect(MONGODB_URI, opts)
+      .then((mongoose) => {
+        console.log('MongoDB connected successfully');
+        return mongoose;
+      })
+      .catch(error => {
+        console.error('MongoDB connection error:', error);
+        console.error('Error name:', error.name);
+        console.error('Error code:', error.code);
+        console.error('MongoDB URI exists:', !!MONGODB_URI);
+        throw error;
+      });
+  }
+
+  try {
+    cached.conn = await cached.promise;
+  } catch (e) {
+    cached.promise = null;
+    throw e;
+  }
+
+  return cached.conn;
+}
+
+// User model schema
+const userSchema = new mongoose.Schema({
+  name: String,
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  subscription: {
+    status: { type: String, default: 'inactive' },
+    plan: { type: String, default: 'bronze' },
+    stripeCustomerId: String,
+    stripeSubscriptionId: String,
+    currentPeriodEnd: Date,
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+  },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+// Get User model (with handling for model compilation errors)
+const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 export async function POST(request) {
   try {
-    console.log('Signin route called');
+    console.log('Signin route called - v2');
     console.log('JWT_SECRET exists:', !!process.env.JWT_SECRET);
     console.log('MONGODB_URI exists:', !!process.env.MONGODB_URI);
     console.log('MONGODB_URI value:', process.env.MONGODB_URI ? `${process.env.MONGODB_URI.substring(0, 20)}...` : 'undefined');
+    
+    // Check if JWT_SECRET is set
+    if (!process.env.JWT_SECRET) {
+      console.error('JWT_SECRET is not defined in environment variables');
+      return NextResponse.json(
+        { error: 'Server configuration error', details: 'JWT_SECRET is not defined' },
+        { status: 500 }
+      );
+    }
     
     try {
       await connectDB();
@@ -30,6 +106,15 @@ export async function POST(request) {
           name: dbError.name,
           code: dbError.code || 'unknown'
         },
+        { status: 500 }
+      );
+    }
+    
+    // Verify mongoose connection is active
+    if (mongoose.connection.readyState !== 1) {
+      console.error('Mongoose connection is not active. Current state:', mongoose.connection.readyState);
+      return NextResponse.json(
+        { error: 'Database connection is not active', details: `Connection state: ${mongoose.connection.readyState}` },
         { status: 500 }
       );
     }
@@ -63,7 +148,8 @@ export async function POST(request) {
     console.log('Finding user with email:', email);
     let user;
     try {
-      user = await User.findOne({ email });
+      user = await User.findOne({ email }).exec();
+      console.log('User lookup result:', user ? 'Found' : 'Not found');
     } catch (findError) {
       console.error('Error finding user:', findError);
       return NextResponse.json(
@@ -90,6 +176,13 @@ export async function POST(request) {
     console.log('Checking password...');
     let isPasswordValid;
     try {
+      if (!user.password) {
+        console.error('User has no password stored');
+        return NextResponse.json(
+          { error: 'Invalid email or password' },
+          { status: 401 }
+        );
+      }
       isPasswordValid = await bcrypt.compare(password, user.password);
     } catch (passwordError) {
       console.error('Error comparing passwords:', passwordError);
@@ -119,6 +212,7 @@ export async function POST(request) {
     console.log('User ID value:', userId);
     console.log('User object ID:', user._id);
     console.log('User object ID type:', typeof user._id);
+    console.log('User subscription:', user.subscription || 'none');
     
     if (!userId) {
       console.error('Invalid user ID for token generation');
@@ -130,25 +224,33 @@ export async function POST(request) {
     
     let token;
     try {
+      // Prepare subscription data safely
+      const subscriptionData = {
+        plan: user.subscription?.plan || 'bronze',
+        status: user.subscription?.status || 'inactive',
+        currentPeriodEnd: user.subscription?.currentPeriodEnd || null,
+        stripeCustomerId: user.subscription?.stripeCustomerId || null,
+        stripeSubscriptionId: user.subscription?.stripeSubscriptionId || null
+      };
+      
+      // Generate token with safe data
       token = jwt.sign(
         { 
           userId: userId,
           email: user.email,
-          name: user.name,
-          subscription: {
-            plan: user.subscription?.plan || 'bronze',
-            status: user.subscription?.status || 'inactive',
-            currentPeriodEnd: user.subscription?.currentPeriodEnd || null,
-            stripeCustomerId: user.subscription?.stripeCustomerId || null,
-            stripeSubscriptionId: user.subscription?.stripeSubscriptionId || null
-          }
+          name: user.name || email.split('@')[0],
+          subscription: subscriptionData
         },
-        process.env.JWT_SECRET || 'development-secret-key',
+        process.env.JWT_SECRET,
         { expiresIn: '7d' }
       );
       console.log('JWT token generated successfully');
+      
+      // Verify token immediately to ensure it's valid
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      console.log('Token verified successfully, expiry:', new Date(decoded.exp * 1000).toISOString());
     } catch (tokenError) {
-      console.error('Error generating JWT token:', tokenError);
+      console.error('Error with JWT token:', tokenError);
       return NextResponse.json(
         { 
           error: 'Error generating authentication token', 
@@ -194,13 +296,16 @@ export async function POST(request) {
     console.error('JWT_SECRET exists:', !!process.env.JWT_SECRET);
     console.error('MONGODB_URI exists:', !!process.env.MONGODB_URI);
     console.error('MONGODB_URI value:', process.env.MONGODB_URI ? `${process.env.MONGODB_URI.substring(0, 20)}...` : 'undefined');
+    console.error('NODE_ENV:', process.env.NODE_ENV);
+    console.error('VERCEL_ENV:', process.env.VERCEL_ENV);
     
     return NextResponse.json(
       { 
         error: 'Internal server error', 
         details: error.message,
         errorType: error.name || 'Unknown',
-        errorCode: error.code || 'none'
+        errorCode: error.code || 'none',
+        env: process.env.NODE_ENV || 'unknown'
       },
       { status: 500 }
     );

@@ -120,32 +120,42 @@ export const verifyToken = (token) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
     // Ensure userId is a string for MongoDB compatibility
-    if (decoded.userId) {
-      // Convert to string if it's not already
-      decoded.userId = decoded.userId.toString();
-      
-      // Log the user ID format for debugging
-      console.log('Token verified successfully');
-      console.log('User ID type:', typeof decoded.userId);
-      console.log('User ID value:', decoded.userId);
-      console.log('Subscription data present:', !!decoded.subscription);
-    } else {
-      console.error('Token missing userId field');
-      throw new Error('TOKEN_INVALID_FORMAT');
+    if (!decoded.userId) {
+      console.error('Token missing userId');
+      throw new Error('INVALID_TOKEN_PAYLOAD');
     }
+    
+    // Ensure userId is a string
+    if (typeof decoded.userId !== 'string') {
+      console.error('Token userId is not a string:', typeof decoded.userId);
+      decoded.userId = String(decoded.userId);
+      console.log('Converted userId to string:', decoded.userId);
+    }
+    
+    // Log userId for debugging
+    console.log('Token contains userId:', decoded.userId);
+    console.log('userId type after verification:', typeof decoded.userId);
     
     return decoded;
   } catch (error) {
-    console.error('Token verification error:', error.name, error.message);
+    // Handle different JWT errors
     if (error.name === 'TokenExpiredError') {
       throw new Error('TOKEN_EXPIRED');
     } else if (error.name === 'JsonWebTokenError') {
-      throw new Error('TOKEN_INVALID');
-    } else if (error.message === 'TOKEN_INVALID_FORMAT') {
-      throw new Error('TOKEN_INVALID_FORMAT');
-    } else {
-      throw new Error('TOKEN_VERIFICATION_FAILED');
+      throw new Error('INVALID_TOKEN');
+    } else if (error.name === 'NotBeforeError') {
+      throw new Error('TOKEN_NOT_ACTIVE');
     }
+    
+    // Re-throw custom errors
+    if (error.message === 'TOKEN_MISSING' || 
+        error.message === 'INVALID_TOKEN_PAYLOAD') {
+      throw error;
+    }
+    
+    // Default error
+    console.error('Token verification error:', error);
+    throw new Error('TOKEN_VERIFICATION_FAILED');
   }
 };
 

@@ -121,8 +121,10 @@ export async function POST(request) {
         const customerEmail = session.customer.email;
         const customerName = session.customer.name || customerEmail.split('@')[0];
         
-        // Generate a temporary password (user will need to reset it)
+        // Generate a temporary password (user will need to set a proper password)
         const tempPassword = Math.random().toString(36).slice(-12);
+        // Flag to indicate this is a new user that needs to set a password
+        const isNewUser = true;
         
         try {
           user = new User({
@@ -138,6 +140,7 @@ export async function POST(request) {
           
           await user.save();
           console.log('Step 3b: New user created successfully:', user.email);
+          console.log('New user needs to set password');
         } catch (createError) {
           console.error('Error creating user:', createError);
           
@@ -253,11 +256,16 @@ export async function POST(request) {
 
     console.log('New JWT token generated with subscription info');
 
+    // Determine if this is a new user who needs to set a password
+    // We consider a user new if they were created during this request
+    const needsPasswordSetup = typeof isNewUser !== 'undefined' && isNewUser === true;
+    
     return NextResponse.json({
       success: true,
       message: 'Subscription verified and updated',
       token: newToken,
-      subscription: subscriptionUpdate
+      subscription: subscriptionUpdate,
+      needsPasswordSetup: needsPasswordSetup
     });
 
   } catch (error) {

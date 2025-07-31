@@ -27,12 +27,34 @@ export async function middleware(request) {
   
   if (token) {
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_super_secret_jwt_key_for_yoga_pe_app_development_2024');
+      // Use JWT_SECRET from environment or fallback
+      const secret = process.env.JWT_SECRET || 'your_super_secret_jwt_key_for_yoga_pe_app_development_2024';
+      console.log('JWT_SECRET exists:', !!process.env.JWT_SECRET);
+      
+      // Verify the token
+      const decoded = jwt.verify(token, secret);
+      
+      // Validate userId in token
+      if (!decoded.userId) {
+        console.error('Token missing userId field');
+        throw new Error('Invalid token format: missing userId');
+      }
+      
+      // Ensure userId is a string
+      if (typeof decoded.userId !== 'string') {
+        console.log('Converting userId to string:', decoded.userId);
+        decoded.userId = String(decoded.userId);
+      }
+      
       isAuthenticated = true;
       user = decoded;
+      console.log('User authenticated successfully, userId:', decoded.userId);
     } catch (error) {
-      console.log('JWT verification failed:', error.message);
+      console.error('JWT verification failed:', error.message);
+      console.error('Token first 10 chars:', token ? token.substring(0, 10) + '...' : 'null');
     }
+  } else {
+    console.log('No auth token found in request');
   }
   
   // Check if the user is authenticated for protected routes

@@ -11,6 +11,7 @@ function SuccessContent() {
   const [status, setStatus] = useState('verifying');
   const [error, setError] = useState('');
   const [subscriptionInfo, setSubscriptionInfo] = useState(null);
+  const [needsPasswordSetup, setNeedsPasswordSetup] = useState(false);
 
   useEffect(() => {
     // Only run if we have a session ID
@@ -66,11 +67,23 @@ function SuccessContent() {
           setSubscriptionInfo(data.subscription);
         }
         
+        // Check if user needs to set a password
+        if (data.needsPasswordSetup) {
+          console.log('New user detected, needs to set password');
+          setNeedsPasswordSetup(true);
+        }
+        
         setStatus('success');
         
-        // Auto-redirect to videos after 3 seconds
+        // Auto-redirect after 3 seconds
         setTimeout(() => {
-          router.push('/videos');
+          if (data.needsPasswordSetup && data.token) {
+            // Redirect to password setup page with token
+            router.push(`/auth/set-password?token=${data.token}`);
+          } else {
+            // Regular redirect to videos page
+            router.push('/videos');
+          }
         }, 3000);
         
       } catch (err) {
@@ -160,12 +173,16 @@ function SuccessContent() {
           <div className="mt-6">
             {status === 'success' ? (
               <div>
-                <p className="text-sm text-gray-600 mb-3">Redirecting to videos in 3 seconds...</p>
+                <p className="text-sm text-gray-600 mb-3">
+                {needsPasswordSetup 
+                  ? 'Redirecting to set your password in 3 seconds...' 
+                  : 'Redirecting to videos in 3 seconds...'}
+              </p>
                 <Link
-                  href="/videos"
+                  href={needsPasswordSetup ? `/auth/set-password?token=${localStorage.getItem('auth_token')}` : "/videos"}
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
-                  View Videos Now
+                  {needsPasswordSetup ? 'Set Password Now' : 'View Videos Now'}
                 </Link>
               </div>
             ) : status === 'error' ? (
