@@ -9,13 +9,29 @@ export const runtime = 'nodejs';
  * Handle contact form submissions
  */
 export async function POST(request) {
+  console.log('Contact form submission received');
+  
+  // Log SMTP configuration for debugging (without sensitive info)
+  console.log('SMTP Configuration:', {
+    host: process.env.SMTP_HOST || 'mail.yogaforpe.com',
+    port: parseInt(process.env.SMTP_PORT || '587'),
+    secure: process.env.SMTP_SECURE === 'true' || false,
+    user: process.env.SMTP_USER || 'info@yogaforpe.com',
+    hasPassword: !!process.env.SMTP_PASSWORD,
+    from: process.env.SMTP_FROM || 'info@yogaforpe.com',
+    contactEmail: process.env.CONTACT_EMAIL || 'hello@yogaforpe.com'
+  });
+  
   try {
     // Parse request body
     const body = await request.json();
     const { name, email, subject, message, newsletter } = body;
     
+    console.log('Contact form data received:', { name, email, subject, messageLength: message?.length, newsletter });
+    
     // Validate required fields
     if (!name || !email || !subject || !message) {
+      console.log('Validation failed: Missing required fields');
       return NextResponse.json(
         { error: 'All fields are required' },
         { status: 400 }
@@ -25,55 +41,100 @@ export async function POST(request) {
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
+      console.log('Validation failed: Invalid email format', email);
       return NextResponse.json(
         { error: 'Invalid email format' },
         { status: 400 }
       );
     }
     
-    // Send contact form email
-    await emailService.sendContactFormEmail({
-      name,
-      email,
-      subject,
-      message,
-      newsletter: !!newsletter
-    });
+    console.log('Attempting to send contact form email...');
     
-    // If user opted for newsletter, send confirmation
-    if (newsletter) {
-      try {
-        await emailService.sendNewsletterConfirmation({ email });
-      } catch (newsletterError) {
-        console.error('Failed to send newsletter confirmation:', newsletterError);
-        // Continue with the response even if newsletter email fails
+    // Send contact form email with direct transporter access
+    try {
+      await emailService.sendContactFormEmail({
+        name,
+        email,
+        subject,
+        message,
+        newsletter: !!newsletter
+      });
+      
+      console.log('Contact form email sent successfully');
+      
+      // If user opted for newsletter, send confirmation
+      if (newsletter) {
+        try {
+          await emailService.sendNewsletterConfirmation({ email });
+          console.log('Newsletter confirmation email sent successfully');
+        } catch (newsletterError) {
+          console.error('Failed to send newsletter confirmation:', newsletterError);
+          // Continue with the response even if newsletter email fails
+        }
       }
+      
+      return NextResponse.json(
+        { message: 'Your message has been sent successfully!' },
+        { status: 200 }
+      );
+    } catch (emailError) {
+      // Handle email sending error specifically
+      console.error('Email sending failed:', emailError);
+      throw emailError; // Re-throw to be caught by outer catch block
     }
-    
-    return NextResponse.json(
-      { message: 'Your message has been sent successfully!' },
-      { status: 200 }
-    );
-    
   } catch (error) {
     console.error('Contact form submission error:', error);
     
     // Provide more detailed error information for debugging
-    const errorMessage = error.code === 'ETIMEDOUT' || error.code === 'ESOCKET' || error.code === 'ECONNREFUSED'
-      ? 'Email server connection timed out. Please check SMTP settings.'
-      : 'Failed to send your message. Please try again later.';
+    let errorMessage = 'Failed to send your message. Please try again later.';
+    let statusCode = 500;
+    let errorType = 'unknown';
     
-    // Log additional details for server-side debugging
+    // Specific error handling based on error codes
+    if (error.code === 'ETIMEDOUT' || error.code === 'ESOCKET' || error.code === 'ETIMEOUT') {
+      errorMessage = 'Email server connection timed out. Please try again later.';
+      errorType = 'timeout';
+      console.error('SMTP timeout error detected');
+    } else if (error.code === 'ECONNREFUSED') {
+      errorMessage = 'Unable to connect to email server. Please try again later.';
+      errorType = 'connection';
+      console.error('SMTP connection refused error detected');
+    } else if (error.code === 'EAUTH') {
+      errorMessage = 'Email authentication failed. Please contact support.';
+      errorType = 'auth';
+      console.error('SMTP authentication error detected');
+    } else if (error.code === 'EENVELOPE') {
+      errorMessage = 'Invalid email address format detected by mail server.';
+      errorType = 'envelope';
+      console.error('SMTP envelope error detected');
+    } else if (error.responseCode >= 500) {
+      errorMessage = 'Mail server error. Please try again later.';
+      errorType = 'server';
+      console.error('SMTP server error detected');
+    }
+    
+    // Log detailed error information
     console.error('Error details:', {
+      type: errorType,
       code: error.code,
       message: error.message,
-      stack: error.stack?.split('\n')[0] || 'No stack trace',
-      smtpResponse: error.response || 'No SMTP response'
+      command: error.command,
+      responseCode: error.responseCode,
+      stack: error.stack?.split('\n').slice(0, 3).join('\n') || 'No stack trace',
+      smtpDetails: error.smtpDetails || 'No SMTP details'
     });
     
     return NextResponse.json(
-      { error: errorMessage, details: process.env.NODE_ENV === 'development' ? error.message : undefined },
-      { status: 500 }
+      { 
+        error: errorMessage, 
+        type: errorType,
+        details: process.env.NODE_ENV === 'development' ? {
+          code: error.code,
+          message: error.message,
+          responseCode: error.responseCode
+        } : undefined 
+      },
+      { status: statusCode }
     );
   }
 }
