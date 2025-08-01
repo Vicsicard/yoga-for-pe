@@ -76,7 +76,7 @@ export default function PremiumModal({ selectedTier, onClose }) {
     setError(null);
     
     try {
-      logDebug('Creating checkout session', { tier: tier === SubscriptionTier.SILVER ? 'SILVER' : 'GOLD' });
+      logDebug('Creating checkout session', { tier: tier === SubscriptionTier.SILVER ? 'silver' : 'gold' });
       
       // Call API to create checkout session with the captured auth token
       const response = await fetch('/api/stripe/create-checkout-session', {
@@ -86,7 +86,7 @@ export default function PremiumModal({ selectedTier, onClose }) {
           'Authorization': `Bearer ${authToken}`
         },
         body: JSON.stringify({
-          tier: tier === SubscriptionTier.SILVER ? 'SILVER' : 'GOLD',
+          tier: tier === SubscriptionTier.SILVER ? 'silver' : 'gold',
         }),
       });
       
