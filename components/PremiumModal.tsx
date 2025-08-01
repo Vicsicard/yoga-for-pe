@@ -92,7 +92,7 @@ export default function PremiumModal({ selectedTier, onClose }: PremiumModalProp
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          tier: tier === SubscriptionTier.SILVER ? 'SILVER' : 'GOLD',
+          tier: tier === SubscriptionTier.SILVER ? 'silver' : 'gold',
         }),
       });
       
