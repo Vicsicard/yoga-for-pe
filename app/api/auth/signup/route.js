@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import emailService from '../../../../lib/services/email';
 
 // Force dynamic rendering for this route
 export const dynamic = 'force-dynamic';
@@ -173,6 +174,18 @@ export async function POST(request) {
       process.env.JWT_SECRET || 'development-secret-key',
       { expiresIn: '7d' }
     );
+
+    // Send welcome email to the new user
+    try {
+      await emailService.sendWelcomeEmail({
+        name: newUser.name,
+        email: newUser.email
+      });
+      console.log('Welcome email sent successfully to:', newUser.email);
+    } catch (emailError) {
+      console.error('Failed to send welcome email:', emailError);
+      // Continue with the response even if email fails
+    }
 
     // Return success response with token
     return NextResponse.json({

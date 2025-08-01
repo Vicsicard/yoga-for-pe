@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
+import emailService from '../../../../lib/services/email';
 
 // Force dynamic rendering for this route
 export const dynamic = 'force-dynamic';
@@ -172,10 +173,17 @@ export async function POST(request) {
         
         console.log('Reset URL generated:', resetUrl);
         
-        // TODO: Send email with reset URL
-        // This would be implemented with an email service like SendGrid, Mailgun, etc.
-        console.log('Would send password reset email to:', email);
-        console.log('With reset link:', resetUrl);
+        // Send password reset email using our email service
+        try {
+          await emailService.sendPasswordResetEmail({
+            email,
+            resetUrl
+          });
+          console.log('Password reset email sent successfully to:', email);
+        } catch (emailError) {
+          console.error('Failed to send password reset email:', emailError);
+          // Don't expose email sending errors to client for security
+        }
       } catch (tokenError) {
         console.error('Error generating reset token:', tokenError);
         // Don't expose error details to client for security

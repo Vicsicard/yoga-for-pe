@@ -1,4 +1,6 @@
-import React from 'react';
+"use client";
+
+import React, { useState } from "react";
 import { FiMail, FiPhone, FiMapPin, FiUser, FiMessageSquare } from 'react-icons/fi';
 import { Container } from '../../components/ui/Container';
 import { Section, SectionHeader } from '../../components/ui/Section';
@@ -6,6 +8,81 @@ import { Button } from '../../components/ui/Button';
 import { HeroSlider, HeroSliderContent } from '../../components/ui/HeroSlider';
 
 export default function ContactPage() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+    newsletter: false
+  });
+  
+  const [formStatus, setFormStatus] = useState({
+    isSubmitting: false,
+    isSubmitted: false,
+    isError: false,
+    message: ""
+  });
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    setFormStatus({
+      isSubmitting: true,
+      isSubmitted: false,
+      isError: false,
+      message: ""
+    });
+    
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to send message");
+      }
+      
+      setFormStatus({
+        isSubmitting: false,
+        isSubmitted: true,
+        isError: false,
+        message: data.message || "Your message has been sent successfully!"
+      });
+      
+      // Reset form after successful submission
+      setFormData({
+        name: "",
+        email: "",
+        subject: "",
+        message: "",
+        newsletter: false
+      });
+      
+    } catch (error) {
+      console.error("Contact form submission error:", error);
+      
+      setFormStatus({
+        isSubmitting: false,
+        isSubmitted: true,
+        isError: true,
+        message: error.message || "Something went wrong. Please try again later."
+      });
+    }
+  };
   return (
     <main>
       {/* Hero Section with Image Slider */}
@@ -85,101 +162,110 @@ export default function ContactPage() {
             <div className="md:col-span-2">
               <div className="bg-white rounded-lg shadow-lg p-8 border border-gray-100">
                 <h2 className="text-2xl font-bold mb-6">Send Us a Message</h2>
-                <form className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                        Your Name
-                      </label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <FiUser className="text-gray-400" />
-                        </div>
+                {formStatus.isSubmitted && !formStatus.isError ? (
+                  <div className="mt-8 p-4 bg-green-50 border border-green-200 rounded-md">
+                    <p className="text-green-700 font-medium">{formStatus.message}</p>
+                    <button 
+                      onClick={() => setFormStatus(prev => ({ ...prev, isSubmitted: false }))} 
+                      className="mt-4 text-sm text-teal-600 hover:text-teal-800 font-medium"
+                    >
+                      Send another message
+                    </button>
+                  </div>
+                ) : (
+                  <form className="space-y-6 mt-8" onSubmit={handleSubmit}>
+                    {formStatus.isSubmitted && formStatus.isError && (
+                      <div className="p-4 bg-red-50 border border-red-200 rounded-md">
+                        <p className="text-red-700">{formStatus.message}</p>
+                      </div>
+                    )}
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                          Name
+                        </label>
                         <input
                           type="text"
                           id="name"
                           name="name"
-                          className="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 bg-gray-50 p-3"
-                          placeholder="John Doe"
+                          value={formData.name}
+                          onChange={handleChange}
+                          required
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
                         />
                       </div>
-                    </div>
-                    <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                        Email Address
-                      </label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <FiMail className="text-gray-400" />
-                        </div>
+                      <div>
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                          Email
+                        </label>
                         <input
                           type="email"
                           id="email"
                           name="email"
-                          className="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 bg-gray-50 p-3"
-                          placeholder="johndoe@example.com"
+                          value={formData.email}
+                          onChange={handleChange}
+                          required
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
                         />
                       </div>
                     </div>
-                  </div>
 
-                  <div>
-                    <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
-                      Subject
-                    </label>
-                    <select
-                      id="subject"
-                      name="subject"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 bg-gray-50 p-3"
-                    >
-                      <option value="" disabled selected>Select a subject</option>
-                      <option value="general">General Inquiry</option>
-                      <option value="professional_development">Professional Development</option>
-                      <option value="curriculum">Curriculum Questions</option>
-                      <option value="videos">Video Content Access</option>
-                      <option value="speaking">Speaking Engagement</option>
-                    </select>
-                  </div>
+                    <div>
+                      <label htmlFor="subject" className="block text-sm font-medium text-gray-700">
+                        Subject
+                      </label>
+                      <input
+                        type="text"
+                        id="subject"
+                        name="subject"
+                        value={formData.subject}
+                        onChange={handleChange}
+                        required
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                      />
+                    </div>
 
-                  <div>
-                    <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
-                      Message
-                    </label>
-                    <div className="relative">
-                      <div className="absolute top-3 left-3 flex items-start pointer-events-none">
-                        <FiMessageSquare className="text-gray-400" />
-                      </div>
+                    <div>
+                      <label htmlFor="message" className="block text-sm font-medium text-gray-700">
+                        Message
+                      </label>
                       <textarea
                         id="message"
                         name="message"
-                        rows={6}
-                        className="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 bg-gray-50 p-3"
-                        placeholder="Your message here..."
+                        rows={5}
+                        value={formData.message}
+                        onChange={handleChange}
+                        required
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
                       ></textarea>
                     </div>
-                  </div>
 
-                  <div className="flex items-start">
-                    <div className="flex items-center h-5">
+                    <div className="flex items-center">
                       <input
                         id="newsletter"
                         name="newsletter"
                         type="checkbox"
-                        className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                        checked={formData.newsletter}
+                        onChange={handleChange}
+                        className="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
                       />
-                    </div>
-                    <div className="ml-3 text-sm">
-                      <label htmlFor="newsletter" className="font-medium text-gray-700">
+                      <label htmlFor="newsletter" className="ml-2 block text-sm text-gray-700">
                         Subscribe to our newsletter
                       </label>
-                      <p className="text-gray-500">Stay updated with new content, events, and yoga resources.</p>
                     </div>
-                  </div>
 
-                  <Button type="submit" size="lg" className="w-full">
-                    Send Message
-                  </Button>
-                </form>
+                    <div>
+                      <button
+                        type="submit"
+                        disabled={formStatus.isSubmitting}
+                        className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:bg-teal-400 disabled:cursor-not-allowed"
+                      >
+                        {formStatus.isSubmitting ? "Sending..." : "Send Message"}
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
             </div>
           </div>

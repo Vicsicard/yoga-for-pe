@@ -9,6 +9,7 @@ A comprehensive web application for Yoga for Physical Education, featuring video
 - Stripe subscription integration
 - MongoDB database integration
 - Responsive design for all devices
+- Bluehost SMTP email integration for transactional emails
 
 ## Authentication and Database System
 
@@ -50,18 +51,55 @@ The application uses MongoDB for data storage with the following features:
 - `/api/debug/auth-test` - Test authentication system
 - `/debug/auth-test` - Visual interface for testing authentication
 
+## Email System
+
+### Email Service
+
+The application uses Nodemailer with Bluehost SMTP for sending transactional emails:
+
+- **Welcome Emails**: Sent to new users upon registration
+- **Password Reset Emails**: Sent when users request password resets
+- **Contact Form Notifications**: Sent to administrators when users submit contact forms
+- **Newsletter Confirmations**: Sent to users who opt into the newsletter
+
+### Implementation
+
+- **Email Service Module**: Centralized email service at `lib/services/email.js`
+- **Templated Emails**: HTML email templates for different email types
+- **Error Handling**: Graceful fallbacks if email sending fails
+- **Environment Configuration**: All SMTP settings configurable via environment variables
+
+### API Integration
+
+- `/api/auth/signup` - Sends welcome emails to new users
+- `/api/auth/forgot-password` - Sends password reset emails
+- `/api/contact` - Processes contact form submissions and sends notifications
+
 ## Environment Variables
 
 The following environment variables are required:
 
 ```
+# Database and Authentication
 MONGODB_URI=mongodb+srv://[username]:[password]@[cluster].mongodb.net/
 JWT_SECRET=[your_jwt_secret]
+
+# Stripe Configuration
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_PUBLISHABLE_KEY=pk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 STRIPE_SILVER_PRICE_ID=price_...
 STRIPE_GOLD_PRICE_ID=price_...
+
+# Email Configuration
+SMTP_HOST=mail.yogaforpe.com
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER=info@yogaforpe.com
+SMTP_PASSWORD=[your_email_password]
+SMTP_FROM=info@yogaforpe.com
+CONTACT_EMAIL=hello@yogaforpe.com
+NEXT_PUBLIC_BASE_URL=https://yogaforpe.com
 ```
 
 ## Getting Started
