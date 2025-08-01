@@ -187,14 +187,20 @@ export async function POST(request) {
       );
     }
 
-    // Validate tier
-    if (!['silver', 'gold'].includes(tier)) {
+    // Validate tier (case-insensitive)
+    const normalizedTier = typeof tier === 'string' ? tier.toLowerCase() : tier;
+    console.log('Normalized subscription tier:', normalizedTier);
+    
+    if (!['silver', 'gold'].includes(normalizedTier)) {
       console.error('Invalid subscription tier:', tier);
       return NextResponse.json(
         { error: 'Invalid subscription tier' },
         { status: 400 }
       );
     }
+    
+    // Use normalized tier for further processing
+    tier = normalizedTier;
 
     // Use existing Stripe price IDs from environment variables
     const priceIds = {
