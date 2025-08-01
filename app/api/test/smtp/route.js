@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import jwt from 'jsonwebtoken';
 
 // Force dynamic rendering for this route
 export const dynamic = 'force-dynamic';
@@ -10,12 +11,37 @@ export const runtime = 'nodejs';
  * This endpoint should only be accessible in development mode
  */
 export async function GET(request) {
-  // Security check - only allow in development mode
-  if (process.env.NODE_ENV !== 'development') {
-    return NextResponse.json(
-      { error: 'This endpoint is only available in development mode' },
-      { status: 403 }
-    );
+  // Security check - only allow in development mode or with admin authentication
+  const isDevMode = process.env.NODE_ENV === 'development';
+  
+  if (!isDevMode) {
+    // In production, require admin authentication
+    const authHeader = request.headers.get('authorization');
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'Authentication required for SMTP testing in production' },
+        { status: 401 }
+      );
+    }
+    
+    try {
+      const token = authHeader.substring(7);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      
+      // Only allow admins to access this endpoint in production
+      if (!decoded.role || decoded.role !== 'admin') {
+        return NextResponse.json(
+          { error: 'Admin privileges required for SMTP testing in production' },
+          { status: 403 }
+        );
+      }
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'Invalid authentication token', details: error.message },
+        { status: 401 }
+      );
+    }
   }
 
   console.log('SMTP test requested');

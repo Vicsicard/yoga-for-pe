@@ -50,38 +50,71 @@ export async function POST(request) {
     
     console.log('Attempting to send contact form email...');
     
-    // Send contact form email with direct transporter access
-    try {
-      await emailService.sendContactFormEmail({
-        name,
-        email,
-        subject,
-        message,
-        newsletter: !!newsletter
-      });
-      
-      console.log('Contact form email sent successfully');
-      
-      // If user opted for newsletter, send confirmation
-      if (newsletter) {
-        try {
-          await emailService.sendNewsletterConfirmation({ email });
-          console.log('Newsletter confirmation email sent successfully');
-        } catch (newsletterError) {
-          console.error('Failed to send newsletter confirmation:', newsletterError);
-          // Continue with the response even if newsletter email fails
+    // Send contact form email with retry logic for serverless environments
+    let retryCount = 0;
+    const maxRetries = 2; // Maximum number of retries
+    let lastError = null;
+    
+    // Retry loop for handling cold starts and connection issues
+    while (retryCount <= maxRetries) {
+      try {
+        console.log(`SMTP attempt ${retryCount + 1}/${maxRetries + 1}`);
+        
+        // Add a small delay before retries to allow for connection establishment
+        if (retryCount > 0) {
+          console.log(`Waiting ${retryCount * 1000}ms before retry...`);
+          await new Promise(resolve => setTimeout(resolve, retryCount * 1000));
+        }
+        
+        // Send the contact form email
+        await emailService.sendContactFormEmail({
+          name,
+          email,
+          subject,
+          message,
+          newsletter: !!newsletter
+        });
+        
+        console.log('Contact form email sent successfully');
+        
+        // If user opted for newsletter, send confirmation
+        if (newsletter) {
+          try {
+            await emailService.sendNewsletterConfirmation({ email });
+            console.log('Newsletter confirmation email sent successfully');
+          } catch (newsletterError) {
+            console.error('Failed to send newsletter confirmation:', newsletterError);
+            // Continue with the response even if newsletter email fails
+          }
+        }
+        
+        // Success - return response
+        return NextResponse.json(
+          { message: 'Your message has been sent successfully!' },
+          { status: 200 }
+        );
+      } catch (emailError) {
+        // Store the error for potential retry or final error handling
+        lastError = emailError;
+        console.error(`Email sending failed (attempt ${retryCount + 1}/${maxRetries + 1}):`, emailError.message);
+        
+        // Only retry on connection-related errors
+        if (['ETIMEDOUT', 'ESOCKET', 'ETIMEOUT', 'ECONNREFUSED'].includes(emailError.code)) {
+          retryCount++;
+          if (retryCount <= maxRetries) {
+            console.log(`Retrying due to connection error: ${emailError.code}`);
+            continue;
+          }
+        } else {
+          // Don't retry on non-connection errors
+          break;
         }
       }
-      
-      return NextResponse.json(
-        { message: 'Your message has been sent successfully!' },
-        { status: 200 }
-      );
-    } catch (emailError) {
-      // Handle email sending error specifically
-      console.error('Email sending failed:', emailError);
-      throw emailError; // Re-throw to be caught by outer catch block
     }
+    
+    // If we get here, all attempts failed
+    console.error('All email sending attempts failed');
+    throw lastError; // Re-throw to be caught by outer catch block
   } catch (error) {
     console.error('Contact form submission error:', error);
     

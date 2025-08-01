@@ -15,15 +15,38 @@ export default function EmailTestPage() {
   });
   const [formResult, setFormResult] = useState(null);
 
-  // Test SMTP connection
+  // Test SMTP connection with authentication for production
   const testSmtpConnection = async () => {
     setLoading(true);
     setResult(null);
     
     try {
-      const response = await fetch('/api/test/smtp');
+      // Get authentication token from localStorage if available
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      
+      // Add authorization header if token exists
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      const response = await fetch('/api/test/smtp', { headers });
       const data = await response.json();
-      setResult(data);
+      
+      // Handle authentication errors
+      if (response.status === 401 || response.status === 403) {
+        setResult({
+          success: false,
+          error: {
+            message: data.error || 'Authentication required for SMTP testing in production',
+            authRequired: true
+          }
+        });
+      } else {
+        setResult(data);
+      }
     } catch (error) {
       setResult({
         success: false,
@@ -45,18 +68,27 @@ export default function EmailTestPage() {
     });
   };
 
-  // Test contact form submission
+  // Test contact form submission with authentication for better error handling
   const testContactForm = async (e) => {
     e.preventDefault();
     setLoading(true);
     setFormResult(null);
     
     try {
+      // Get authentication token from localStorage if available (for better error reporting)
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      
+      // Add authorization header if token exists
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       const response = await fetch('/api/contact', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers,
         body: JSON.stringify(contactForm)
       });
       
@@ -111,6 +143,13 @@ export default function EmailTestPage() {
               <h3 className="font-semibold">
                 {result.success ? '✅ Connection Successful' : '❌ Connection Failed'}
               </h3>
+              {result.error?.authRequired && (
+                <div className="mt-2 p-3 bg-yellow-100 border border-yellow-300 rounded">
+                  <p className="font-medium">Authentication Required</p>
+                  <p className="text-sm mt-1">You need to be logged in as an admin to test SMTP in production.</p>
+                  <p className="text-sm mt-1">Please log in first and ensure your account has admin privileges.</p>
+                </div>
+              )}
             </div>
             <div className="p-4 bg-gray-50 overflow-auto">
               <pre className="text-sm whitespace-pre-wrap">
