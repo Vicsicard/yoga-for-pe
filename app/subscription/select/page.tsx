@@ -123,6 +123,10 @@ export default function SubscriptionSelectPage() {
     setIsLoading(true);
     setSelectedTier(tier);
 
+    // Capture auth token at the beginning to prevent race conditions
+    // where token might be cleared during the process
+    const token = isClient ? localStorage.getItem('auth_token') : null;
+
     try {
       if (tier === 'bronze') {
         // Bronze is free - redirect to videos immediately
@@ -135,7 +139,6 @@ export default function SubscriptionSelectPage() {
         }
         
         // For Silver/Gold, redirect to Stripe checkout
-        const token = localStorage.getItem('auth_token');
         if (!token) {
           throw new Error('Please sign in to subscribe to a plan');
         }
