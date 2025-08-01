@@ -57,9 +57,18 @@ export default function PremiumModal({ selectedTier, onClose }) {
   const handleSubscribe = async (tier) => {
     logDebug(`Handling subscription for tier: ${SubscriptionTier[tier]}`);
     
+    // Capture auth token early to prevent race conditions with session checks
+    const authToken = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+    
     if (!isSignedIn || !userId) {
       logDebug('User not signed in, showing auth options');
       setShowAuthOptions(true);
+      return;
+    }
+    
+    if (!authToken) {
+      logDebug('No auth token found, cannot proceed with checkout');
+      setError('Authentication required. Please sign in again.');
       return;
     }
     
@@ -69,11 +78,12 @@ export default function PremiumModal({ selectedTier, onClose }) {
     try {
       logDebug('Creating checkout session', { tier: tier === SubscriptionTier.SILVER ? 'SILVER' : 'GOLD' });
       
-      // Call API to create checkout session
+      // Call API to create checkout session with the captured auth token
       const response = await fetch('/api/stripe/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
         },
         body: JSON.stringify({
           tier: tier === SubscriptionTier.SILVER ? 'SILVER' : 'GOLD',
