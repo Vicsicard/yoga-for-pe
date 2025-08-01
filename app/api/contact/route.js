@@ -58,8 +58,21 @@ export async function POST(request) {
   } catch (error) {
     console.error('Contact form submission error:', error);
     
+    // Provide more detailed error information for debugging
+    const errorMessage = error.code === 'ETIMEDOUT' || error.code === 'ESOCKET' || error.code === 'ECONNREFUSED'
+      ? 'Email server connection timed out. Please check SMTP settings.'
+      : 'Failed to send your message. Please try again later.';
+    
+    // Log additional details for server-side debugging
+    console.error('Error details:', {
+      code: error.code,
+      message: error.message,
+      stack: error.stack?.split('\n')[0] || 'No stack trace',
+      smtpResponse: error.response || 'No SMTP response'
+    });
+    
     return NextResponse.json(
-      { error: 'Failed to send your message. Please try again later.' },
+      { error: errorMessage, details: process.env.NODE_ENV === 'development' ? error.message : undefined },
       { status: 500 }
     );
   }
