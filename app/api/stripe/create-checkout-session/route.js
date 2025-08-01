@@ -208,8 +208,20 @@ export async function POST(request) {
       gold: process.env.STRIPE_GOLD_PRICE_ID
     };
 
+    // Log all environment variables related to Stripe (without exposing full secret key)
+    console.log('Environment variables check:');
+    console.log('STRIPE_PUBLISHABLE_KEY exists:', !!process.env.STRIPE_PUBLISHABLE_KEY);
+    console.log('STRIPE_SECRET_KEY exists:', !!process.env.STRIPE_SECRET_KEY);
+    if (process.env.STRIPE_SECRET_KEY) {
+      console.log('STRIPE_SECRET_KEY starts with:', process.env.STRIPE_SECRET_KEY.substring(0, 8) + '...');
+    }
+    console.log('STRIPE_SILVER_PRICE_ID:', process.env.STRIPE_SILVER_PRICE_ID);
+    console.log('STRIPE_GOLD_PRICE_ID:', process.env.STRIPE_GOLD_PRICE_ID);
+    console.log('NEXT_PUBLIC_BASE_URL:', process.env.NEXT_PUBLIC_BASE_URL);
+
     const selectedPriceId = priceIds[tier];
     console.log('Selected price ID exists:', !!selectedPriceId);
+    console.log('Selected price ID for tier', tier, ':', selectedPriceId);
     
     if (!selectedPriceId) {
       console.error(`Price ID not found for tier: ${tier}`);
@@ -217,6 +229,27 @@ export async function POST(request) {
       console.error('STRIPE_GOLD_PRICE_ID exists:', !!process.env.STRIPE_GOLD_PRICE_ID);
       return NextResponse.json(
         { error: `Price ID not found for tier: ${tier}` },
+        { status: 400 }
+      );
+    }
+    
+    // Verify the price ID exists in Stripe
+    try {
+      console.log('Verifying price ID exists in Stripe:', selectedPriceId);
+      const price = await stripe.prices.retrieve(selectedPriceId);
+      console.log('Price verified in Stripe:', price.id, 'Active:', price.active);
+      
+      if (!price.active) {
+        console.error('Price is inactive in Stripe:', selectedPriceId);
+        return NextResponse.json(
+          { error: 'Selected subscription price is currently inactive' },
+          { status: 400 }
+        );
+      }
+    } catch (priceError) {
+      console.error('Error retrieving price from Stripe:', priceError.message);
+      return NextResponse.json(
+        { error: 'Invalid price ID', details: priceError.message },
         { status: 400 }
       );
     }
@@ -284,6 +317,20 @@ export async function POST(request) {
       console.error('Error creating checkout session:', sessionError.message);
       console.error('Error type:', sessionError.type);
       console.error('Error code:', sessionError.code);
+      
+      // Log detailed error information for debugging
+      if (sessionError.raw) {
+        console.error('Stripe raw error:', JSON.stringify(sessionError.raw));
+      }
+      
+      // Log request parameters for debugging
+      console.error('Checkout session request parameters:', JSON.stringify({
+        customer: stripeCustomerId,
+        payment_method_types: ['card'],
+        line_items: [{ price: selectedPriceId, quantity: 1 }],
+        mode: 'subscription',
+        metadata: { userId: user._id.toString(), tier: tier },
+      }));
       
       // Return more specific error based on Stripe error type
       if (sessionError.type === 'StripeCardError') {
